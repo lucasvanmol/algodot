@@ -6,8 +6,8 @@ extends Control
 #	driver = AsyncExecutorDriver.new()
 
 func _on_Button_pressed():
-	$Label.text = "Data = " + $Algodot.get_data()
-	$Algodot.health()
+	$Label.text = "Data = " + $Algod.get_data()
+	$Algod.suggested_transaction_params()
 
 #func _process(delta):
 #	if not Engine.editor_hint:

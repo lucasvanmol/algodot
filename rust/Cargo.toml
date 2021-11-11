@@ -1,15 +1,6 @@
-[package]
-name = "algodot"
-version = "0.1.0"
-edition = "2018"
+[workspace]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[lib]
-crate-type = ["cdylib"]
-
-[dependencies]
-tokio = { version = "1.10", features = ["rt"] }
-gdnative = { git = "https://github.com/godot-rust/godot-rust.git", features = ["async"], rev = "cc96860" }
-futures = "0.3"
-algonaut = "0.3.0"
+members = [
+    "algodot",
+    "macros"
+]
