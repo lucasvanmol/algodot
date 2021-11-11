@@ -1,9 +1,8 @@
 use std::rc::Rc;
-
 use algonaut::algod::{v2::Algod, AlgodBuilder, AlgodCustomEndpointBuilder};
 use gdnative::prelude::*;
 use gdnative::tasks::{Async, AsyncMethod, Spawner};
-use macros::*;
+use algodot_macros::*;
 
 #[derive(NativeClass)]
 #[inherit(Node)]
