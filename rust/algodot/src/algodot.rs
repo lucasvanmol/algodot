@@ -1,4 +1,3 @@
-
 use std::rc::Rc;
 
 use algonaut::algod::{v2::Algod, AlgodBuilder, AlgodCustomEndpointBuilder};
@@ -19,9 +18,8 @@ pub struct Algodot {
     #[property]
     headers: Dictionary<Shared>,
 
-    algod: Rc<Algod>
+    algod: Rc<Algod>,
 }
-
 
 impl Algodot {
     fn new(_owner: &Node) -> Self {
@@ -32,15 +30,16 @@ impl Algodot {
 
             // algod will be initialised on _enter_tree()
             // leave theses default values here for now
-            algod: Rc::new(AlgodBuilder::new()
-                .bind("http://localhost:4001")
-                .auth("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-                .build_v2()
-                .unwrap())
+            algod: Rc::new(
+                AlgodBuilder::new()
+                    .bind("http://localhost:4001")
+                    .auth("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+                    .build_v2()
+                    .unwrap(),
+            ),
         }
     }
 }
-
 
 #[methods]
 impl Algodot {
@@ -48,14 +47,14 @@ impl Algodot {
     fn _enter_tree(&mut self, _owner: &Node) {
         let algod: Algod;
         if self.token.is_empty() {
-            let h1: Vec<(String, String)> = self.headers.iter()
-                .map(|(key, val)| {
-                    (key.to_string(), val.to_string())
-                }).collect();
-            let h2 = h1.iter()
-                .map(|(key, val)| {
-                    (key.as_str(), val.as_str())
-                })
+            let h1: Vec<(String, String)> = self
+                .headers
+                .iter()
+                .map(|(key, val)| (key.to_string(), val.to_string()))
+                .collect();
+            let h2 = h1
+                .iter()
+                .map(|(key, val)| (key.as_str(), val.as_str()))
                 .collect();
 
             algod = AlgodCustomEndpointBuilder::new()
@@ -63,7 +62,6 @@ impl Algodot {
                 .headers(h2)
                 .build_v2()
                 .unwrap();
-
         } else {
             algod = AlgodBuilder::new()
                 .bind(&self.url)
@@ -80,8 +78,8 @@ impl Algodot {
     }
 }
 
-
-asyncmethods!(algod, 
+asyncmethods!(
+    algod,
     fn health() {
         let status = algod.health().await;
 
@@ -92,7 +90,6 @@ asyncmethods!(algod,
 
         ().to_variant()
     },
-
     fn suggested_transaction_params() {
         let params = algod.suggested_transaction_params().await;
 
@@ -104,5 +101,3 @@ asyncmethods!(algod,
         ().to_variant()
     }
 );
-
-
