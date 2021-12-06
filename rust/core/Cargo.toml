@@ -1,19 +1,15 @@
 [package]
-name = "algodot"
+name = "algodot_core"
 version = "0.1.0"
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[lib]
-crate-type = ["cdylib"]
-
 [dependencies]
-tokio = { version = "1.10", features = ["rt"] }
 gdnative = { git = "https://github.com/godot-rust/godot-rust.git", features = ["async"], rev = "deb9dbfd413f8ac751a2267be010b2089ff26d50" }
-futures = "0.3"
 algonaut = { git = "https://github.com/manuelmauro/algonaut", rev = "c623dc3" }
-algodot_macros = { path = "../macros" }
-algodot_core = { path = "../core" }
-serde_json = "1.0"
+derive_more = "0.99.16"
 serde = "1.0"
+serde_json = "1.0"
+thiserror = "1.0.30"
+arrayvec = "0.7.2"

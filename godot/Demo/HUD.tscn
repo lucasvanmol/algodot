@@ -1,0 +1,27 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Demo/ShopItem.tscn" type="PackedScene" id=1]
+
+[node name="HUD" type="Control"]
+margin_left = 13.0
+margin_top = 9.0
+margin_right = 53.0
+margin_bottom = 49.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Address" type="RichTextLabel" parent="."]
+margin_right = 993.0
+margin_bottom = 17.0
+focus_mode = 2
+text = "Your address: "
+selection_enabled = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ShopItem" parent="." instance=ExtResource( 1 )]
+position = Vector2( 952.89, 536.111 )
+scale = Vector2( 3, 3 )
+item = 156
