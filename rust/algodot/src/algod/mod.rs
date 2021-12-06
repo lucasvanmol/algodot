@@ -58,23 +58,6 @@ impl Algodot {
     }
 
     fn register_signals(builder: &ClassBuilder<Algodot>) {
-        // builder.add_signal(Signal {
-        //     name: "algod_response",
-        //     args: &[
-        //         SignalArgument {
-        //             name: "type",
-        //             default: ().to_variant(),
-        //             export_info: ExportInfo::new(VariantType::Dictionary),
-        //             usage: PropertyUsage::DEFAULT,
-        //         },
-        //         SignalArgument {
-        //             name: "response",
-        //             default: ().to_variant(),
-        //             export_info: ExportInfo::new(VariantType::Dictionary),
-        //             usage: PropertyUsage::DEFAULT,
-        //         },
-        //     ],
-        // });
         builder.add_signal(Signal {
             name: "transaction_confirmed",
             args: &[SignalArgument {
@@ -164,11 +147,6 @@ impl Algodot {
                 .unwrap();
             self.algod = Rc::new(algod);
         }
-    }
-
-    #[export]
-    fn get_data(&self, _owner: TRef<Node>) -> String {
-        "Hello, World!".to_string()
     }
 
     #[export]
@@ -433,12 +411,10 @@ asyncmethods!(algod, node, this,
     };
 
     fn send_transaction(_ctx, args) -> "transaction_sent" {
-        let txn = args.read::<Transaction>().get().unwrap();
-        let from_account = args.read::<Account>().get().unwrap();
+        let txn = args.read::<SignedTransaction>().get().unwrap();
 
-        let signed_t = from_account.sign_transaction(&txn).unwrap();
         async move {
-            let response = algod.broadcast_signed_transaction(&signed_t).await;
+            let response = algod.broadcast_signed_transaction(&txn).await;
 
             let send_response = response
                 .as_ref()

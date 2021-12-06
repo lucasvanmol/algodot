@@ -1,5 +1,5 @@
 use algonaut::core::{MicroAlgos, Round, SuggestedTransactionParams};
-use algonaut::crypto::HashDigest;
+use algonaut::crypto::{HashDigest, Signature};
 use algonaut::model::algod::v2::{PendingTransaction, TransactionParams};
 use algonaut::transaction::account::Account;
 use algonaut::transaction::transaction::{
@@ -135,7 +135,7 @@ impl FromVariant for MyTransaction {
     }
 }
 
-#[derive(Deref, DerefMut, From)]
+#[derive(Deref, DerefMut, From, Debug)]
 pub struct MySignedTransaction(pub SignedTransaction);
 
 impl ToVariant for MySignedTransaction {
@@ -168,10 +168,25 @@ impl FromVariant for MySignedTransaction {
 
 // Helper functions //
 
+const SIG_LEN: usize = 64;
 fn get_signature(dict: &Dictionary) -> Result<TransactionSignature, FromVariantError> {
     if let Ok(sig) = get_field(dict, "sig") {
-        godot_dbg!(sig);
-        todo!()
+        let bytes = get_vec_u8(&dict, "sig")?;
+
+        if bytes.len() != SIG_LEN {
+            Err(FromVariantError::InvalidLength {
+                len: bytes.len(),
+                expected: SIG_LEN,
+            })
+        } else {
+            let mut signature = [0u8; SIG_LEN];
+
+            for i in 0..SIG_LEN {
+                signature[i] = bytes[i]
+            }
+
+            Ok(TransactionSignature::Single(Signature(signature)))
+        }
     } else if let Ok(msig) = get_field(dict, "msig") {
         godot_dbg!(msig);
         todo!()
@@ -295,15 +310,33 @@ fn get_address(dict: &Dictionary, field_name: &'static str) -> Result<Address, F
         })
 }
 
+fn get_dict(dict: &Dictionary, field_name: &'static str) -> Result<Dictionary, FromVariantError> {
+    let var = get_field(&dict, field_name)?;
+
+    var.try_to_dictionary()
+        .ok_or(FromVariantError::InvalidVariantType {
+            variant_type: var.get_type(),
+            expected: VariantType::Dictionary,
+        })
+}
+
 fn get_vec_u8(dict: &Dictionary, field_name: &'static str) -> Result<Vec<u8>, FromVariantError> {
-    let byte_array = get_field(&dict, field_name)?.try_to_byte_array().ok_or(
-        FromVariantError::InvalidField {
-            field_name,
-            error: Box::new(FromVariantError::Custom("invalid hash digest".to_string())),
-        },
-    )?;
-    let x = Ok(byte_array.read().iter().map(|num| *num).collect());
-    x
+    let var = get_field(&dict, field_name)?;
+    let byte_array = var
+        .try_to_array()
+        .and_then(|bytes| {
+            Some(
+                bytes
+                    .iter()
+                    .map(|byte| byte.to_u64() as u8)
+                    .collect::<Vec<u8>>(),
+            )
+        })
+        .ok_or(FromVariantError::InvalidVariantType {
+            variant_type: var.get_type(),
+            expected: VariantType::ByteArray,
+        })?;
+    Ok(byte_array)
 }
 
 // https://developer.algorand.org/docs/get-details/transactions/
@@ -344,20 +377,22 @@ fn get_transaction_type(
             Ok(TransactionType::KeyRegistration(keyreg))
         }
         "acfg" => {
+            let params = get_dict(&dict, "apar")?;
+
             let acfg = AssetConfigurationTransaction {
                 sender: get_address(&dict, "snd")?,
                 params: Some(AssetParams {
-                    asset_name: get_string(&dict, "an").ok(),
-                    decimals: get_u64(&dict, "dc").ok().and_then(|num| Some(num as u32)),
-                    default_frozen: get_bool(&dict, "df").ok(),
-                    total: get_u64(&dict, "t").ok(),
-                    unit_name: get_string(&dict, "un").ok(),
-                    meta_data_hash: get_vec_u8(&dict, "am").ok(),
-                    url: get_string(&dict, "au").ok(),
-                    clawback: get_address(&dict, "c").ok(),
-                    freeze: get_address(&dict, "f").ok(),
-                    manager: get_address(&dict, "m").ok(),
-                    reserve: get_address(&dict, "r").ok(),
+                    asset_name: get_string(&params, "an").ok(),
+                    decimals: get_u64(&params, "dc").ok().and_then(|num| Some(num as u32)),
+                    default_frozen: get_bool(&params, "df").ok(),
+                    total: get_u64(&params, "t").ok(),
+                    unit_name: get_string(&params, "un").ok(),
+                    meta_data_hash: get_vec_u8(&params, "am").ok(),
+                    url: get_string(&params, "au").ok(),
+                    clawback: get_address(&params, "c").ok(),
+                    freeze: get_address(&params, "f").ok(),
+                    manager: get_address(&params, "m").ok(),
+                    reserve: get_address(&params, "r").ok(),
                 }),
                 config_asset: get_u64(&dict, "caid").ok(),
             };

@@ -271,7 +271,6 @@ text = "Buy Food (50 tokens)"
 info_text = "First, send some algo to your wallet address (testnet/goal)"
 
 [node name="Setup" type="Control" parent="."]
-visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource( 4 )
@@ -468,6 +467,7 @@ __meta__ = {
 }
 
 [node name="Fund" type="Control" parent="Setup/Panel"]
+visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource( 8 )
@@ -557,7 +557,6 @@ __meta__ = {
 }
 
 [node name="SetUpShop" type="Control" parent="Setup/Panel"]
-visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource( 9 )

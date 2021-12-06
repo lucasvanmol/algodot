@@ -40,7 +40,7 @@ func set_up_shop():
 		
 	var stxn = $Algod.sign_transaction(tx, mnemonic);
 		
-	print(tx)
+	$Algod.send_transaction(stxn)
 	
 	# Create smart contracts
 	

@@ -4,6 +4,7 @@ func _ready():
 	for child in $Panel.get_children():
 		child.hide()
 	
+	show()
 	$Panel/Connect.show()
 
 var step = 0
