@@ -1,11 +1,11 @@
 use algodot_core::*;
 use algodot_macros::*;
 use algonaut::algod::{v2::Algod, AlgodBuilder, AlgodCustomEndpointBuilder};
-use algonaut::core::{MicroAlgos, Round};
+use algonaut::core::{CompiledTealBytes, MicroAlgos, Round};
 use algonaut::model::algod::v2::{PendingTransaction, TransactionResponse};
 use algonaut::transaction::transaction::{
     ApplicationCallOnComplete, ApplicationCallTransaction, AssetConfigurationTransaction,
-    AssetParams, AssetTransferTransaction,
+    AssetParams, AssetTransferTransaction, StateSchema,
 };
 use algonaut::transaction::tx_group::TxGroup;
 use algonaut::transaction::{Pay, TransactionType, TxnBuilder};
@@ -173,13 +173,13 @@ impl Algodot {
         from: Address,
         to: Address,
         amount: u64,
-    ) -> Variant {
-        let txn = TxnBuilder::with(
+    ) -> Transaction {
+        TxnBuilder::with(
             params.clone(),
             Pay::new(*from, *to, MicroAlgos(amount)).build(),
         )
-        .build();
-        to_json_dict(&txn)
+        .build()
+        .into()
     }
 
     #[export]
@@ -191,8 +191,8 @@ impl Algodot {
         asset_id: u64,
         amount: u64,
         receiver: Address,
-    ) -> Variant {
-        let txn = TxnBuilder::with(
+    ) -> Transaction {
+        TxnBuilder::with(
             params.clone(),
             TransactionType::AssetTransferTransaction(AssetTransferTransaction {
                 sender: *sender,
@@ -202,8 +202,8 @@ impl Algodot {
                 close_to: None,
             }),
         )
-        .build();
-        to_json_dict(&txn)
+        .build()
+        .into()
     }
 
     #[export]
@@ -223,10 +223,11 @@ impl Algodot {
         freeze: Option<Address>,
         manager: Option<Address>,
         reserve: Option<Address>,
-    ) -> Variant {
+    ) -> Transaction {
         let mdh = meta_data_hash
             .and_then(|mdh| Some(mdh.read().iter().map(|num| *num).collect::<Vec<u8>>()));
-        let txn = TxnBuilder::with(
+
+        TxnBuilder::with(
             params.clone(),
             TransactionType::AssetConfigurationTransaction(AssetConfigurationTransaction {
                 sender: *sender,
@@ -246,8 +247,8 @@ impl Algodot {
                 config_asset: None,
             }),
         )
-        .build();
-        to_json_dict(&txn)
+        .build()
+        .into()
     }
 
     #[export]
@@ -256,87 +257,87 @@ impl Algodot {
         _owner: TRef<Node>,
         params: SuggestedTransactionParams,
         sender: Address,
-        app_id: u64,
-        accounts: StringArray,
-        app_arguments: VariantArray, // array of PoolByteArrays
-        foreign_apps: Int32Array,
-        foreign_assets: Int32Array,
-    ) -> Variant {
-        let accounts = {
-            if accounts.len() > 0 {
-                Some(
-                    accounts
-                        .read()
-                        .iter()
-                        .map(|str| *Address::from_variant(&str.to_variant()).unwrap())
-                        .collect(),
-                )
-            } else {
-                None
-            }
-        };
+        app_id: Option<u64>,
+        accounts: Option<StringArray>,
+        app_arguments: Option<VariantArray>, // array of PoolByteArrays
+        foreign_apps: Option<Int32Array>,
+        foreign_assets: Option<Int32Array>,
+        approval_program: Option<Vec<u8>>,
+        clear_state_program: Option<Vec<u8>>,
+        global_state_schema: Option<(u64, u64)>,
+        local_state_schema: Option<(u64, u64)>,
+    ) -> Transaction {
+        let accounts = accounts.and_then(|acc| {
+            Some(
+                acc.read()
+                    .iter()
+                    .map(|str| *Address::from_variant(&str.to_variant()).unwrap())
+                    .collect(),
+            )
+        });
 
-        let arguments: Option<Vec<Vec<u8>>> = {
-            if app_arguments.len() > 0 {
-                Some(
-                    app_arguments
-                        .iter()
-                        .map(|var| {
-                            var.try_to_byte_array()
-                                .unwrap()
-                                .read()
-                                .iter()
-                                .map(|num| *num)
-                                .collect::<Vec<u8>>()
-                        })
-                        .collect(),
-                )
-            } else {
-                None
-            }
-        };
+        let app_arguments: Option<Vec<Vec<u8>>> = app_arguments.and_then(|args| {
+            Some(
+                args.iter()
+                    .map(|var| {
+                        var.try_to_byte_array()
+                            .unwrap()
+                            .read()
+                            .iter()
+                            .map(|num| *num)
+                            .collect::<Vec<u8>>()
+                    })
+                    .collect(),
+            )
+        });
 
-        let foreign_apps: Option<Vec<u64>> = {
-            if foreign_apps.len() > 0 {
-                Some(foreign_apps.read().iter().map(|num| *num as u64).collect())
-            } else {
-                None
-            }
-        };
+        let foreign_apps: Option<Vec<u64>> =
+            foreign_apps.and_then(|fa| Some(fa.read().iter().map(|num| *num as u64).collect()));
 
-        let foreign_assets: Option<Vec<u64>> = {
-            if foreign_assets.len() > 0 {
-                Some(
-                    foreign_assets
-                        .read()
-                        .iter()
-                        .map(|num| *num as u64)
-                        .collect(),
-                )
-            } else {
-                None
-            }
-        };
+        let foreign_assets: Option<Vec<u64>> =
+            foreign_assets.and_then(|fa| Some(fa.read().iter().map(|num| *num as u64).collect()));
 
-        let txn = TxnBuilder::with(
+        let approval_program: Option<CompiledTealBytes> =
+            approval_program.and_then(|bytes| Some(CompiledTealBytes(bytes)));
+
+        let clear_state_program: Option<CompiledTealBytes> =
+            clear_state_program.and_then(|bytes| Some(CompiledTealBytes(bytes)));
+
+        let global_state_schema: Option<StateSchema> =
+            global_state_schema.and_then(|(number_ints, number_byteslices)| {
+                Some(StateSchema {
+                    number_ints,
+                    number_byteslices,
+                })
+            });
+
+        let local_state_schema: Option<StateSchema> =
+            local_state_schema.and_then(|(number_ints, number_byteslices)| {
+                Some(StateSchema {
+                    number_ints,
+                    number_byteslices,
+                })
+            });
+
+        TxnBuilder::with(
             params.clone(),
             TransactionType::ApplicationCallTransaction(ApplicationCallTransaction {
                 sender: *sender,
-                app_id: Some(app_id),
+                app_id: app_id,
                 on_complete: ApplicationCallOnComplete::NoOp,
-                accounts: accounts,
-                approval_program: None,
-                app_arguments: arguments,
-                clear_state_program: None,
-                foreign_apps: foreign_apps,
-                foreign_assets: foreign_assets,
-                global_state_schema: None,
-                local_state_schema: None,
+                accounts,
+                approval_program,
+                app_arguments,
+                clear_state_program,
+                foreign_apps,
+                foreign_assets,
+                global_state_schema,
+                local_state_schema,
                 extra_pages: 0,
             }),
         )
-        .build();
-        to_json_dict(&txn)
+        .build()
+        .into()
     }
 
     #[export]
@@ -481,9 +482,33 @@ asyncmethods!(algod, node, this,
 
                 let wait = Algodot::wait_for_transaction(algod, response.unwrap()).await;
 
-                unsafe { node.assume_safe().emit_signal("transaction_confirmed", &[wait.map(|pt| to_json_dict(&pt)).unwrap().to_variant()]) };
+                unsafe {
+                    node.assume_safe().emit_signal(
+                        "transaction_confirmed",
+                        &[wait.map(|pt| to_json_dict(&pt)).unwrap().to_variant()]
+                    )
+                };
             });
 
+
+            ().to_variant()
+        }
+    };
+
+    fn compile_teal(_ctx, args) -> "teal_compiled" {
+        let source_code = args.read::<String>().get().unwrap();
+
+        async move {
+            let compiled = algod.compile_teal(source_code.as_bytes()).await;
+
+            godot_unwrap!(compiled => {
+                unsafe {
+                    node.assume_safe().emit_signal(
+                        "teal_compiled",
+                        &[(compiled.hash.0.to_variant(), compiled.program.0.to_variant()).to_variant()]
+                    )
+                };
+            });
 
             ().to_variant()
         }
