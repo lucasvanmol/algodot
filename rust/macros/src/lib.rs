@@ -2,7 +2,7 @@ pub use paste::paste;
 
 #[macro_export]
 macro_rules! asyncmethods {
-    ($algod:ident, $node:ident, $this:ident, $( fn $fn:ident($ctx:ident, $args:ident)$( -> $signal:tt)? $block:block); *) => {
+    ($algod:ident, $node:ident, $this:ident, $( fn $fn:ident($ctx:ident, $args:ident) $block:block) *) => {
         $crate::paste! {
             $(
                 #[allow(non_camel_case_types)]
@@ -26,19 +26,6 @@ macro_rules! asyncmethods {
             fn register_methods(builder: &ClassBuilder<Algodot>) {
                 $ (
                     builder.build_method(stringify!($fn), Async::new([<__ $fn >])).done();
-
-                    $(
-
-                        builder.add_signal(Signal {
-                            name: $signal,
-                            args: &[SignalArgument {
-                                name: "response",
-                                default: ().to_variant(),
-                                export_info: ExportInfo::new(VariantType::Dictionary),
-                                usage: PropertyUsage::DEFAULT,
-                            }],
-                        });
-                    ) ?
                 ) *
             }
         }
@@ -60,7 +47,10 @@ macro_rules! godot_unwrap {
     ($res:ident => $block:block) => {
         match $res {
             Ok($res) => $block,
-            Err(err) => godot_error!("{:?}", err),
+            Err(err) => {
+                godot_error!("{:?}", err);
+                ().to_variant()
+            }
         }
     };
 }

@@ -138,6 +138,8 @@ impl Algodot {
                     .unwrap();
 
                 self.algod = Rc::new(algod);
+
+                ().to_variant()
             });
         } else {
             algod = AlgodBuilder::new()
@@ -355,48 +357,42 @@ impl Algodot {
 }
 
 asyncmethods!(algod, node, this,
-    fn health(_ctx, _args) -> "health" {
+    fn health(_ctx, _args) {
         async move {
             let status = algod.health().await;
 
             match status {
-                Ok(_) => unsafe { node.assume_safe().emit_signal("health", &[0.to_variant()]) }, // OK
-                Err(_) => unsafe { node.assume_safe().emit_signal("health", &[1.to_variant()]) }, // FAILED
-            };
-
-            ().to_variant()
+                Ok(_) => 0.to_variant(), // OK
+                Err(_) => 1.to_variant(), // FAILED
+            }
         }
-    };
+    }
 
-    fn suggested_transaction_params(_ctx, _args) -> "suggested_transaction_params" {
+    fn suggested_transaction_params(_ctx, _args) {
         async move {
             let params = algod.suggested_transaction_params().await;
 
             godot_unwrap!(params => {
                 let params = to_json_dict(&params);
 
-                unsafe { node.assume_safe().emit_signal("suggested_transaction_params", &[params.to_variant()]) };
-            });
-
-            ().to_variant()
+                params.to_variant()
+            })
         }
-    };
+    }
 
-    fn status(_ctx, _args) -> "status" {
+    fn status(_ctx, _args) {
         async move {
             let status = algod.status().await;
 
             godot_unwrap!(status => {
                 let status = to_json_dict(&status);
 
-                unsafe { node.assume_safe().emit_signal("status", &[status.to_variant()]) };
-            });
-
-            ().to_variant()
+                status.to_variant()
+            })
         }
-    };
+    }
 
-    fn account_information(_ctx, args) -> "account_info" {
+    fn account_information(_ctx, args) {
         let address = args.read::<Address>().get().unwrap();
 
         async move {
@@ -404,113 +400,57 @@ asyncmethods!(algod, node, this,
             godot_unwrap!(info => {
                 let info = to_json_dict(&info);
 
-                unsafe { node.assume_safe().emit_signal("account_info", &[info.to_variant()]) };
-            });
-
-            ().to_variant()
+                info.to_variant()
+            })
         }
-    };
+    }
 
-    fn send_transaction(_ctx, args) -> "transaction_sent" {
+    fn send_transaction(_ctx, args) {
         let txn = args.read::<SignedTransaction>().get().unwrap();
 
         async move {
-            let response = algod.broadcast_signed_transaction(&txn).await;
+            let txid = algod.broadcast_signed_transaction(&txn).await;
 
-            let send_response = response
-                .as_ref()
-                .map(|r| to_json_dict(&r));
-
-            godot_unwrap!(send_response => {
-                unsafe { node.assume_safe().emit_signal("transaction_sent", &[send_response.to_variant()]) };
-
-                let wait = Algodot::wait_for_transaction(algod, response.unwrap()).await;
-
-                unsafe { node.assume_safe().emit_signal("transaction_confirmed", &[wait.map(|pt| to_json_dict(&pt)).unwrap().to_variant()]) };
-            });
-
-            ().to_variant()
+            godot_unwrap!(txid => {
+                to_json_dict(&txid)
+            })
         }
-    };
+    }
 
-    fn send_transactions(_ctx, args) -> "transaction_sent" {
+    fn wait_for_transaction(_ctx, args) {
+        let tx_id = args.read::<u64>().get().unwrap().to_string();
+
+        async move {
+            let pending_tx = Algodot::wait_for_transaction(algod, TransactionResponse { tx_id }).await;
+
+            godot_unwrap!(pending_tx => {
+                to_json_dict(&pending_tx)
+            })
+        }
+    }
+
+    fn send_transactions(_ctx, args) {
         let vartxns = args.read::<Vec<SignedTransaction>>().get().unwrap();
         let txns: Vec<algonaut::transaction::SignedTransaction> = vartxns.iter().map(|tx| tx.0.clone()).collect();
 
         async move {
-            let response = algod.broadcast_signed_transactions(txns.as_slice()).await;
+            let txid = algod.broadcast_signed_transactions(txns.as_slice()).await;
 
-            let send_response = response
-                .as_ref()
-                .map(|r| to_json_dict(&r));
-
-            godot_unwrap!(send_response => {
-                unsafe { node.assume_safe().emit_signal("transaction_sent", &[send_response.to_variant()]) };
-
-                let wait = Algodot::wait_for_transaction(algod, response.unwrap()).await;
-
-                unsafe { node.assume_safe().emit_signal("transaction_confirmed", &[wait.map(|pt| to_json_dict(&pt)).unwrap().to_variant()]) };
-            });
-
-            ().to_variant()
+            godot_unwrap!(txid => {
+                to_json_dict(&txid)
+            })
         }
-    };
+    }
 
-    fn send_algo_transaction(_ctx, args) -> "algo_transaction_sent" {
-        let from_account = args.read::<Account>().get().unwrap();
-        let to_address = args.read::<Address>().get().unwrap();
-        let amount = args.read::<u64>().get().unwrap();
-
-        async move {
-            let params = algod.suggested_transaction_params().await.unwrap();
-
-            let t = TxnBuilder::with(
-                params,
-                Pay::new(from_account.address(), *to_address, MicroAlgos(amount)).build(),
-            )
-            .build();
-
-            let signed_t = from_account.sign_transaction(&t).unwrap();
-
-            let response = algod.broadcast_signed_transaction(&signed_t).await;
-            let send_response = response
-                .as_ref()
-                .map(|r| to_json_dict(&r));
-
-            godot_unwrap!(send_response => {
-                unsafe { node.assume_safe().emit_signal("transaction_sent", &[send_response.to_variant()]) };
-
-                let wait = Algodot::wait_for_transaction(algod, response.unwrap()).await;
-
-                unsafe {
-                    node.assume_safe().emit_signal(
-                        "transaction_confirmed",
-                        &[wait.map(|pt| to_json_dict(&pt)).unwrap().to_variant()]
-                    )
-                };
-            });
-
-
-            ().to_variant()
-        }
-    };
-
-    fn compile_teal(_ctx, args) -> "teal_compiled" {
+    fn compile_teal(_ctx, args) {
         let source_code = args.read::<String>().get().unwrap();
 
         async move {
             let compiled = algod.compile_teal(source_code.as_bytes()).await;
 
             godot_unwrap!(compiled => {
-                unsafe {
-                    node.assume_safe().emit_signal(
-                        "teal_compiled",
-                        &[(compiled.hash.0.to_variant(), compiled.program.0.to_variant()).to_variant()]
-                    )
-                };
-            });
-
-            ().to_variant()
+                (compiled.hash.0.to_variant(), compiled.program.0.to_variant()).to_variant()
+            })
         }
     }
 );

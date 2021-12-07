@@ -643,8 +643,6 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[connection signal="health" from="Algod" to="." method="_on_Algod_health"]
-[connection signal="suggested_transaction_params" from="Algod" to="." method="_on_Algod_suggested_transaction_params"]
 [connection signal="input_event" from="PlayArea" to="." method="_on_PlayArea_input_event"]
 [connection signal="pressed" from="Setup/Panel/Connect/Test" to="Setup/Panel/Connect" method="_on_Test_pressed"]
 [connection signal="pressed" from="Setup/Panel/Connect/Next" to="Setup" method="_on_Next_pressed"]

@@ -45,8 +45,3 @@ url = "http://localhost:4001"
 token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 [connection signal="pressed" from="Button" to="." method="_on_Button_pressed"]
-[connection signal="account_info" from="Algod" to="." method="_on_Algod_account_info"]
-[connection signal="status" from="Algod" to="." method="_on_Algod_status"]
-[connection signal="suggested_transaction_params" from="Algod" to="." method="_on_Algod_suggested_transaction_params"]
-[connection signal="transaction_confirmed" from="Algod" to="." method="_on_Algod_transaction_confirmed"]
-[connection signal="transaction_sent" from="Algod" to="." method="_on_Algod_transaction_sent"]

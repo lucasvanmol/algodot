@@ -1,0 +1,68 @@
+#pragma version 3
+
+// This smart contract is unsafe 
+// Do not use in a production environment
+
+int 0
+txn ApplicationID
+==
+bnz approve
+
+gtxn 0 OnCompletion
+int NoOp
+==
+gtxn 1 Sender
+gtxn 0 Receiver
+==
+&&
+gtxn 1 TypeEnum
+int axfer
+==
+&&
+gtxn 1 XferAsset
+int %s // payment asa id
+==
+&&
+gtxn 0 RekeyTo
+global ZeroAddress
+==
+&&
+gtxn 1 RekeyTo
+global ZeroAddress
+==
+&&
+gtxn 0 NumAppArgs
+int 1
+==
+&&
+assert
+
+
+arg_0
+byte "sword"
+==
+bnz buy_sword
+
+buy_sword:
+gtxn 1 AssetAmount
+int %s // sword cost
+==
+gtxn 0 XferAsset
+int %s // sword asa id
+==
+&&
+gtxn 0 AssetAmount
+int 1
+==
+&&
+
+bnz approve
+
+
+
+approve:
+int 1
+return
+
+reject:
+err

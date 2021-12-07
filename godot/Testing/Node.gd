@@ -3,7 +3,11 @@ extends Control
 func _on_Button_pressed():
 	#$Label.text = "Data = " + $Algod.get_data()
 #	$Algod.health(funcref(self, "test_callback"))
-	$Algod.suggested_transaction_params()
+
+	var a = yield($Algod.health(), "completed")
+	print(a)
+ 
+	#$Algod.suggested_transaction_params()
 	#$Algod.account_information("ZW3ISEHZUHPO7OZGMKLKIIMKVICOUDRCERI454I3DB2BH52HGLSO67W754")
 	#var account = $Algod.generate_key()
 	#var account = ["YOEYQJO25HLTHCVM4ZRHI2WXRKWDCRUSYHC75DQXT6U74ELTKVACDTMBNU", "child accident biology child elder demand scale arrow example core state general obscure harvest bone siege all dream accuse service polar bind trim ability rain"]
