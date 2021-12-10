@@ -1,17 +1,16 @@
 use algonaut::core::{MicroAlgos, Round, SuggestedTransactionParams};
 use algonaut::crypto::{HashDigest, Signature};
-use algonaut::model::algod::v2::{PendingTransaction, TransactionParams};
 use algonaut::transaction::account::Account;
 use algonaut::transaction::transaction::{
-    AssetConfigurationTransaction, AssetParams, KeyRegistration, Payment, TransactionSignature,
+    AssetConfigurationTransaction, AssetParams, Payment, TransactionSignature,
 };
 use algonaut::transaction::{SignedTransaction, Transaction, TransactionType};
 use algonaut::{core::Address, error::AlgonautError};
 use arrayvec::ArrayVec;
-use derive_more::{Deref, DerefMut, From, Into};
+use derive_more::{Deref, DerefMut, From};
 use gdnative::api::JSON;
 use gdnative::prelude::*;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use std::str::FromStr;
 use thiserror::Error;
 
@@ -28,6 +27,7 @@ pub fn to_json_dict<T: Serialize>(r: &T) -> Variant {
     }
 }
 
+#[allow(dead_code)]
 pub fn to_json_string<T: OwnedToVariant + ToVariant>(r: &T) -> GodotString {
     JSON::godot_singleton().print(r, "", false)
 }
@@ -54,8 +54,8 @@ pub struct MyAddress(Address);
 impl FromVariant for MyAddress {
     fn from_variant(variant: &Variant) -> Result<Self, FromVariantError> {
         Address::from_str(&variant.to_string())
-            .map_err(|err| FromVariantError::Custom(err))
-            .map(|addr| MyAddress(addr))
+            .map_err(FromVariantError::Custom)
+            .map(MyAddress)
     }
 }
 
@@ -66,7 +66,7 @@ impl FromVariant for MyAccount {
     fn from_variant(variant: &Variant) -> Result<Self, FromVariantError> {
         Account::from_mnemonic(&variant.to_string())
             .map_err(|err| FromVariantError::Custom(err.to_string()))
-            .map(|addr| MyAccount(addr))
+            .map(MyAccount)
     }
 }
 
@@ -170,8 +170,8 @@ impl FromVariant for MySignedTransaction {
 
 const SIG_LEN: usize = 64;
 fn get_signature(dict: &Dictionary) -> Result<TransactionSignature, FromVariantError> {
-    if let Ok(sig) = get_field(dict, "sig") {
-        let bytes = get_vec_u8(&dict, "sig")?;
+    if let Ok(_sig) = get_field(dict, "sig") {
+        let bytes = get_vec_u8(dict, "sig")?;
 
         if bytes.len() != SIG_LEN {
             Err(FromVariantError::InvalidLength {
@@ -181,9 +181,7 @@ fn get_signature(dict: &Dictionary) -> Result<TransactionSignature, FromVariantE
         } else {
             let mut signature = [0u8; SIG_LEN];
 
-            for i in 0..SIG_LEN {
-                signature[i] = bytes[i]
-            }
+            signature.clone_from_slice(&bytes);
 
             Ok(TransactionSignature::Single(Signature(signature)))
         }
@@ -201,10 +199,8 @@ fn get_signature(dict: &Dictionary) -> Result<TransactionSignature, FromVariantE
 }
 
 fn get_field(dict: &Dictionary, field_name: &str) -> Result<Variant, FromVariantError> {
-    dict.get(field_name).ok_or(FromVariantError::Custom(format!(
-        "Missing field: {0}",
-        field_name
-    )))
+    dict.get(field_name)
+        .ok_or_else(|| FromVariantError::Custom(format!("Missing field: {0}", field_name)))
 }
 
 fn get_hash_digest(
@@ -212,8 +208,8 @@ fn get_hash_digest(
     field_name: &'static str,
 ) -> Result<HashDigest, FromVariantError> {
     Ok(HashDigest({
-        let byte_array = get_field(&dict, field_name)?;
-        dbg!(&byte_array);
+        let byte_array = get_field(dict, field_name)?;
+
         let byte_array = byte_array
             .try_to_array()
             .ok_or(FromVariantError::InvalidField {
@@ -253,19 +249,21 @@ fn get_hash_digest(
 }
 
 fn parse_u64(var: &Variant) -> Option<u64> {
-    var.try_to_u64().or(var.try_to_f64().and_then(|num| {
-        if num == (num as u64) as f64 {
-            Some(num as u64)
-        } else {
-            None
-        }
-    }))
+    var.try_to_u64().or_else(|| {
+        var.try_to_f64().and_then(|num| {
+            if num == (num as u64) as f64 {
+                Some(num as u64)
+            } else {
+                None
+            }
+        })
+    })
 }
 
 fn get_u64(dict: &Dictionary, field_name: &'static str) -> Result<u64, FromVariantError> {
-    let var = get_field(&dict, field_name)?;
+    let var = get_field(dict, field_name)?;
     parse_u64(&var).ok_or(FromVariantError::InvalidField {
-        field_name: field_name,
+        field_name,
         error: Box::new(FromVariantError::Custom(
             "must be positive integer".to_string(),
         )),
@@ -273,19 +271,19 @@ fn get_u64(dict: &Dictionary, field_name: &'static str) -> Result<u64, FromVaria
 }
 
 fn get_bool(dict: &Dictionary, field_name: &'static str) -> Result<bool, FromVariantError> {
-    get_field(&dict, field_name)?
+    get_field(dict, field_name)?
         .try_to_bool()
         .ok_or(FromVariantError::InvalidField {
-            field_name: field_name,
+            field_name,
             error: Box::new(FromVariantError::Custom("field must be bool".to_string())),
         })
 }
 
 fn get_string(dict: &Dictionary, field_name: &'static str) -> Result<String, FromVariantError> {
-    get_field(&dict, field_name)?
+    get_field(dict, field_name)?
         .try_to_string()
         .ok_or(FromVariantError::InvalidField {
-            field_name: field_name,
+            field_name,
             error: Box::new(FromVariantError::Custom("field must be string".to_string())),
         })
 }
@@ -293,25 +291,25 @@ fn get_string(dict: &Dictionary, field_name: &'static str) -> Result<String, Fro
 const HASH_LEN: usize = 32;
 
 fn get_address(dict: &Dictionary, field_name: &'static str) -> Result<Address, FromVariantError> {
-    let ty = get_field(&dict, field_name)?.get_type();
+    let ty = get_field(dict, field_name)?.get_type();
     godot_dbg!(ty);
-    get_field(&dict, field_name)?
+    get_field(dict, field_name)?
         .try_to_array()
-        .and_then(|bytes| {
+        .map(|bytes| {
             // x.to_u64() can sometimes return default value, maybe replace with x.try_to_u64()
             let iter: ArrayVec<u8, HASH_LEN> = bytes.iter().map(|x| x.to_u64() as u8).collect();
             let mut slc: [u8; HASH_LEN] = [0; HASH_LEN];
             slc.clone_from_slice(iter.as_slice());
-            Some(Address::new(slc))
+            Address::new(slc)
         })
         .ok_or(FromVariantError::InvalidField {
-            field_name: field_name,
+            field_name,
             error: Box::new(FromVariantError::Custom("invalid address".to_string())),
         })
 }
 
 fn get_dict(dict: &Dictionary, field_name: &'static str) -> Result<Dictionary, FromVariantError> {
-    let var = get_field(&dict, field_name)?;
+    let var = get_field(dict, field_name)?;
 
     var.try_to_dictionary()
         .ok_or(FromVariantError::InvalidVariantType {
@@ -321,16 +319,14 @@ fn get_dict(dict: &Dictionary, field_name: &'static str) -> Result<Dictionary, F
 }
 
 fn get_vec_u8(dict: &Dictionary, field_name: &'static str) -> Result<Vec<u8>, FromVariantError> {
-    let var = get_field(&dict, field_name)?;
+    let var = get_field(dict, field_name)?;
     let byte_array = var
         .try_to_array()
-        .and_then(|bytes| {
-            Some(
-                bytes
-                    .iter()
-                    .map(|byte| byte.to_u64() as u8)
-                    .collect::<Vec<u8>>(),
-            )
+        .map(|bytes| {
+            bytes
+                .iter()
+                .map(|byte| byte.to_u64() as u8)
+                .collect::<Vec<u8>>()
         })
         .ok_or(FromVariantError::InvalidVariantType {
             variant_type: var.get_type(),
@@ -345,7 +341,7 @@ fn get_transaction_type(
     field_name: &'static str,
 ) -> Result<TransactionType, FromVariantError> {
     let txn_type =
-        get_field(&dict, field_name)?
+        get_field(dict, field_name)?
             .try_to_string()
             .ok_or(FromVariantError::InvalidField {
                 field_name,
@@ -354,36 +350,25 @@ fn get_transaction_type(
                 )),
             })?;
 
+    #[allow(clippy::diverging_sub_expression)] // todo!()
     match txn_type.as_str() {
         "pay" => {
             let pay = Payment {
-                sender: get_address(&dict, "snd")?,
-                receiver: get_address(&dict, "rcv")?,
-                amount: MicroAlgos(get_u64(&dict, "amt")?),
-                close_remainder_to: get_address(&dict, "close").ok(),
+                sender: get_address(dict, "snd")?,
+                receiver: get_address(dict, "rcv")?,
+                amount: MicroAlgos(get_u64(dict, "amt")?),
+                close_remainder_to: get_address(dict, "close").ok(),
             };
             Ok(TransactionType::Payment(pay))
         }
-        "keyreg" => {
-            let keyreg = KeyRegistration {
-                sender: get_address(&dict, "snd")?,
-                vote_pk: todo!(),
-                selection_pk: todo!(),
-                vote_first: todo!(),
-                vote_last: todo!(),
-                vote_key_dilution: todo!(),
-                nonparticipating: todo!(),
-            };
-            Ok(TransactionType::KeyRegistration(keyreg))
-        }
         "acfg" => {
-            let params = get_dict(&dict, "apar")?;
+            let params = get_dict(dict, "apar")?;
 
             let acfg = AssetConfigurationTransaction {
-                sender: get_address(&dict, "snd")?,
+                sender: get_address(dict, "snd")?,
                 params: Some(AssetParams {
                     asset_name: get_string(&params, "an").ok(),
-                    decimals: get_u64(&params, "dc").ok().and_then(|num| Some(num as u32)),
+                    decimals: get_u64(&params, "dc").ok().map(|num| num as u32),
                     default_frozen: get_bool(&params, "df").ok(),
                     total: get_u64(&params, "t").ok(),
                     unit_name: get_string(&params, "un").ok(),
@@ -394,10 +379,11 @@ fn get_transaction_type(
                     manager: get_address(&params, "m").ok(),
                     reserve: get_address(&params, "r").ok(),
                 }),
-                config_asset: get_u64(&dict, "caid").ok(),
+                config_asset: get_u64(dict, "caid").ok(),
             };
             Ok(TransactionType::AssetConfigurationTransaction(acfg))
         }
+        //"keyreg" => TransactionType::KeyRegistration
         //"axfer" => Ok(TransactionType::AssetTransferTransaction),
         //"afrz" => Ok(TransactionType::AssetFreezeTransaction),
         //"appl" => Ok(TransactionType::ApplicationTransaction),

@@ -9,10 +9,10 @@ use algonaut::transaction::transaction::{
 };
 use algonaut::transaction::tx_group::TxGroup;
 use algonaut::transaction::{Pay, TransactionType, TxnBuilder};
-use gdnative::api::{Engine, JSONParseResult, JSON};
+use gdnative::api::Engine;
 use gdnative::prelude::*;
 use gdnative::tasks::{Async, AsyncMethod, Spawner};
-use serde::Serialize;
+
 use std::rc::Rc;
 
 #[derive(NativeClass)]
@@ -84,7 +84,7 @@ impl Algodot {
                 if confirmed_round != 0 {
                     return Ok(txn);
                 }
-            } else if txn.pool_error != "" {
+            } else if !txn.pool_error.is_empty() {
                 return Err(AlgodotError::PoolError(txn.pool_error));
             }
         }
@@ -199,7 +199,7 @@ impl Algodot {
             TransactionType::AssetTransferTransaction(AssetTransferTransaction {
                 sender: *sender,
                 xfer: asset_id,
-                amount: amount,
+                amount,
                 receiver: *receiver,
                 close_to: None,
             }),
@@ -209,6 +209,7 @@ impl Algodot {
     }
 
     #[export]
+    #[allow(clippy::too_many_arguments)]
     fn construct_asset_create(
         &self,
         _owner: TRef<Node>,
@@ -226,8 +227,7 @@ impl Algodot {
         manager: Option<Address>,
         reserve: Option<Address>,
     ) -> Transaction {
-        let mdh = meta_data_hash
-            .and_then(|mdh| Some(mdh.read().iter().map(|num| *num).collect::<Vec<u8>>()));
+        let mdh = meta_data_hash.map(|mdh| mdh.read().iter().copied().collect::<Vec<u8>>());
 
         TxnBuilder::with(
             params.clone(),
@@ -240,11 +240,11 @@ impl Algodot {
                     total: Some(total),
                     unit_name: Some(unit_name),
                     meta_data_hash: mdh,
-                    url: url,
-                    clawback: clawback.and_then(|x| Some(*x)),
-                    freeze: freeze.and_then(|x| Some(*x)),
-                    manager: manager.and_then(|x| Some(*x)),
-                    reserve: reserve.and_then(|x| Some(*x)),
+                    url,
+                    clawback: clawback.map(|x| *x),
+                    freeze: freeze.map(|x| *x),
+                    manager: manager.map(|x| *x),
+                    reserve: reserve.map(|x| *x),
                 }),
                 config_asset: None,
             }),
@@ -254,6 +254,7 @@ impl Algodot {
     }
 
     #[export]
+    #[allow(clippy::too_many_arguments)]
     fn construct_app_call(
         &self,
         _owner: TRef<Node>,
@@ -269,63 +270,54 @@ impl Algodot {
         global_state_schema: Option<(u64, u64)>,
         local_state_schema: Option<(u64, u64)>,
     ) -> Transaction {
-        let accounts = accounts.and_then(|acc| {
-            Some(
-                acc.read()
-                    .iter()
-                    .map(|str| *Address::from_variant(&str.to_variant()).unwrap())
-                    .collect(),
-            )
+        let accounts = accounts.map(|acc| {
+            acc.read()
+                .iter()
+                .map(|str| *Address::from_variant(&str.to_variant()).unwrap())
+                .collect()
         });
 
-        let app_arguments: Option<Vec<Vec<u8>>> = app_arguments.and_then(|args| {
-            Some(
-                args.iter()
-                    .map(|var| {
-                        var.try_to_byte_array()
-                            .unwrap()
-                            .read()
-                            .iter()
-                            .map(|num| *num)
-                            .collect::<Vec<u8>>()
-                    })
-                    .collect(),
-            )
+        let app_arguments: Option<Vec<Vec<u8>>> = app_arguments.map(|args| {
+            args.iter()
+                .map(|var| {
+                    var.try_to_byte_array()
+                        .unwrap()
+                        .read()
+                        .iter()
+                        .copied()
+                        .collect::<Vec<u8>>()
+                })
+                .collect()
         });
 
         let foreign_apps: Option<Vec<u64>> =
-            foreign_apps.and_then(|fa| Some(fa.read().iter().map(|num| *num as u64).collect()));
+            foreign_apps.map(|fa| fa.read().iter().map(|num| *num as u64).collect());
 
         let foreign_assets: Option<Vec<u64>> =
-            foreign_assets.and_then(|fa| Some(fa.read().iter().map(|num| *num as u64).collect()));
+            foreign_assets.map(|fa| fa.read().iter().map(|num| *num as u64).collect());
 
-        let approval_program: Option<CompiledTealBytes> =
-            approval_program.and_then(|bytes| Some(CompiledTealBytes(bytes)));
+        let approval_program: Option<CompiledTealBytes> = approval_program.map(CompiledTealBytes);
 
         let clear_state_program: Option<CompiledTealBytes> =
-            clear_state_program.and_then(|bytes| Some(CompiledTealBytes(bytes)));
+            clear_state_program.map(CompiledTealBytes);
 
         let global_state_schema: Option<StateSchema> =
-            global_state_schema.and_then(|(number_ints, number_byteslices)| {
-                Some(StateSchema {
-                    number_ints,
-                    number_byteslices,
-                })
+            global_state_schema.map(|(number_ints, number_byteslices)| StateSchema {
+                number_ints,
+                number_byteslices,
             });
 
         let local_state_schema: Option<StateSchema> =
-            local_state_schema.and_then(|(number_ints, number_byteslices)| {
-                Some(StateSchema {
-                    number_ints,
-                    number_byteslices,
-                })
+            local_state_schema.map(|(number_ints, number_byteslices)| StateSchema {
+                number_ints,
+                number_byteslices,
             });
 
         TxnBuilder::with(
             params.clone(),
             TransactionType::ApplicationCallTransaction(ApplicationCallTransaction {
                 sender: *sender,
-                app_id: app_id,
+                app_id,
                 on_complete: ApplicationCallOnComplete::NoOp,
                 accounts,
                 approval_program,
@@ -349,9 +341,9 @@ impl Algodot {
         _owner: TRef<Node>,
         mut txns: Vec<Transaction>,
     ) -> Vec<Transaction> {
-        let mut txns_mut_refs: Vec<&mut algonaut::transaction::Transaction> =
+        let txns_mut_refs: Vec<&mut algonaut::transaction::Transaction> =
             txns.iter_mut().map(|tx| &mut tx.0).collect();
-        TxGroup::assign_group_id(txns_mut_refs);
+        TxGroup::assign_group_id(txns_mut_refs).unwrap();
         txns
     }
 }
