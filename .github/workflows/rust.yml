@@ -1,4 +1,4 @@
-name: Continuous integration
+name: CI
 
 on:
   push:
@@ -129,10 +129,10 @@ jobs:
         run: |
           wget "https://downloads.tuxfamily.org/godotengine/$GODOT_VER/Godot_v${GODOT_VER}-${GODOT_REL}_linux_headless.64.zip" -O /tmp/godot.zip
           unzip /tmp/godot.zip -d ${{ runner.temp }}/godot_bin
-      - name: Build godot-rust
-        run: cargo build
       - name: Algorand Sandbox
         uses: lucasvanmol/algorand-sandbox-action@v1
+      - name: Build Algodot
+        run: cargo build
       - name: Run Godot integration tests
         run: |
           cd test;
