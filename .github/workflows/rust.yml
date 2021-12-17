@@ -129,7 +129,7 @@ jobs:
         run: |
           wget "https://downloads.tuxfamily.org/godotengine/$GODOT_VER/Godot_v${GODOT_VER}-${GODOT_REL}_linux_headless.64.zip" -O /tmp/godot.zip
           unzip /tmp/godot.zip -d ${{ runner.temp }}/godot_bin
-      - name: Cache Docker layers for sandbox
+      - name: Check cache for sandbox Docker layers
         uses: satackey/action-docker-layer-caching@v0.0.11
         # Ignore the failure of a step and avoid terminating the job.
         continue-on-error: true
