@@ -131,16 +131,8 @@ jobs:
           unzip /tmp/godot.zip -d ${{ runner.temp }}/godot_bin
       - name: Build godot-rust
         run: cargo build
-      - name: Setup Sandbox
-        run: |
-          git clone https://github.com/algorand/sandbox.git;
-          cd sandbox;
-          ./sandbox up;
-          retVal=$?;
-          if [ $retVal -ne 0 ]; then
-              cat ./sandbox.log;
-          fi;
-          exit $retVal;
+      - name: Algorand Sandbox
+        uses: lucasvanmol/algorand-sandbox-action@v1
       - name: Run Godot integration tests
         run: |
           cd test;
