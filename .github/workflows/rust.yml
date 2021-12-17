@@ -146,9 +146,5 @@ jobs:
           if grep -q "Leaked instance" "${{ runner.temp }}/stdout.log"; then
             exit 1;
           fi;
-          "${{ runner.temp }}/godot_bin/Godot_v${GODOT_VER}-${GODOT_REL}_linux_headless.64" -e --path ./project/ --run-editor-tests > >(tee "${{ runner.temp }}/stdout.log");
-          if grep -q "Leaked instance" "${{ runner.temp }}/stdout.log"; then
-            exit 1;
-          fi;
 
   
