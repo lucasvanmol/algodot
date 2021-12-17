@@ -26,9 +26,8 @@ _global_script_class_icons={
 
 [application]
 
-config/name="Project"
+config/name="AlgodotTests"
 run/main_scene="res://Scene.tscn"
-config/icon="res://icon.png"
 
 [autoload]
 
@@ -37,7 +36,3 @@ AsyncExecutorDriver="*res://gdnative/async_executor.gdns"
 [editor_plugins]
 
 enabled=PoolStringArray( "res://addons/editor_test_runner/plugin.cfg" )
-
-[physics]
-
-common/enable_pause_aware_picking=true
