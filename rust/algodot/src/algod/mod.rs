@@ -415,7 +415,7 @@ asyncmethods!(algod, node, this,
     }
 
     fn wait_for_transaction(_ctx, args) {
-        let tx_id = args.read::<String>().get().unwrap().to_string();
+        let tx_id = args.read::<String>().get().unwrap();
 
         async move {
             let pending_tx = Algodot::wait_for_transaction(algod, TransactionResponse { tx_id }).await;
