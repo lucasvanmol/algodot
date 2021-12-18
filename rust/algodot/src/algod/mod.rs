@@ -74,10 +74,8 @@ impl Algodot {
         tx: TransactionResponse,
     ) -> Result<PendingTransaction, AlgodotError> {
         let status = algod.status().await?;
-        let mut round = status.last_round;
+        let mut round = status.last_round - 1;
         loop {
-            // wait for next round
-            round += 1;
             algod.status_after_round(Round(round)).await?;
             let txn = algod.pending_transaction_with_id(&tx.tx_id).await?;
             if let Some(confirmed_round) = txn.confirmed_round {
@@ -87,6 +85,7 @@ impl Algodot {
             } else if !txn.pool_error.is_empty() {
                 return Err(AlgodotError::PoolError(txn.pool_error));
             }
+            round += 1;
         }
     }
 }
