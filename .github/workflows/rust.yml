@@ -16,11 +16,10 @@ env:
   GODOT_VER: "3.4"
   GODOT_REL: stable
 
-  SANDBOX_CONFIG: rust/test/sandbox/config.test
-  SANDBOX_GENESIS: rust/test/sandbox/genesis/genesis.json
+  SANDBOX_CONFIG: dev
 
   # Because of genesis.json this account will start with some funds
-  ALGODOT_FUNDER_MNEMONIC: "version hand outdoor sting spawn warrior noise rose lift faint apart shaft clerk melt deal soft shop pool sister collect armed planet mixed absent unfair"
+  ALGODOT_FUNDER_MNEMONIC: "letter nasty produce hidden confirm sad color diamond allow ring truth code mirror atom obscure this opinion one life travel chat lobster cook about flight"
 
 defaults:
   run:
@@ -147,8 +146,8 @@ jobs:
         # Ignore the failure of a step and avoid terminating the job.
         continue-on-error: true
         with:
-          key: docker-layer-caching-${{ github.workflow }}-${{ hashFiles(env.SANDBOX_CONFIG, env.SANDBOX_GENESIS) }}-{hash}
-          restore-keys: docker-layer-caching-${{ github.workflow }}-${{ hashFiles(env.SANDBOX_CONFIG, env.SANDBOX_GENESIS) }}-
+          key: docker-layer-caching-${{ github.workflow }}-${{ env.SANDBOX_CONFIG }}-{hash}
+          restore-keys: docker-layer-caching-${{ github.workflow }}-${{ env.SANDBOX_CONFIG }}-
 
       - name: Algorand private network
         id: sandbox

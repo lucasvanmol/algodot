@@ -5,7 +5,7 @@ cargo build
 Copy-Item "../target/debug/algodot.dll" -Destination "./project/lib"
 
 # For now this is set manually with `./sandbox goal account export -a ...`, based on genesis.json
-$Env:ALGODOT_FUNDER_MNEMONIC = "version hand outdoor sting spawn warrior noise rose lift faint apart shaft clerk melt deal soft shop pool sister collect armed planet mixed absent unfair"
+$Env:ALGODOT_FUNDER_MNEMONIC = "letter nasty produce hidden confirm sad color diamond allow ring truth code mirror atom obscure this opinion one life travel chat lobster cook about flight"
 
 & 'C:\Program Files (x86)\Steam\steamapps\common\Godot Engine\godot.windows.opt.tools.64.exe' --path ./project/
 
