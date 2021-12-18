@@ -16,6 +16,12 @@ env:
   GODOT_VER: "3.4"
   GODOT_REL: stable
 
+  SANDBOX_CONFIG: rust/test/sandbox/config.test
+  SANDBOX_GENESIS: rust/test/sandbox/genesis/genesis.json
+
+  # Because of genesis.json this account will start with some funds
+  ALGODOT_FUNDER_MNEMONIC: "version hand outdoor sting spawn warrior noise rose lift faint apart shaft clerk melt deal soft shop pool sister collect armed planet mixed absent unfair"
+
 defaults:
   run:
     working-directory: rust
@@ -136,18 +142,19 @@ jobs:
           wget "https://downloads.tuxfamily.org/godotengine/$GODOT_VER/Godot_v${GODOT_VER}-${GODOT_REL}_linux_headless.64.zip" -O /tmp/godot.zip
           unzip /tmp/godot.zip -d ${{ runner.temp }}/godot_bin
 
-      - name: Check cache for sandbox Docker layers
+      - name: Check cache for Docker layers
         uses: satackey/action-docker-layer-caching@v0.0.11
         # Ignore the failure of a step and avoid terminating the job.
         continue-on-error: true
+        with:
+          key: docker-layer-caching-${{ github.workflow }}-${{ hashFiles(env.SANDBOX_CONFIG, env.SANDBOX_GENESIS) }}-{hash}
+          restore-keys: docker-layer-caching-${{ github.workflow }}-${{ hashFiles(env.SANDBOX_CONFIG, env.SANDBOX_GENESIS) }}-
 
-      - name: Algorand Sandbox
+      - name: Algorand private network
         id: sandbox
         uses: lucasvanmol/algorand-sandbox-action@v1
-      
-      - name: Set ALGODOT_FUNDER_MNEMONIC
-        run: |
-          ALGODOT_FUNDER_MNEMONIC="${{ steps.sandbox.outputs.mnemonic }}"
+        with:
+          config: ${{ env.SANDBOX_CONFIG }}
 
       - name: Build Algodot
         run: cargo build
