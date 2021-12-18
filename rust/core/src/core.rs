@@ -48,7 +48,7 @@ impl From<AlgonautError> for AlgodotError {
     }
 }
 
-#[derive(Deref, DerefMut)]
+#[derive(Deref, DerefMut, From)]
 pub struct MyAddress(Address);
 
 impl FromVariant for MyAddress {
@@ -56,6 +56,12 @@ impl FromVariant for MyAddress {
         Address::from_str(&variant.to_string())
             .map_err(FromVariantError::Custom)
             .map(MyAddress)
+    }
+}
+
+impl ToVariant for MyAddress {
+    fn to_variant(&self) -> Variant {
+        (*self).to_string().to_variant()
     }
 }
 
@@ -291,8 +297,6 @@ fn get_string(dict: &Dictionary, field_name: &'static str) -> Result<String, Fro
 const HASH_LEN: usize = 32;
 
 fn get_address(dict: &Dictionary, field_name: &'static str) -> Result<Address, FromVariantError> {
-    let ty = get_field(dict, field_name)?.get_type();
-    godot_dbg!(ty);
     get_field(dict, field_name)?
         .try_to_array()
         .map(|bytes| {

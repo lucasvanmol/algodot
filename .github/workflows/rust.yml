@@ -1,5 +1,8 @@
 name: CI
 
+# Continuous Integration w/ Godot Engine and private Algorand Network
+# Godot CI inspired by: https://github.com/godot-rust/godot-rust/tree/master/.github/workflows
+
 on:
   push:
     branches: [ master ]
@@ -113,30 +116,42 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: stable
           override: true
+
       - name: Check cache for installed Godot version
         id: cache-godot
         uses: actions/cache@v2
         with:
           path: ${{ runner.temp }}/godot_bin
           key: godot-${{ runner.os }}-v${{ env.GODOT_VER }}-${{ env.GODOT_REL }}
+
       - name: Install Godot
         if: steps.cache-godot.outputs.cache-hit != 'true'
         run: |
           wget "https://downloads.tuxfamily.org/godotengine/$GODOT_VER/Godot_v${GODOT_VER}-${GODOT_REL}_linux_headless.64.zip" -O /tmp/godot.zip
           unzip /tmp/godot.zip -d ${{ runner.temp }}/godot_bin
+
       - name: Check cache for sandbox Docker layers
         uses: satackey/action-docker-layer-caching@v0.0.11
         # Ignore the failure of a step and avoid terminating the job.
         continue-on-error: true
+
       - name: Algorand Sandbox
+        id: sandbox
         uses: lucasvanmol/algorand-sandbox-action@v1
+      
+      - name: Set ALGODOT_FUNDER_MNEMONIC
+        run: |
+          ALGODOT_FUNDER_MNEMONIC="${{ steps.sandbox.outputs.mnemonic }}"
+
       - name: Build Algodot
         run: cargo build
+        
       - name: Run Godot integration tests
         run: |
           cd test;

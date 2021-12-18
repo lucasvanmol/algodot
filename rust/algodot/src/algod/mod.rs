@@ -158,6 +158,11 @@ impl Algodot {
     }
 
     #[export]
+    fn get_address(&self, _owner: TRef<Node>, mnemonic: Account) -> Address {
+        mnemonic.address().into()
+    }
+
+    #[export]
     fn sign_transaction(
         &self,
         _owner: TRef<Node>,
@@ -220,12 +225,12 @@ impl Algodot {
         default_frozen: bool,
         total: u64,
         unit_name: String,
-        meta_data_hash: Option<ByteArray>,
-        url: Option<String>,
-        clawback: Option<Address>,
-        freeze: Option<Address>,
-        manager: Option<Address>,
-        reserve: Option<Address>,
+        #[opt] meta_data_hash: Option<ByteArray>,
+        #[opt] url: Option<String>,
+        #[opt] clawback: Option<Address>,
+        #[opt] freeze: Option<Address>,
+        #[opt] manager: Option<Address>,
+        #[opt] reserve: Option<Address>,
     ) -> Transaction {
         let mdh = meta_data_hash.map(|mdh| mdh.read().iter().copied().collect::<Vec<u8>>());
 
@@ -260,15 +265,15 @@ impl Algodot {
         _owner: TRef<Node>,
         params: SuggestedTransactionParams,
         sender: Address,
-        app_id: Option<u64>,
-        accounts: Option<StringArray>,
-        app_arguments: Option<VariantArray>, // array of PoolByteArrays
-        foreign_apps: Option<Int32Array>,
-        foreign_assets: Option<Int32Array>,
-        approval_program: Option<Vec<u8>>,
-        clear_state_program: Option<Vec<u8>>,
-        global_state_schema: Option<(u64, u64)>,
-        local_state_schema: Option<(u64, u64)>,
+        #[opt] app_id: Option<u64>,
+        #[opt] accounts: Option<StringArray>,
+        #[opt] app_arguments: Option<VariantArray>, // array of PoolByteArrays
+        #[opt] foreign_apps: Option<Int32Array>,
+        #[opt] foreign_assets: Option<Int32Array>,
+        #[opt] approval_program: Option<Vec<u8>>,
+        #[opt] clear_state_program: Option<Vec<u8>>,
+        #[opt] global_state_schema: Option<(u64, u64)>,
+        #[opt] local_state_schema: Option<(u64, u64)>,
     ) -> Transaction {
         let accounts = accounts.map(|acc| {
             acc.read()
@@ -404,13 +409,13 @@ asyncmethods!(algod, node, this,
             let txid = algod.broadcast_signed_transaction(&txn).await;
 
             godot_unwrap!(txid => {
-                to_json_dict(&txid)
+                txid.tx_id.to_variant()
             })
         }
     }
 
     fn wait_for_transaction(_ctx, args) {
-        let tx_id = args.read::<u64>().get().unwrap().to_string();
+        let tx_id = args.read::<String>().get().unwrap().to_string();
 
         async move {
             let pending_tx = Algodot::wait_for_transaction(algod, TransactionResponse { tx_id }).await;
