@@ -160,7 +160,7 @@ jobs:
           curl --fail --show-error -i -X POST \
             -H "X-Algo-API-Token: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" \
             -H "Content-Type:application/x-binary" \
-            -T "${{ github.workspace }}/rust/test/sandbox/test.stxn" 
+            -T "${{ github.workspace }}/rust/test/sandbox/test.stxn" \
             localhost:4001/v1/transactions
 
 
