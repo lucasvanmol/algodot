@@ -176,13 +176,13 @@ impl Algodot {
         &self,
         _owner: TRef<Node>,
         params: SuggestedTransactionParams,
-        from: Address,
-        to: Address,
+        sender: Address,
+        receiver: Address,
         amount: u64,
     ) -> Transaction {
         TxnBuilder::with(
             params.clone(),
-            Pay::new(*from, *to, MicroAlgos(amount)).build(),
+            Pay::new(*sender, *receiver, MicroAlgos(amount)).build(),
         )
         .build()
         .into()
@@ -194,9 +194,9 @@ impl Algodot {
         _owner: TRef<Node>,
         params: SuggestedTransactionParams,
         sender: Address,
-        asset_id: u64,
-        amount: u64,
         receiver: Address,
+        amount: u64,
+        asset_id: u64,
     ) -> Transaction {
         TxnBuilder::with(
             params.clone(),
