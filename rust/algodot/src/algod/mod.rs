@@ -274,6 +274,7 @@ impl Algodot {
         #[opt] clear_state_program: Option<Vec<u8>>,
         #[opt] global_state_schema: Option<(u64, u64)>,
         #[opt] local_state_schema: Option<(u64, u64)>,
+        #[opt] extra_pages: Option<u64>,
     ) -> Transaction {
         let accounts = accounts.map(|acc| {
             acc.read()
@@ -295,24 +296,22 @@ impl Algodot {
                 .collect()
         });
 
-        let foreign_apps: Option<Vec<u64>> =
-            foreign_apps.map(|fa| fa.read().iter().map(|num| *num as u64).collect());
+        let foreign_apps = foreign_apps.map(|fa| fa.read().iter().map(|num| *num as u64).collect());
 
-        let foreign_assets: Option<Vec<u64>> =
+        let foreign_assets =
             foreign_assets.map(|fa| fa.read().iter().map(|num| *num as u64).collect());
 
-        let approval_program: Option<CompiledTealBytes> = approval_program.map(CompiledTealBytes);
+        let approval_program = approval_program.map(CompiledTealBytes);
 
-        let clear_state_program: Option<CompiledTealBytes> =
-            clear_state_program.map(CompiledTealBytes);
+        let clear_state_program = clear_state_program.map(CompiledTealBytes);
 
-        let global_state_schema: Option<StateSchema> =
+        let global_state_schema =
             global_state_schema.map(|(number_ints, number_byteslices)| StateSchema {
                 number_ints,
                 number_byteslices,
             });
 
-        let local_state_schema: Option<StateSchema> =
+        let local_state_schema =
             local_state_schema.map(|(number_ints, number_byteslices)| StateSchema {
                 number_ints,
                 number_byteslices,
@@ -332,7 +331,7 @@ impl Algodot {
                 foreign_assets,
                 global_state_schema,
                 local_state_schema,
-                extra_pages: 0,
+                extra_pages: extra_pages.unwrap_or(0),
             }),
         )
         .build()
