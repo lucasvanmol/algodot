@@ -2,6 +2,7 @@ extends Node
 
 var algod: Algod
 var funder_mnemonic
+var funder_address
 var account
 var params
 
@@ -19,6 +20,7 @@ func _ready():
 	
 	print(" -- Get funder account")
 	funder_mnemonic = OS.get_environment("ALGODOT_FUNDER_MNEMONIC")
+	funder_address = algod.get_address(funder_mnemonic)
 	if funder_mnemonic == "":
 		push_error("Env var `ALGODOT_FUNDER_MNEMONIC` not set")
 		status = false
@@ -62,8 +64,7 @@ func _test_transaction():
 	print("sending tx")
 	params = yield(algod.suggested_transaction_params(), "completed")
 	account = algod.generate_key()
-	var from_address = algod.get_address(funder_mnemonic)
-	var tx = algod.construct_payment(params, from_address, account[0], 123456789)
+	var tx = algod.construct_payment(params, funder_address, account[0], 123456789)
 	var stx = algod.sign_transaction(tx, funder_mnemonic)
 	var txid = yield(algod.send_transaction(stx), "completed")
 	
@@ -75,17 +76,53 @@ func _test_transaction():
 
 func _test_asset_transfers():
 	print(" -- _test_asset_transfers")
-	
+
+	print("create")
 	var tx = algod.construct_asset_create(
 		params,
-		account[0],
-		"TestCoin",
-		2,
-		false,
-		100000,
-		"TC"
+		account[0], # Creator
+		"TestCoin",	# Asset name
+		2,			# Decimals
+		false,		# Default frozen?
+		100000,		# Total supply
+		"TC"		# Unit name
 	)
 	var stx = algod.sign_transaction(tx, account[1])
+	var txid = yield(algod.send_transaction(stx), "completed")
+	var tx_info = yield(algod.transaction_information(txid), "completed")
+	var asset_index = int(tx_info.get("asset-index"))
+
+	print("opt in")
+	var optin_tx = algod.construct_asset_opt_in(
+		params,
+		funder_address,
+		asset_index
+	)
+	stx = algod.sign_transaction(optin_tx, funder_mnemonic)
 	yield(algod.send_transaction(stx), "completed")
-	
+
+	print("atomic swap")
+
+	var algo_tx = algod.construct_payment(
+		params,
+		funder_address,
+		account[0],
+		100
+	)
+
+	var asset_tx = algod.construct_asset_xfer(
+		params,
+		account[0],
+		funder_address,
+		1,
+		asset_index
+	)
+
+	var txns = algod.group_transactions([algo_tx, asset_tx])
+	txns[0] = algod.sign_transaction(txns[0], funder_mnemonic)
+	txns[1] = algod.sign_transaction(txns[1], account[1])
+
+	yield(algod.send_transactions(txns), "completed")
+
+
 	return true

@@ -4,8 +4,8 @@ use algonaut::algod::{v2::Algod, AlgodBuilder, AlgodCustomEndpointBuilder};
 use algonaut::core::{CompiledTealBytes, MicroAlgos, Round};
 use algonaut::model::algod::v2::{PendingTransaction, TransactionResponse};
 use algonaut::transaction::transaction::{
-    ApplicationCallOnComplete, ApplicationCallTransaction, AssetConfigurationTransaction,
-    AssetParams, AssetTransferTransaction, StateSchema,
+    ApplicationCallOnComplete, ApplicationCallTransaction, AssetAcceptTransaction,
+    AssetConfigurationTransaction, AssetParams, AssetTransferTransaction, StateSchema,
 };
 use algonaut::transaction::tx_group::TxGroup;
 use algonaut::transaction::{Pay, TransactionType, TxnBuilder};
@@ -339,6 +339,25 @@ impl Algodot {
     }
 
     #[export]
+    fn construct_asset_opt_in(
+        &self,
+        _owner: TRef<Node>,
+        params: SuggestedTransactionParams,
+        sender: Address,
+        asset_id: u64,
+    ) -> Transaction {
+        TxnBuilder::with(
+            params.clone(),
+            TransactionType::AssetAcceptTransaction(AssetAcceptTransaction {
+                sender: *sender,
+                xfer: asset_id,
+            }),
+        )
+        .build()
+        .into()
+    }
+
+    #[export]
     /// Give transactions same group id
     fn group_transactions(
         &self,
@@ -393,6 +412,20 @@ asyncmethods!(algod, node, this,
 
         async move {
             let info = algod.account_information(&address).await;
+            godot_unwrap!(info => {
+                let info = to_json_dict(&info);
+
+                info.to_variant()
+            })
+        }
+    }
+
+    fn transaction_information(_ctx, args) {
+        let txid = args.read::<String>().get().unwrap();
+
+        async move {
+            let info = algod.pending_transaction_with_id(txid.as_ref()).await;
+
             godot_unwrap!(info => {
                 let info = to_json_dict(&info);
 

@@ -1,8 +1,10 @@
 use algonaut::core::{MicroAlgos, Round, SuggestedTransactionParams};
 use algonaut::crypto::{HashDigest, Signature};
+use algonaut::model::algod::v2::PendingTransaction;
 use algonaut::transaction::account::Account;
 use algonaut::transaction::transaction::{
-    AssetConfigurationTransaction, AssetParams, Payment, TransactionSignature,
+    AssetAcceptTransaction, AssetConfigurationTransaction, AssetParams, AssetTransferTransaction,
+    Payment, TransactionSignature,
 };
 use algonaut::transaction::{SignedTransaction, Transaction, TransactionType};
 use algonaut::{core::Address, error::AlgonautError};
@@ -138,6 +140,15 @@ impl FromVariant for MyTransaction {
             rekey_to: get_address(&dict, "rekey").ok(),
         };
         Ok(MyTransaction(t))
+    }
+}
+
+#[derive(Deref, DerefMut, From)]
+pub struct MyPendingTransaction(pub PendingTransaction);
+
+impl ToVariant for MyPendingTransaction {
+    fn to_variant(&self) -> Variant {
+        to_json_dict(&self.0)
     }
 }
 
@@ -388,7 +399,24 @@ fn get_transaction_type(
             Ok(TransactionType::AssetConfigurationTransaction(acfg))
         }
         //"keyreg" => TransactionType::KeyRegistration
-        //"axfer" => Ok(TransactionType::AssetTransferTransaction),
+        "axfer" => {
+            if let Some(amount) = get_u64(dict, "aamt").ok() {
+                let axfer = AssetTransferTransaction {
+                    sender: get_address(dict, "snd")?,
+                    xfer: get_u64(dict, "xaid")?,
+                    amount,
+                    receiver: get_address(dict, "arcv")?,
+                    close_to: get_address(dict, "aclose").ok(),
+                };
+                Ok(TransactionType::AssetTransferTransaction(axfer))
+            } else {
+                let axfer = AssetAcceptTransaction {
+                    sender: get_address(dict, "snd")?,
+                    xfer: get_u64(dict, "xaid")?,
+                };
+                Ok(TransactionType::AssetAcceptTransaction(axfer))
+            }
+        }
         //"afrz" => Ok(TransactionType::AssetFreezeTransaction),
         //"appl" => Ok(TransactionType::ApplicationTransaction),
         _ => Err(FromVariantError::InvalidField {
