@@ -197,6 +197,7 @@ impl Algodot {
         receiver: Address,
         amount: u64,
         asset_id: u64,
+        #[opt] close_to: Option<Address>,
     ) -> Transaction {
         TxnBuilder::with(
             params.clone(),
@@ -205,7 +206,7 @@ impl Algodot {
                 xfer: asset_id,
                 amount,
                 receiver: *receiver,
-                close_to: None,
+                close_to: close_to.map(|x| *x),
             }),
         )
         .build()
