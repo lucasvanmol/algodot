@@ -398,7 +398,7 @@ fn get_transaction_type(
             };
             Ok(TransactionType::AssetConfigurationTransaction(acfg))
         }
-        //"keyreg" => TransactionType::KeyRegistration
+        "keyreg" => todo!(),
         "axfer" => {
             if let Ok(amount) = get_u64(dict, "aamt") {
                 let axfer = AssetTransferTransaction {
@@ -417,8 +417,8 @@ fn get_transaction_type(
                 Ok(TransactionType::AssetAcceptTransaction(axfer))
             }
         }
-        //"afrz" => Ok(TransactionType::AssetFreezeTransaction),
-        //"appl" => Ok(TransactionType::ApplicationTransaction),
+        "afrz" => todo!(),
+        "appl" => todo!(),
         _ => Err(FromVariantError::InvalidField {
             field_name,
             error: Box::new(FromVariantError::Custom("invalid txn type".to_string())),
