@@ -400,7 +400,7 @@ fn get_transaction_type(
         }
         //"keyreg" => TransactionType::KeyRegistration
         "axfer" => {
-            if let Some(amount) = get_u64(dict, "aamt").ok() {
+            if let Ok(amount) = get_u64(dict, "aamt") {
                 let axfer = AssetTransferTransaction {
                     sender: get_address(dict, "snd")?,
                     xfer: get_u64(dict, "xaid")?,

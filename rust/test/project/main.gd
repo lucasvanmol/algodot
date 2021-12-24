@@ -47,7 +47,6 @@ func _timeout():
 	print(" -- exiting.")
 	get_tree().quit()
 
-
 func _test_algod_connection():
 	print(" -- _test_algod_connection")
 	
