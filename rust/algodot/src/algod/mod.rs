@@ -189,6 +189,7 @@ impl Algodot {
     }
 
     #[export]
+    #[allow(clippy::too_many_arguments)]
     fn construct_asset_xfer(
         &self,
         _owner: TRef<Node>,
