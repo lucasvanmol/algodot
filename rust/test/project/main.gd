@@ -123,5 +123,13 @@ func _test_asset_transfers():
 
 	yield(algod.send_transactions(txns), "completed")
 
+	var info = yield(algod.account_information(funder_address), "completed")
 
-	return true
+	var funder_assets = info.assets
+	for asset in funder_assets:
+		if asset["asset-id"] == asset_index && asset["amount"] == 1:
+			return true
+
+	printerr("   !! _test_asset_transfers failed")
+	return false
+
