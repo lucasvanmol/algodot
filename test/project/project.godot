@@ -9,12 +9,12 @@
 config_version=4
 
 _global_script_classes=[ {
-"base": "",
+"base": "Node",
 "class": "Algod",
 "language": "NativeScript",
 "path": "res://gdnative/algod.gdns"
 }, {
-"base": "",
+"base": "Node",
 "class": "AsyncExecutorDriver",
 "language": "NativeScript",
 "path": "res://gdnative/async_executor.gdns"
