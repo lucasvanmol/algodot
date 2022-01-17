@@ -20,10 +20,12 @@ func _ready():
 	
 	print(" -- Get funder account")
 	funder_mnemonic = OS.get_environment("ALGODOT_FUNDER_MNEMONIC")
-	funder_address = algod.get_address(funder_mnemonic)
 	if funder_mnemonic == "":
-		push_error("Env var `ALGODOT_FUNDER_MNEMONIC` not set")
-		status = false
+		print("   !! Env var `ALGODOT_FUNDER_MNEMONIC` not set")
+		#status = false
+		funder_mnemonic = "letter nasty produce hidden confirm sad color diamond allow ring truth code mirror atom obscure this opinion one life travel chat lobster cook about flight"
+
+	funder_address = algod.get_address(funder_mnemonic)
 
 	status = status && yield(_test_algod_connection(), "completed")
 	status = status && yield(_test_transaction(), "completed")

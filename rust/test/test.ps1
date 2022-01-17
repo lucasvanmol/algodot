@@ -1,14 +1,14 @@
 # PowerShell Integration Testing
 #   - Godot must be installed and the exe path set in the env var below
 #   - Algorand Sandbox must be up and running, ideally with the config found in `./sandbox`
-#   - There is currently a bug in the `algonaut` rust library that causes transactions to fail when
-#       they are in the very first block of the network. When using release mode, you'll have to wait 
-#       atleast one block time (4.5s) after starting up the sandbox for the first time. In dev mode 
-#       (as is the case when using the provided config file `config.test`), blocks are submitted instantly,
-#       and are only submitted when transaction are sent, so you'll have to send atleast one transaction
-#       when you start up the network for the first time. The signed transaction binary file `test.stxn`
-#       is ready to be POSTed to the network at `/v1/transactions`, provided the given genesis.json file
-#       is used.
+#   - There is currently a bug in the `algonaut` rust library that causes transactions with their first 
+#       valid round ("fv") set to 0 to not have this value show up upon serialization. When using release mode, 
+#       you'll have to wait atleast one block time (4.5s) after starting up the sandbox for the first time. 
+#       In dev mode (as is the case when using the provided config file `config.test`), blocks are submitted
+#       instantly, and are only submitted when transaction are sent, so you'll have to send atleast one 
+#       transaction when you start up the network for the first time. The signed transaction binary file 
+#       `test.stxn` is ready to be POSTed to the network at `/v1/transactions`, provided the given genesis.json 
+#       file is used, or sent with `goal clerk rawsend -f ./test.stxn`
 #   - If anyone ends up making a bash script or similair for linux, feel free to PR 
 
 # Location of godot install
