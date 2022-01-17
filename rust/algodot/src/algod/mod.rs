@@ -1,6 +1,7 @@
 use algodot_core::*;
 use algodot_macros::*;
-use algonaut::algod::{v2::Algod, AlgodBuilder, AlgodCustomEndpointBuilder};
+use algonaut::algod::AlgodCustomEndpointBuilder;
+use algonaut::algod::{v2::Algod, AlgodBuilder};
 use algonaut::core::{CompiledTealBytes, MicroAlgos, Round};
 use algonaut::model::algod::v2::{PendingTransaction, TransactionResponse};
 use algonaut::transaction::transaction::{
@@ -12,7 +13,6 @@ use algonaut::transaction::{Pay, TransactionType, TxnBuilder};
 use gdnative::api::Engine;
 use gdnative::prelude::*;
 use gdnative::tasks::{Async, AsyncMethod, Spawner};
-
 use std::rc::Rc;
 
 #[derive(NativeClass)]
@@ -124,7 +124,7 @@ impl Algodot {
                 })
                 .collect::<Result<Vec<(String, String)>, AlgodotError>>();
 
-            godot_unwrap!(headers => {
+            if let Some(headers) = godot_unwrap!(headers) {
                 let headers: Vec<(&str, &str)> = headers
                     .iter()
                     .map(|(str1, str2)| -> (&str, &str) { (str1, str2) })
@@ -137,9 +137,7 @@ impl Algodot {
                     .unwrap();
 
                 self.algod = Rc::new(algod);
-
-                ().to_variant()
-            });
+            }
         } else {
             algod = AlgodBuilder::new()
                 .bind(&self.url)
@@ -387,24 +385,14 @@ asyncmethods!(algod, node, this,
     fn suggested_transaction_params(_ctx, _args) {
         async move {
             let params = algod.suggested_transaction_params().await;
-
-            godot_unwrap!(params => {
-                let params = to_json_dict(&params);
-
-                params.to_variant()
-            })
+            godot_unwrap!(params).map(|params| to_json_dict(&params)).to_variant()
         }
     }
 
     fn status(_ctx, _args) {
         async move {
             let status = algod.status().await;
-
-            godot_unwrap!(status => {
-                let status = to_json_dict(&status);
-
-                status.to_variant()
-            })
+            godot_unwrap!(status).map(|status| to_json_dict(&status)).to_variant()
         }
     }
 
@@ -413,11 +401,7 @@ asyncmethods!(algod, node, this,
 
         async move {
             let info = algod.account_information(&address).await;
-            godot_unwrap!(info => {
-                let info = to_json_dict(&info);
-
-                info.to_variant()
-            })
+            godot_unwrap!(info).map(|info| to_json_dict(&info)).to_variant()
         }
     }
 
@@ -426,12 +410,7 @@ asyncmethods!(algod, node, this,
 
         async move {
             let info = algod.pending_transaction_with_id(txid.as_ref()).await;
-
-            godot_unwrap!(info => {
-                let info = to_json_dict(&info);
-
-                info.to_variant()
-            })
+            godot_unwrap!(info).map(|info| to_json_dict(&info)).to_variant()
         }
     }
 
@@ -440,10 +419,7 @@ asyncmethods!(algod, node, this,
 
         async move {
             let txid = algod.broadcast_signed_transaction(&txn).await;
-
-            godot_unwrap!(txid => {
-                txid.tx_id.to_variant()
-            })
+            godot_unwrap!(txid).map(|txid| txid.tx_id).to_variant()
         }
     }
 
@@ -452,10 +428,7 @@ asyncmethods!(algod, node, this,
 
         async move {
             let pending_tx = Algodot::wait_for_transaction(algod, TransactionResponse { tx_id }).await;
-
-            godot_unwrap!(pending_tx => {
-                to_json_dict(&pending_tx)
-            })
+            godot_unwrap!(pending_tx).map(|tx| to_json_dict(&tx)).to_variant()
         }
     }
 
@@ -465,10 +438,7 @@ asyncmethods!(algod, node, this,
 
         async move {
             let txid = algod.broadcast_signed_transactions(txns.as_slice()).await;
-
-            godot_unwrap!(txid => {
-                to_json_dict(&txid)
-            })
+            godot_unwrap!(txid).map(|txid| to_json_dict(&txid)).to_variant()
         }
     }
 
@@ -477,10 +447,7 @@ asyncmethods!(algod, node, this,
 
         async move {
             let compiled = algod.compile_teal(source_code.as_bytes()).await;
-
-            godot_unwrap!(compiled => {
-                (compiled.hash.0.to_variant(), compiled.program.0.to_variant()).to_variant()
-            })
+            godot_unwrap!(compiled).map(|c| (c.hash.0.to_variant(), c.program.0.to_variant())).to_variant()
         }
     }
 );

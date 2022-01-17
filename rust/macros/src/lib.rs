@@ -1,5 +1,6 @@
 pub use paste::paste;
 
+/// Macro for simplifying AsyncMethod impl
 #[macro_export]
 macro_rules! asyncmethods {
     ($algod:ident, $node:ident, $this:ident, $( fn $fn:ident($ctx:ident, $args:ident) $block:block) *) => {
@@ -32,24 +33,15 @@ macro_rules! asyncmethods {
     };
 }
 
-#[macro_export]
-macro_rules! godot_result {
-    ($res:ident) => {
-        match $res {
-            Ok(ok) => godot_print!("{:?}", ok),
-            Err(err) => godot_error!("{:?}", err),
-        }
-    };
-}
-
+/// Converts from `Result<T, E>` to `Option<T>`, printing the error to godot's stderr.
 #[macro_export]
 macro_rules! godot_unwrap {
-    ($res:ident => $block:block) => {
+    ($res:ident) => {
         match $res {
-            Ok($res) => $block,
+            Ok(ok) => Some(ok),
             Err(err) => {
                 godot_error!("{:?}", err);
-                ().to_variant()
+                None
             }
         }
     };
