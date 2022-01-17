@@ -20,9 +20,10 @@ use thiserror::Error;
 // check JSONParseResult.error
 // https://docs.godotengine.org/en/stable/classes/class_jsonparseresult.html
 pub fn to_json_dict<T: Serialize>(r: &T) -> Variant {
+    let str = serde_json::to_string(r).unwrap();
     unsafe {
         JSON::godot_singleton()
-            .parse(&serde_json::to_string(r).unwrap())
+            .parse(&str)
             .unwrap()
             .assume_safe()
             .result()
