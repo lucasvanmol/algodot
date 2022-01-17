@@ -1,7 +1,0 @@
-[gd_resource type="GDNativeLibrary" format=2]
-
-[resource]
-entry/Windows.64 = "res://../rust/target/debug/algodot.dll"
-entry/X11.64 = "res://../rust/target/x86_64-unknown-linux-gnu/debug/libalgodot.so"
-dependency/Windows.64 = [  ]
-dependency/X11.64 = [  ]
