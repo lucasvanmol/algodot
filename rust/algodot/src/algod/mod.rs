@@ -165,8 +165,9 @@ impl Algodot {
         _owner: TRef<Node>,
         txn: Transaction,
         signer: Account,
-    ) -> SignedTransaction {
-        SignedTransaction::from(signer.sign_transaction(&txn).unwrap())
+    ) -> Option<SignedTransaction> {
+        let stxn = signer.sign_transaction(&txn);
+        godot_unwrap!(stxn).map(SignedTransaction::from)
     }
 
     #[export]
@@ -265,8 +266,8 @@ impl Algodot {
         params: SuggestedTransactionParams,
         sender: Address,
         #[opt] app_id: Option<u64>,
-        #[opt] accounts: Option<StringArray>,
-        #[opt] app_arguments: Option<VariantArray>, // array of PoolByteArrays
+        #[opt] accounts: Option<Vec<Address>>,
+        #[opt] app_arguments: Option<VariantArray>, // array of PoolByteArrays. Could perhaps be changed directily to Option<Vec<Vec<u8>>>
         #[opt] foreign_apps: Option<Int32Array>,
         #[opt] foreign_assets: Option<Int32Array>,
         #[opt] approval_program: Option<Vec<u8>>,
@@ -275,12 +276,8 @@ impl Algodot {
         #[opt] local_state_schema: Option<(u64, u64)>,
         #[opt] extra_pages: Option<u64>,
     ) -> Transaction {
-        let accounts = accounts.map(|acc| {
-            acc.read()
-                .iter()
-                .map(|str| *Address::from_variant(&str.to_variant()).unwrap())
-                .collect()
-        });
+        let accounts: Option<Vec<algonaut::core::Address>> =
+            accounts.map(|acc| acc.iter().map(|acc| **acc).collect());
 
         let app_arguments: Option<Vec<Vec<u8>>> = app_arguments.map(|args| {
             args.iter()
@@ -362,11 +359,11 @@ impl Algodot {
         &self,
         _owner: TRef<Node>,
         mut txns: Vec<Transaction>,
-    ) -> Vec<Transaction> {
+    ) -> Option<Vec<Transaction>> {
         let txns_mut_refs: Vec<&mut algonaut::transaction::Transaction> =
             txns.iter_mut().map(|tx| &mut tx.0).collect();
-        TxGroup::assign_group_id(txns_mut_refs).unwrap();
-        txns
+        let result = TxGroup::assign_group_id(txns_mut_refs);
+        godot_unwrap!(result).map(|_| txns)
     }
 }
 
@@ -398,7 +395,6 @@ asyncmethods!(algod, node, this,
 
     fn account_information(_ctx, args) {
         let address = args.read::<Address>().get().unwrap();
-
         async move {
             let info = algod.account_information(&address).await;
             godot_unwrap!(info).map(|info| to_json_dict(&info)).to_variant()
