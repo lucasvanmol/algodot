@@ -1,8 +1,0 @@
-# For cross-compilation with cross (https://github.com/rust-embedded/cross)
-#
-# `cross build --target x86_64-unknown-linux-gnu`
-#
-# Image must first be built e.g.
-# `docker build -t algodot-buildtarget/gnu:0.2.1 ./docker`
-[target.x86_64-unknown-linux-gnu]
-image = "algodot-buildtarget/gnu:0.2.1"
