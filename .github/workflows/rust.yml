@@ -79,7 +79,7 @@ jobs:
       - name: Test
         run: cargo test --workspace
 
-  build-release:
+  check-build-release:
     name: build-release-${{ matrix.os }}
     needs: rustfmt-clippy
     strategy:
@@ -167,14 +167,15 @@ jobs:
       - name: Run Godot integration tests
         run: |
           cd test;
-          mkdir -p ./project/lib;
-          cp ../target/debug/libalgodot.so ./project/lib/;
+          mkdir -p ./project/addons/algodot/lib;
+          cp ../target/debug/libalgodot.so ./project/addons/algodot/lib/;
           "${{ runner.temp }}/godot_bin/Godot_v${GODOT_VER}-${GODOT_REL}_linux_headless.64" --path ./project/ > >(tee "${{ runner.temp }}/stdout.log");
           if grep -q "Leaked instance" "${{ runner.temp }}/stdout.log"; then
             exit 1;
           fi;
 
-   build-release:
+
+  deploy-build-release:
     name: build-release-windows
     needs: integration-test-godot
     runs-on: windows-latest
@@ -205,10 +206,10 @@ jobs:
         run: ./build.ps1
 
       - name: Push
-            uses: s0/git-publish-subdir-action@develop
-            env:
-              REPO: self
-              BRANCH: build
-              FOLDER: target/build 
-              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              MESSAGE: "Build: ({sha}) {msg}"
+        uses: s0/git-publish-subdir-action@develop
+        env:
+          REPO: self
+          BRANCH: build
+          FOLDER: target/build 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MESSAGE: "Build: ({sha}) {msg}"
