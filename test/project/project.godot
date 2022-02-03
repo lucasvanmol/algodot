@@ -31,7 +31,7 @@ run/main_scene="res://Scene.tscn"
 
 [autoload]
 
-AsyncExecutorDriver="*res://gdnative/async_executor.gdns"
+AsyncExecutorDriver="*res://addons/algodot/gdnative/async_executor.gdns"
 
 [editor_plugins]
 

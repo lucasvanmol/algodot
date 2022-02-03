@@ -19,4 +19,3 @@ Cargo.lock
 # Test project
 **/.import/*
 test/project/addons/algodot/lib/*
-!test/project/lib/.gitkeep
