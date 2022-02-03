@@ -21,7 +21,8 @@ $Env:ALGODOT_FUNDER_MNEMONIC = "letter nasty produce hidden confirm sad color di
 
 # Build, copy dll, and run gdscript integration tests
 Push-Location $PSScriptRoot 
+Remove-Item "./project/addons/algodot/lib/*.*"
 cargo build
-Copy-Item "../target/debug/algodot.dll" -Destination "./project/lib"
+Copy-Item "../target/debug/algodot.dll" -Destination "./project/addons/algodot/lib"
 & $Env:GODOT_EXE_PATH --path ./project/
 Pop-Location

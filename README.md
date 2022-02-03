@@ -5,28 +5,45 @@ Algorand integration in Godot
 
 Link coming soon!
 
-## Running the demo
+## Usage
 
-First, build the GDNative library by running:
+Initializing the Algod object
 
+```gdscript
+algod = Algod.new()
+algod.url = "http://localhost:4001"
+algod.token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+add_child(algod)
 ```
-cargo build
+
+Test connections using `.health()`
+
+```gdscript
+assert(yield(algod.health(), "completed") == OK)
 ```
 
-inside the `rust` directory and open `godot/project.godot` in godot.
+Sending transactions
 
-Currently, only 64-bit windows is supported, and 64-bit linux is untested. 
-Working builds for Windows, Linux, and Mac will be available soon.
+```gdscript
+var from_mnemonic = "your twenty five word mnemonic ..."
+var from_address = algod.get_address(from_mnemonic)
 
-## Asset Credits
+# Get suggested parameters
+var params = yield(algod.suggested_transaction_params(), "completed")
 
-Cozy Farm Asset Pack by shubibubi
-https://shubibubi.itch.io/cozy-farm
+# Generate a new account
+var to_account = algod.generate_key()
 
-Medieval Fantasy Character Pack
-https://oco.itch.io/medieval-fantasy-character-pack
+# Create and sign transaction
+var tx = algod.construct_payment(params, from_address, account[0], 123456789)
+var stx = algod.sign_transaction(tx, from_mnemonic)
+var txid = yield(algod.send_transaction(stx), "completed")
 
-Shikashi's Fantasy Icons Pack
-https://cheekyinkling.itch.io/shikashis-fantasy-icons-pack
+# Wait for confirmation
+yield(algod.wait_for_transaction(txid), "completed")
+var info = yield(algod.account_information(account[0]), "completed")
 
-
+assert(info.amount == 123456789)
+```
+	
+For more examples, check out the test script in the `./test/project` directory.

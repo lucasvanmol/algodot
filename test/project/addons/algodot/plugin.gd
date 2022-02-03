@@ -13,12 +13,12 @@ func _enter_tree():
 	add_custom_type(
 		"Algod",
 		"Node",
-		preload("res://gdnative/algod.gdns"),
+		preload("res://addons/algodot/gdnative/algod.gdns"),
 		node_icon
 	)
 	
 	# Driver for executing async rust code in _process
-	add_autoload_singleton("AsyncExecutorDriver", "res://gdnative/async_executor.gdns")
+	add_autoload_singleton("AsyncExecutorDriver", "res://addons/algodot/gdnative/async_executor.gdns")
 
 
 func _exit_tree():

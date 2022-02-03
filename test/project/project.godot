@@ -9,15 +9,15 @@
 config_version=4
 
 _global_script_classes=[ {
-"base": "Node",
+"base": "",
 "class": "Algod",
 "language": "NativeScript",
-"path": "res://gdnative/algod.gdns"
+"path": "res://addons/algodot/gdnative/algod.gdns"
 }, {
-"base": "Node",
+"base": "",
 "class": "AsyncExecutorDriver",
 "language": "NativeScript",
-"path": "res://gdnative/async_executor.gdns"
+"path": "res://addons/algodot/gdnative/async_executor.gdns"
 } ]
 _global_script_class_icons={
 "Algod": "",
@@ -35,4 +35,4 @@ AsyncExecutorDriver="*res://gdnative/async_executor.gdns"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "res://addons/editor_test_runner/plugin.cfg" )
+enabled=PoolStringArray(  )
