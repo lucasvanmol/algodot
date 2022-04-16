@@ -3,7 +3,7 @@ Algorand integration in Godot
 
 ## Download the addon
 
-Link coming soon!
+https://godotengine.org/asset-library/asset/1219
 
 ## Usage
 
