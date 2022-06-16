@@ -1,8 +1,7 @@
 use algodot_core::*;
 use algodot_macros::*;
-use algonaut::algod::AlgodCustomEndpointBuilder;
-use algonaut::algod::{v2::Algod, AlgodBuilder};
-use algonaut::core::{CompiledTealBytes, MicroAlgos, Round};
+use algonaut::algod::v2::Algod;
+use algonaut::core::{CompiledTeal, MicroAlgos, Round};
 use algonaut::model::algod::v2::{PendingTransaction, TransactionResponse};
 use algonaut::transaction::transaction::{
     ApplicationCallOnComplete, ApplicationCallTransaction, AssetAcceptTransaction,
@@ -41,11 +40,11 @@ impl Algodot {
             // algod will be initialised on _enter_tree()
             // leave these default values here for now
             algod: Rc::new(
-                AlgodBuilder::new()
-                    .bind("http://localhost:4001")
-                    .auth("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-                    .build_v2()
-                    .unwrap(),
+                Algod::new(
+                    "http://localhost:4001",
+                    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                )
+                .unwrap(),
             ),
         }
     }
@@ -130,20 +129,12 @@ impl Algodot {
                     .map(|(str1, str2)| -> (&str, &str) { (str1, str2) })
                     .collect();
 
-                algod = AlgodCustomEndpointBuilder::new()
-                    .bind(&self.url)
-                    .headers(headers)
-                    .build_v2()
-                    .unwrap();
+                algod = Algod::with_headers(&self.url, headers).unwrap();
 
                 self.algod = Rc::new(algod);
             }
         } else {
-            algod = AlgodBuilder::new()
-                .bind(&self.url)
-                .auth(&self.token)
-                .build_v2()
-                .unwrap();
+            algod = Algod::new(&self.url, &self.token).unwrap();
             self.algod = Rc::new(algod);
         }
     }
@@ -166,7 +157,7 @@ impl Algodot {
         txn: Transaction,
         signer: Account,
     ) -> Option<SignedTransaction> {
-        let stxn = signer.sign_transaction(&txn);
+        let stxn = signer.sign_transaction(txn.into());
         godot_unwrap!(stxn).map(SignedTransaction::from)
     }
 
@@ -180,10 +171,11 @@ impl Algodot {
         amount: u64,
     ) -> Transaction {
         TxnBuilder::with(
-            params.clone(),
+            &params,
             Pay::new(*sender, *receiver, MicroAlgos(amount)).build(),
         )
         .build()
+        .unwrap()
         .into()
     }
 
@@ -200,7 +192,7 @@ impl Algodot {
         #[opt] close_to: Option<Address>,
     ) -> Transaction {
         TxnBuilder::with(
-            params.clone(),
+            &params,
             TransactionType::AssetTransferTransaction(AssetTransferTransaction {
                 sender: *sender,
                 xfer: asset_id,
@@ -210,6 +202,7 @@ impl Algodot {
             }),
         )
         .build()
+        .unwrap()
         .into()
     }
 
@@ -235,7 +228,7 @@ impl Algodot {
         let mdh = meta_data_hash.map(|mdh| mdh.read().iter().copied().collect::<Vec<u8>>());
 
         TxnBuilder::with(
-            params.clone(),
+            &params,
             TransactionType::AssetConfigurationTransaction(AssetConfigurationTransaction {
                 sender: *sender,
                 params: Some(AssetParams {
@@ -255,6 +248,7 @@ impl Algodot {
             }),
         )
         .build()
+        .unwrap()
         .into()
     }
 
@@ -274,7 +268,7 @@ impl Algodot {
         #[opt] clear_state_program: Option<Vec<u8>>,
         #[opt] global_state_schema: Option<(u64, u64)>,
         #[opt] local_state_schema: Option<(u64, u64)>,
-        #[opt] extra_pages: Option<u64>,
+        #[opt] extra_pages: Option<u32>,
     ) -> Transaction {
         let accounts: Option<Vec<algonaut::core::Address>> =
             accounts.map(|acc| acc.iter().map(|acc| **acc).collect());
@@ -297,9 +291,9 @@ impl Algodot {
         let foreign_assets =
             foreign_assets.map(|fa| fa.read().iter().map(|num| *num as u64).collect());
 
-        let approval_program = approval_program.map(CompiledTealBytes);
+        let approval_program = approval_program.map(CompiledTeal);
 
-        let clear_state_program = clear_state_program.map(CompiledTealBytes);
+        let clear_state_program = clear_state_program.map(CompiledTeal);
 
         let global_state_schema =
             global_state_schema.map(|(number_ints, number_byteslices)| StateSchema {
@@ -314,7 +308,7 @@ impl Algodot {
             });
 
         TxnBuilder::with(
-            params.clone(),
+            &params,
             TransactionType::ApplicationCallTransaction(ApplicationCallTransaction {
                 sender: *sender,
                 app_id,
@@ -331,6 +325,7 @@ impl Algodot {
             }),
         )
         .build()
+        .unwrap()
         .into()
     }
 
@@ -343,13 +338,14 @@ impl Algodot {
         asset_id: u64,
     ) -> Transaction {
         TxnBuilder::with(
-            params.clone(),
+            &params,
             TransactionType::AssetAcceptTransaction(AssetAcceptTransaction {
                 sender: *sender,
                 xfer: asset_id,
             }),
         )
         .build()
+        .unwrap()
         .into()
     }
 
@@ -360,9 +356,9 @@ impl Algodot {
         _owner: TRef<Node>,
         mut txns: Vec<Transaction>,
     ) -> Option<Vec<Transaction>> {
-        let txns_mut_refs: Vec<&mut algonaut::transaction::Transaction> =
+        let mut txns_mut_refs: Vec<&mut algonaut::transaction::Transaction> =
             txns.iter_mut().map(|tx| &mut tx.0).collect();
-        let result = TxGroup::assign_group_id(txns_mut_refs);
+        let result = TxGroup::assign_group_id(txns_mut_refs.as_mut_slice());
         godot_unwrap!(result).map(|_| txns)
     }
 }
@@ -443,7 +439,7 @@ asyncmethods!(algod, node, this,
 
         async move {
             let compiled = algod.compile_teal(source_code.as_bytes()).await;
-            godot_unwrap!(compiled).map(|c| (c.hash.0.to_variant(), c.program.0.to_variant())).to_variant()
+            godot_unwrap!(compiled).map(|c| (c.hash().0.to_vec().to_variant(), c.bytes_to_sign().to_variant())).to_variant()
         }
     }
 );

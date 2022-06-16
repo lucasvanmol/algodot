@@ -7,9 +7,9 @@ use algonaut::transaction::transaction::{
     Payment, TransactionSignature,
 };
 use algonaut::transaction::{SignedTransaction, Transaction, TransactionType};
-use algonaut::{core::Address, error::AlgonautError};
+use algonaut::{core::Address, error::ServiceError};
 use arrayvec::ArrayVec;
-use derive_more::{Deref, DerefMut, From};
+use derive_more::{Deref, DerefMut, From, Into};
 use gdnative::api::JSON;
 use gdnative::prelude::*;
 use serde::Serialize;
@@ -42,16 +42,16 @@ pub enum AlgodotError {
     #[error("pool error: `{0}`")]
     PoolError(String),
     #[error("algonaut error:`{0}`")]
-    AlgonautError(AlgonautError),
+    ServiceError(ServiceError),
 }
 
-impl From<AlgonautError> for AlgodotError {
-    fn from(err: AlgonautError) -> Self {
-        AlgodotError::AlgonautError(err)
+impl From<ServiceError> for AlgodotError {
+    fn from(err: ServiceError) -> Self {
+        AlgodotError::ServiceError(err)
     }
 }
 
-#[derive(Deref, DerefMut, From)]
+#[derive(Debug, Deref, DerefMut, From)]
 pub struct MyAddress(Address);
 
 impl FromVariant for MyAddress {
@@ -103,14 +103,14 @@ impl FromVariant for MySuggestedTransactionParams {
             last_valid: Round(get_u64(&dict, "last_valid")?),
             consensus_version: get_string(&dict, "consensus_version")?,
             min_fee: MicroAlgos(get_u64(&dict, "min_fee")?),
-            fee: MicroAlgos(get_u64(&dict, "fee")?),
+            fee_per_byte: MicroAlgos(get_u64(&dict, "fee_per_byte")?),
             genesis_hash: get_hash_digest(&dict, "genesis_hash")?,
         };
         Ok(MySuggestedTransactionParams(t))
     }
 }
 
-#[derive(Deref, DerefMut, From)]
+#[derive(Deref, DerefMut, From, Into)]
 pub struct MyTransaction(pub Transaction);
 
 impl ToVariant for MyTransaction {
@@ -178,6 +178,7 @@ impl FromVariant for MySignedTransaction {
             transaction: txn.0,
             transaction_id: id,
             sig: get_signature(&dict)?,
+            auth_address: None,
         };
 
         Ok(MySignedTransaction(st))
