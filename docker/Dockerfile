@@ -1,8 +1,10 @@
-FROM rustembedded/cross:x86_64-unknown-linux-gnu-0.2.1
+# Let cross provide the FROM instruction
+ARG CROSS_BASE_IMAGE
+FROM $CROSS_BASE_IMAGE
 
 RUN apt-get update -y 
 
-# Install openssl
+# Install openssl requirement for `bindgen` (https://github.com/rust-lang/rust-bindgen/issues/1797)
 RUN apt-get install -y libssl-dev 
 
 # Install llvm & libclang
