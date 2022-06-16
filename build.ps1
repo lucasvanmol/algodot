@@ -3,8 +3,15 @@ Push-Location $PSScriptRoot
 Remove-Item "./test/project/addons/algodot/lib/*.*" -ErrorAction SilentlyContinue
 Remove-Item "./target/build/*" -Recurse -ErrorAction SilentlyContinue
 Copy-Item -Path "./test/project/addons" -Destination "./target/build" -Recurse
-docker build -t algodot-buildtarget/gnu:0.2.1 ./docker
+
+# Build for windows
 cargo build -Z unstable-options --release --out-dir "./test/project/addons/algodot/lib"
-cross build --target x86_64-unknown-linux-gnu  -Z unstable-options --release --out-dir "./test/project/addons/algodot/lib"
+
+# Build for linux with cross
+docker build -t algodot-buildtarget/gnu:0.2.1 ./docker
+cross build --target x86_64-unknown-linux-gnu -Z unstable-options --release --out-dir "./test/project/addons/algodot/lib"
+
+# Uncomment to run gdscript integration tests as in `./test/test.ps1`
 #& $Env:GODOT_EXE_PATH --path ./test/project/
+
 Pop-Location

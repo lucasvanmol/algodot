@@ -1,4 +1,4 @@
-# algodot
+# Algodot
 Algorand integration in Godot
 
 ## Download the addon
@@ -47,3 +47,15 @@ assert(info.amount == 123456789)
 ```
 	
 For more examples, check out the test script in the `./test/project` directory.
+
+# Development
+
+## Testing
+
+See the README in `./test`
+
+## Building
+
+```
+./build.ps1
+```
