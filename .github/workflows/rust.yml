@@ -174,42 +174,43 @@ jobs:
             exit 1;
           fi;
 
-
-  deploy-build-release:
-    name: build-release-windows
-    needs: integration-test-godot
-    runs-on: windows-latest
-    steps:
+  # # Linux containers on windows runners are not well supported
+  # # Need to find another solution for CD
+  # deploy-build-release:
+  #   name: build-release-windows
+  #   needs: integration-test-godot
+  #   runs-on: windows-latest
+  #   steps:
     
-      - name: Install LLVM and Clang # required for bindgen to work, see https://github.com/rust-lang/rust-bindgen/issues/1797
-        uses: KyleMayes/install-llvm-action@32c4866ebb71e0949e8833eb49beeebed48532bd
-        with:
-          version: "11.0"
-          directory: ${{ runner.temp }}/llvm
+  #     - name: Install LLVM and Clang # required for bindgen to work, see https://github.com/rust-lang/rust-bindgen/issues/1797
+  #       uses: KyleMayes/install-llvm-action@32c4866ebb71e0949e8833eb49beeebed48532bd
+  #       with:
+  #         version: "11.0"
+  #         directory: ${{ runner.temp }}/llvm
           
-      - name: Set LIBCLANG_PATH
-        run: echo "LIBCLANG_PATH=$((gcm clang).source -replace "clang.exe")" >> $env:GITHUB_ENV
-        working-directory: .
+  #     - name: Set LIBCLANG_PATH
+  #       run: echo "LIBCLANG_PATH=$((gcm clang).source -replace "clang.exe")" >> $env:GITHUB_ENV
+  #       working-directory: .
       
-      - uses: actions/checkout@v2
+  #     - uses: actions/checkout@v2
 
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
+  #     - uses: actions-rs/toolchain@v1
+  #       with:
+  #         profile: minimal
+  #         toolchain: stable
+  #         override: true
 
-      - name: Install cross
-        run: cargo install cross
+  #     - name: Install cross
+  #       run: cargo install cross
       
-      - name: Build
-        run: ./build.ps1
+  #     - name: Build
+  #       run: ./build.ps1
 
-      - name: Push
-        uses: s0/git-publish-subdir-action@develop
-        env:
-          REPO: self
-          BRANCH: build
-          FOLDER: target/build 
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MESSAGE: "Build: ({sha}) {msg}"
+  #     - name: Push
+  #       uses: s0/git-publish-subdir-action@develop
+  #       env:
+  #         REPO: self
+  #         BRANCH: build
+  #         FOLDER: target/build 
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #         MESSAGE: "Build: ({sha}) {msg}"
