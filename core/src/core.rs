@@ -8,7 +8,6 @@ use algonaut::transaction::transaction::{
 };
 use algonaut::transaction::{SignedTransaction, Transaction, TransactionType};
 use algonaut::{core::Address, error::ServiceError};
-use arrayvec::ArrayVec;
 use derive_more::{Deref, DerefMut, From, Into};
 use gdnative::api::JSON;
 use gdnative::prelude::*;
@@ -16,9 +15,14 @@ use serde::Serialize;
 use std::str::FromStr;
 use thiserror::Error;
 
-// todo: remove unwraps and resturn Result
-// check JSONParseResult.error
-// https://docs.godotengine.org/en/stable/classes/class_jsonparseresult.html
+/// This file contains implementations of ToVariant and FromVariant for algonaut types.
+///
+/// It might be worth looking into forking algonaut instead, allowing the use of `#[derive]` directly.
+/// It would be cool to be able to leverage algonaut's `serde` implementations somehow (essentially
+/// using `serde_json` to get a Godot Dictionary, but with the right types.
+
+// TODO: remove to_json_dict. Implement ToVariant for types instead
+//#[deprecated]
 pub fn to_json_dict<T: Serialize>(r: &T) -> Variant {
     let str = serde_json::to_string(r).unwrap();
     unsafe {
@@ -85,13 +89,27 @@ impl MyAccount {
     }
 }
 
-#[derive(Deref, DerefMut)]
+#[derive(Deref, DerefMut, From)]
 pub struct MySuggestedTransactionParams(SuggestedTransactionParams);
+
+impl ToVariant for MySuggestedTransactionParams {
+    fn to_variant(&self) -> Variant {
+        let dict = Dictionary::new();
+        dict.insert("genesis_id", &self.genesis_id);
+        dict.insert("first_valid", self.first_valid.0);
+        dict.insert("last_valid", self.last_valid.0);
+        dict.insert("consensus_version", &self.consensus_version);
+        dict.insert("min_fee", self.min_fee.0);
+        dict.insert("fee_per_byte", self.fee_per_byte.0);
+        dict.insert("genesis_hash", ByteArray::from_slice(&self.genesis_hash.0));
+        dict.owned_to_variant()
+    }
+}
 
 impl FromVariant for MySuggestedTransactionParams {
     fn from_variant(variant: &Variant) -> Result<Self, FromVariantError> {
         let dict = variant
-            .try_to_dictionary()
+            .to::<Dictionary>()
             .ok_or(FromVariantError::InvalidVariantType {
                 variant_type: variant.get_type(),
                 expected: VariantType::Dictionary,
@@ -115,7 +133,104 @@ pub struct MyTransaction(pub Transaction);
 
 impl ToVariant for MyTransaction {
     fn to_variant(&self) -> Variant {
-        to_json_dict(&self.0)
+        let dict = Dictionary::new();
+        dict.insert("fee", self.fee.0);
+        dict.insert("fv", self.first_valid.0);
+        dict.insert("gh", ByteArray::from_slice(&self.genesis_hash.0));
+        dict.insert("lv", self.last_valid.0);
+        dict.insert(
+            "type",
+            match &self.txn_type {
+                TransactionType::Payment(payment) => {
+                    dict.insert("snd", MyAddress::from(payment.sender));
+                    dict.insert("rcv", MyAddress::from(payment.receiver));
+                    dict.insert("amt", payment.amount.0);
+                    if let Some(close) = payment.close_remainder_to {
+                        dict.insert("close", MyAddress::from(close))
+                    };
+                    "pay"
+                }
+                TransactionType::KeyRegistration(_) => todo!(),
+                TransactionType::AssetConfigurationTransaction(cfg) => {
+                    dict.insert("snd", MyAddress(cfg.sender));
+                    let apar = Dictionary::new();
+                    if let Some(config_asset) = cfg.config_asset {
+                        apar.insert("caid", config_asset);
+                    }
+                    if let Some(params) = &cfg.params {
+                        if let Some(asset_name) = &params.asset_name {
+                            apar.insert("an", asset_name)
+                        }
+                        if let Some(decimals) = &params.decimals {
+                            apar.insert("dc", decimals)
+                        }
+                        if let Some(default_frozen) = &params.default_frozen {
+                            apar.insert("df", default_frozen)
+                        }
+                        if let Some(total) = &params.total {
+                            apar.insert("t", total)
+                        }
+                        if let Some(unit_name) = &params.unit_name {
+                            apar.insert("un", unit_name)
+                        }
+                        if let Some(meta_data_hash) = &params.meta_data_hash {
+                            apar.insert("am", meta_data_hash)
+                        }
+                        if let Some(url) = &params.url {
+                            apar.insert("au", url)
+                        }
+                        if let Some(clawback) = &params.clawback {
+                            apar.insert("c", MyAddress::from(*clawback))
+                        }
+                        if let Some(freeze) = &params.freeze {
+                            apar.insert("f", MyAddress::from(*freeze))
+                        }
+                        if let Some(manager) = &params.manager {
+                            apar.insert("m", MyAddress::from(*manager))
+                        }
+                        if let Some(reserve) = &params.reserve {
+                            apar.insert("r", MyAddress::from(*reserve))
+                        }
+                    }
+                    dict.insert("apar", apar);
+                    "acfg"
+                }
+                TransactionType::AssetTransferTransaction(axfer) => {
+                    dict.insert("snd", MyAddress::from(axfer.sender));
+                    dict.insert("xaid", axfer.xfer);
+                    dict.insert("aamt", axfer.amount);
+                    dict.insert("arcv", MyAddress::from(axfer.receiver));
+                    if let Some(close_to) = axfer.close_to {
+                        dict.insert("aclose", MyAddress::from(close_to));
+                    }
+                    "axfer"
+                }
+                TransactionType::AssetAcceptTransaction(axfer) => {
+                    dict.insert("snd", MyAddress::from(axfer.sender));
+                    dict.insert("xaid", axfer.xfer);
+                    "axfer"
+                }
+                TransactionType::AssetClawbackTransaction(_) => todo!(),
+                TransactionType::AssetFreezeTransaction(_) => todo!(),
+                TransactionType::ApplicationCallTransaction(_) => todo!(),
+            },
+        );
+        if let Some(gen) = &self.genesis_id {
+            dict.insert("gen", gen);
+        }
+        if let Some(grp) = &self.group {
+            dict.insert("grp", ByteArray::from_slice(&grp.0));
+        }
+        if let Some(lx) = &self.lease {
+            dict.insert("lx", ByteArray::from_slice(&lx.0));
+        }
+        if let Some(note) = &self.note {
+            dict.insert("note", ByteArray::from_slice(note.as_slice()));
+        }
+        if let Some(rekey) = self.rekey_to {
+            dict.insert("rekey", MyAddress::from(rekey));
+        }
+        dict.owned_to_variant()
     }
 }
 
@@ -123,7 +238,7 @@ impl ToVariant for MyTransaction {
 impl FromVariant for MyTransaction {
     fn from_variant(variant: &Variant) -> Result<Self, FromVariantError> {
         let dict = variant
-            .try_to_dictionary()
+            .to::<Dictionary>()
             .ok_or(FromVariantError::InvalidVariantType {
                 variant_type: variant.get_type(),
                 expected: VariantType::Dictionary,
@@ -158,14 +273,25 @@ pub struct MySignedTransaction(pub SignedTransaction);
 
 impl ToVariant for MySignedTransaction {
     fn to_variant(&self) -> Variant {
-        to_json_dict(&self.0)
+        let dict = Dictionary::new();
+        dict.insert("txn", MyTransaction::from(self.transaction.clone()));
+        match self.sig {
+            TransactionSignature::Single(sig) => dict.insert("sig", ByteArray::from_slice(&sig.0)),
+            TransactionSignature::Multi(_) => todo!(),
+            TransactionSignature::Logic(_) => todo!(),
+        }
+        //dict.insert("txid", self.transaction_id.to_variant());
+        if let Some(sgnr) = self.auth_address {
+            dict.insert("sgnr", MyAddress::from(sgnr));
+        }
+        dict.owned_to_variant()
     }
 }
 
 impl FromVariant for MySignedTransaction {
     fn from_variant(variant: &Variant) -> Result<Self, FromVariantError> {
         let dict = variant
-            .try_to_dictionary()
+            .to::<Dictionary>()
             .ok_or(FromVariantError::InvalidVariantType {
                 variant_type: variant.get_type(),
                 expected: VariantType::Dictionary,
@@ -226,50 +352,31 @@ fn get_hash_digest(
     dict: &Dictionary,
     field_name: &'static str,
 ) -> Result<HashDigest, FromVariantError> {
-    Ok(HashDigest({
-        let byte_array = get_field(dict, field_name)?;
+    let byte_array = get_field(dict, field_name)?;
 
-        let byte_array = byte_array
-            .try_to_array()
-            .ok_or(FromVariantError::InvalidField {
-                field_name,
-                error: Box::new(FromVariantError::Custom("must be byte array".to_string())),
-            })?;
-        if byte_array.len() == 32 {
-            let mut slice: [u8; 32] = [0; 32];
-            for (i, elem) in byte_array.iter().enumerate() {
-                let e = parse_u64(&elem)
-                    .and_then(|num| {
-                        if num < u8::MAX as u64 {
-                            Some(num as u8)
-                        } else {
-                            None
-                        }
-                    })
-                    .ok_or(FromVariantError::InvalidField {
-                        field_name,
-                        error: Box::new(FromVariantError::Custom(format!(
-                            "element {:?} is not a byte",
-                            &elem
-                        ))),
-                    })?;
-                slice[i] = e as u8;
-            }
-            Ok(slice)
-        } else {
-            Err(FromVariantError::InvalidField {
-                field_name,
-                error: Box::new(FromVariantError::Custom(
-                    "must be 32 bytes long".to_string(),
-                )),
-            })
-        }
-    }?))
+    let byte_array = byte_array
+        .to::<ByteArray>()
+        .ok_or(FromVariantError::InvalidField {
+            field_name,
+            error: Box::new(FromVariantError::Custom("must be byte array".to_string())),
+        })?;
+    let mut slice: [u8; 32] = [0; 32];
+    if byte_array.len() == 32 {
+        slice.copy_from_slice(byte_array.to_vec().as_slice());
+        Ok(HashDigest(slice))
+    } else {
+        Err(FromVariantError::InvalidField {
+            field_name,
+            error: Box::new(FromVariantError::Custom(
+                "must be 32 bytes long".to_string(),
+            )),
+        })
+    }
 }
 
 fn parse_u64(var: &Variant) -> Option<u64> {
-    var.try_to_u64().or_else(|| {
-        var.try_to_f64().and_then(|num| {
+    var.to::<u64>().or_else(|| {
+        var.to::<f64>().and_then(|num| {
             if num == (num as u64) as f64 {
                 Some(num as u64)
             } else {
@@ -291,7 +398,7 @@ fn get_u64(dict: &Dictionary, field_name: &'static str) -> Result<u64, FromVaria
 
 fn get_bool(dict: &Dictionary, field_name: &'static str) -> Result<bool, FromVariantError> {
     get_field(dict, field_name)?
-        .try_to_bool()
+        .to::<bool>()
         .ok_or(FromVariantError::InvalidField {
             field_name,
             error: Box::new(FromVariantError::Custom("field must be bool".to_string())),
@@ -300,35 +407,54 @@ fn get_bool(dict: &Dictionary, field_name: &'static str) -> Result<bool, FromVar
 
 fn get_string(dict: &Dictionary, field_name: &'static str) -> Result<String, FromVariantError> {
     get_field(dict, field_name)?
-        .try_to_string()
+        .to::<String>()
         .ok_or(FromVariantError::InvalidField {
             field_name,
             error: Box::new(FromVariantError::Custom("field must be string".to_string())),
         })
 }
 
-const HASH_LEN: usize = 32;
-
 fn get_address(dict: &Dictionary, field_name: &'static str) -> Result<Address, FromVariantError> {
-    get_field(dict, field_name)?
-        .try_to_array()
-        .map(|bytes| {
-            // x.to_u64() can sometimes return default value, maybe replace with x.try_to_u64()
-            let iter: ArrayVec<u8, HASH_LEN> = bytes.iter().map(|x| x.to_u64() as u8).collect();
-            let mut slc: [u8; HASH_LEN] = [0; HASH_LEN];
-            slc.clone_from_slice(iter.as_slice());
-            Address::new(slc)
-        })
-        .ok_or(FromVariantError::InvalidField {
+    let addr_string =
+        get_field(dict, field_name)?
+            .to::<String>()
+            .ok_or(FromVariantError::InvalidField {
+                field_name,
+                error: Box::new(FromVariantError::Custom(
+                    "address must be a string".to_string(),
+                )),
+            })?;
+
+    let address =
+        Address::from_str(addr_string.as_str()).map_err(|e| FromVariantError::InvalidField {
             field_name,
-            error: Box::new(FromVariantError::Custom("invalid address".to_string())),
-        })
+            error: Box::new(FromVariantError::Custom(format!(
+                "error parsing address: {e}"
+            ))),
+        })?;
+    Ok(address)
+    //const HASH_LEN: usize = 32;
+
+    // let bytes = get_vec_u8(dict, field_name)?;
+
+    // let mut slice: [u8; HASH_LEN] = [0; HASH_LEN];
+    // if bytes.len() == HASH_LEN {
+    //     slice.copy_from_slice(bytes.as_slice());
+    //     Ok(Address::new(slice))
+    // } else {
+    //     Err(FromVariantError::InvalidField {
+    //         field_name,
+    //         error: Box::new(FromVariantError::Custom(format!(
+    //             "address must be {HASH_LEN} byte array"
+    //         ))),
+    //     })
+    // }
 }
 
 fn get_dict(dict: &Dictionary, field_name: &'static str) -> Result<Dictionary, FromVariantError> {
     let var = get_field(dict, field_name)?;
 
-    var.try_to_dictionary()
+    var.to::<Dictionary>()
         .ok_or(FromVariantError::InvalidVariantType {
             variant_type: var.get_type(),
             expected: VariantType::Dictionary,
@@ -338,17 +464,15 @@ fn get_dict(dict: &Dictionary, field_name: &'static str) -> Result<Dictionary, F
 fn get_vec_u8(dict: &Dictionary, field_name: &'static str) -> Result<Vec<u8>, FromVariantError> {
     let var = get_field(dict, field_name)?;
     let byte_array = var
-        .try_to_array()
-        .map(|bytes| {
-            bytes
-                .iter()
-                .map(|byte| byte.to_u64() as u8)
-                .collect::<Vec<u8>>()
-        })
-        .ok_or(FromVariantError::InvalidVariantType {
-            variant_type: var.get_type(),
-            expected: VariantType::ByteArray,
-        })?;
+        .to::<ByteArray>()
+        .ok_or(FromVariantError::InvalidField {
+            field_name,
+            error: Box::new(FromVariantError::InvalidVariantType {
+                variant_type: var.get_type(),
+                expected: VariantType::ByteArray,
+            }),
+        })?
+        .to_vec();
     Ok(byte_array)
 }
 
@@ -359,7 +483,7 @@ fn get_transaction_type(
 ) -> Result<TransactionType, FromVariantError> {
     let txn_type =
         get_field(dict, field_name)?
-            .try_to_string()
+            .to::<String>()
             .ok_or(FromVariantError::InvalidField {
                 field_name,
                 error: Box::new(FromVariantError::Custom(

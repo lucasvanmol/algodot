@@ -6,10 +6,9 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-gdnative = { git = "https://github.com/godot-rust/godot-rust.git", features = ["async"], rev = "deb9dbfd413f8ac751a2267be010b2089ff26d50" }
+gdnative = { version = "0.10", features = ["async"] }
 algonaut = { git = "https://github.com/manuelmauro/algonaut", rev = "75bce54" }
 derive_more = "0.99.16"
 serde = "1.0"
 serde_json = "1.0"
 thiserror = "1.0.30"
-arrayvec = "0.7.2"

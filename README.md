@@ -59,3 +59,11 @@ See the README in `./test`
 ```
 ./build.ps1
 ```
+
+On windows, there maybe some errors with bindgen not finding C headers: see https://godot-rust.github.io/book/faq/configuration.html#c-headers-not-found-by-bindgen
+
+Running in the Visual Studio Developer Console should set the appropriate env vars, notable one called `INCLUDE`. For my installation, this looked something like: 
+
+```
+INCLUDE=C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\Tools\MSVC\14.29.30133\include;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um;C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt;C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\shared;C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\um;C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\winrt;C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\cppwinrt
+```

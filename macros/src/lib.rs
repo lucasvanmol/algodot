@@ -26,7 +26,7 @@ macro_rules! asyncmethods {
 
             fn register_methods(builder: &ClassBuilder<Algodot>) {
                 $ (
-                    builder.build_method(stringify!($fn), Async::new([<__ $fn >])).done();
+                    builder.method(stringify!($fn), Async::new([<__ $fn >])).done();
                 ) *
             }
         }

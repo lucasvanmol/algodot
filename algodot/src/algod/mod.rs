@@ -18,13 +18,13 @@ use std::rc::Rc;
 #[inherit(Node)]
 #[register_with(Self::register)]
 pub struct Algodot {
-    #[property(after_set = "Self::update_algod")]
+    #[property(set = "Self::set_url")]
     url: String,
 
-    #[property(after_set = "Self::update_algod")]
+    #[property(set = "Self::set_token")]
     token: String,
 
-    #[property(after_set = "Self::update_algod")]
+    #[property(set = "Self::set_headers")]
     headers: StringArray,
 
     algod: Rc<Algod>,
@@ -57,15 +57,15 @@ impl Algodot {
     }
 
     fn register_signals(builder: &ClassBuilder<Algodot>) {
-        builder.add_signal(Signal {
-            name: "transaction_confirmed",
-            args: &[SignalArgument {
-                name: "transaction_info",
+        builder
+            .signal("transaction_confirmed")
+            .with_param_custom(SignalParam {
+                name: "transaction_info".into(),
                 default: ().to_variant(),
                 export_info: ExportInfo::new(VariantType::Dictionary),
                 usage: PropertyUsage::DEFAULT,
-            }],
-        })
+            })
+            .done();
     }
 
     async fn wait_for_transaction(
@@ -93,6 +93,24 @@ impl Algodot {
 impl Algodot {
     #[export]
     fn _enter_tree(&mut self, _owner: TRef<Node>) {
+        self.update_algod(_owner);
+    }
+
+    #[export]
+    fn set_url(&mut self, _owner: TRef<Node>, url: String) {
+        self.url = url;
+        self.update_algod(_owner);
+    }
+
+    #[export]
+    fn set_token(&mut self, _owner: TRef<Node>, token: String) {
+        self.token = token;
+        self.update_algod(_owner);
+    }
+
+    #[export]
+    fn set_headers(&mut self, _owner: TRef<Node>, headers: StringArray) {
+        self.headers = headers;
         self.update_algod(_owner);
     }
 
@@ -275,14 +293,7 @@ impl Algodot {
 
         let app_arguments: Option<Vec<Vec<u8>>> = app_arguments.map(|args| {
             args.iter()
-                .map(|var| {
-                    var.try_to_byte_array()
-                        .unwrap()
-                        .read()
-                        .iter()
-                        .copied()
-                        .collect::<Vec<u8>>()
-                })
+                .map(|var| var.to::<Vec<u8>>().unwrap())
                 .collect()
         });
 
@@ -377,8 +388,8 @@ asyncmethods!(algod, node, this,
 
     fn suggested_transaction_params(_ctx, _args) {
         async move {
-            let params = algod.suggested_transaction_params().await;
-            godot_unwrap!(params).map(|params| to_json_dict(&params)).to_variant()
+            let params = algod.suggested_transaction_params().await.map(SuggestedTransactionParams::from);
+            godot_unwrap!(params).to_variant()
         }
     }
 
