@@ -1,0 +1,46 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=4
+
+_global_script_classes=[ {
+"base": "",
+"class": "Algod",
+"language": "NativeScript",
+"path": "res://addons/algodot/gdnative/algod.gdns"
+}, {
+"base": "",
+"class": "AsyncExecutorDriver",
+"language": "NativeScript",
+"path": "res://addons/algodot/gdnative/async_executor.gdns"
+} ]
+_global_script_class_icons={
+"Algod": "",
+"AsyncExecutorDriver": ""
+}
+
+[application]
+
+config/name="AlgodotTests"
+run/main_scene="res://Scene.tscn"
+
+[autoload]
+
+AsyncExecutorDriver="*res://addons/algodot/gdnative/async_executor.gdns"
+
+[debug]
+
+settings/gdscript/max_call_stack=5000
+
+[editor_plugins]
+
+enabled=PoolStringArray( "res://addons/algodot/plugin.cfg" )
+
+[gdnative]
+
+singletons=[  ]
