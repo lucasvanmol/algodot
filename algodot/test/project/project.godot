@@ -33,14 +33,6 @@ run/main_scene="res://Scene.tscn"
 
 AsyncExecutorDriver="*res://addons/algodot/gdnative/async_executor.gdns"
 
-[debug]
-
-settings/gdscript/max_call_stack=5000
-
 [editor_plugins]
 
-enabled=PoolStringArray( "res://addons/algodot/plugin.cfg" )
-
-[gdnative]
-
-singletons=[  ]
+enabled=PoolStringArray(  )
