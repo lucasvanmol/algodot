@@ -440,6 +440,11 @@ func create_assets(asset_name : String, to_address : String, Total_supply: int):
 	)
 	return tx
 
+func destroy_assets():
+	"placehlder function, would arrange logic later"
+	pass
+
+
 func construct_asset_transfer( from_address : String, to_address : String, amount_ : int ):
 	transferred_assets = true
 	asset_tx = algod.construct_asset_xfer( # rewrite this as a separate function
