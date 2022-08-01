@@ -27,6 +27,7 @@ extends Node
 
 var algod: Algod
 
+
 export (String) var funder_mnemonic
 export (String) var funder_address
 export (String) var url

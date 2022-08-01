@@ -18,10 +18,16 @@ _global_script_classes=[ {
 "class": "AsyncExecutorDriver",
 "language": "NativeScript",
 "path": "res://addons/algodot/gdnative/async_executor.gdns"
+}, {
+"base": "EditorScript",
+"class": "ReferenceCollector",
+"language": "GDScript",
+"path": "res://addons/algodot/Documentation/Scripts/DocsReferenceCollector.gd"
 } ]
 _global_script_class_icons={
 "Algod": "",
-"AsyncExecutorDriver": ""
+"AsyncExecutorDriver": "",
+"ReferenceCollector": ""
 }
 
 [application]
@@ -32,7 +38,8 @@ run/main_scene="res://Scene.tscn"
 [autoload]
 
 AsyncExecutorDriver="*res://addons/algodot/gdnative/async_executor.gdns"
+DocsHelper="*res://addons/algodot/Documentation/Scripts/DocsHelper.gd"
 
 [editor_plugins]
 
-enabled=PoolStringArray(  )
+enabled=PoolStringArray( "res://addons/algodot/plugin.cfg" )

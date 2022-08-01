@@ -1,3 +1,6 @@
+//implement Algorand functions here
+//use wasm_bindgen::prelude::*; //for building to webassembly
+
 use algodot_core::*;
 use algodot_macros::*;
 use algonaut::algod::v2::Algod;
