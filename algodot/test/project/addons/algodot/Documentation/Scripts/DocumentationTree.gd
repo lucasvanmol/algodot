@@ -16,6 +16,7 @@ func select_item(path):
 	DocsHelper.search_and_select_docs(documentation_tree, path)
 
 
+
 ################################################################################
 ##							PRIVATE FUNCTIONS 								  ##
 ################################################################################
@@ -28,7 +29,9 @@ func _ready():
 	
 
 func _on_item_selected():
-	var item = get_selected()
+	var item = get_selected() #code breaks here, returns null
+	#print ("Item:", item) #for debug purposes only
 	var metadata = item.get_metadata(0)
-	if metadata.has('path'):
+	if metadata != null && metadata.has('path'):
 		emit_signal("_page_selected", metadata['path'])
+		#print ("Meta Data: ", metadata['path']) #for debug purposes only #works. What connects to this?

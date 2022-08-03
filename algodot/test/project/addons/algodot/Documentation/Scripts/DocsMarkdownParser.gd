@@ -1,6 +1,7 @@
+# Bug likely comes from here
+
 extends Node
 
-#var DocsHelper = load("res://addons/algodot/Documentation/Scripts/DocsHelper.gd")
 
 var heading1_font = "res://addons/algodot/Documentation/Theme/DocumentationH1.tres"
 var heading2_font = "res://addons/algodot/Documentation/Theme/DocumentationH2.tres"
@@ -119,6 +120,7 @@ func parse(content : String):
 	## Find all heading1s
 	regex.compile("(?:\\n|^)#(?<heading>[^#\\n]+)")
 	result = regex.search_all(content)
+	#print ("111111111") # for debug purposes only
 	if result:
 		for res in result:
 			heading1s.append(res.get_string("heading"))
@@ -126,6 +128,7 @@ func parse(content : String):
 	## Find all heading2s
 	regex.compile("(?:\\n|^)##(?<heading>[^#\\n]+)")
 	result = regex.search_all(content)
+	#print ("22222222") # for debug purposes only
 	if result:
 		for res in result:
 			heading2s.append(res.get_string("heading"))
@@ -133,6 +136,7 @@ func parse(content : String):
 	## Find all heading3s
 	regex.compile("(?:\\n|^)###(?<heading>[^#\\n]+)")
 	result = regex.search_all(content)
+	#print ("333333333") # for debug purposes only
 	if result:
 		for res in result:
 			heading3s.append(res.get_string("heading"))
@@ -190,5 +194,5 @@ func parse(content : String):
 			content = content.replace("+"+element,"[indent]-"+element+"[/indent]")
 		if content.find("* "+element):
 			content = content.replace("+"+element,"[indent]-"+element+"[/indent]")
-	
+	#print (" DocsMarkdown Parser debug : ",content) #for deug purposes only
 	return content

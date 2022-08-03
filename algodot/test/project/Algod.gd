@@ -104,8 +104,8 @@ func _ready():
 	" These are custom tests for the Script. Run to test that Script works"
 	if debug_txn == true: 
 		status = status && yield(_test_algod_connection(), "completed") #works
-		status = status && yield(_test_transaction_to_receiver_addr(funder_address , funder_mnemonic , receivers_address , receivers_mnemonic), "completed") #untested
-		status = status && yield(_test_asset_transfers_to_receivers_address(funder_address , funder_mnemonic , receivers_address , receivers_mnemonic), "completed") #untested
+		status = status && yield(_send_transaction_to_receiver_addr(funder_address , funder_mnemonic , receivers_address , receivers_mnemonic), "completed") #untested
+		status = status && yield(_send_asset_transfers_to_receivers_address(funder_address , funder_mnemonic , receivers_address , receivers_mnemonic), "completed") #untested
 
 
 	if status:
@@ -260,7 +260,7 @@ func create_new_account(_account : Array): #it should be fed the account varible
 
 
 "# sends transaction btw two accounts"
-func _test_transaction_to_receiver_addr( _funder_address : String, _funder_mnemonic : String, _receivers_address : String , _receivers_mnemonic: String  ): #works #should be fed the receiver and sender's accounts as parameters
+func _send_transaction_to_receiver_addr( _funder_address : String, _funder_mnemonic : String, _receivers_address : String , _receivers_mnemonic: String  ): #works #should be fed the receiver and sender's accounts as parameters
 	print(" -- _sending_transaction")
 	
 	print("sending tx")
@@ -292,8 +292,8 @@ func _test_transaction_to_receiver_addr( _funder_address : String, _funder_mnemo
 
 
 " Make Sure the Funder's Address has sufficient Algos or the Code will Break"
-func _test_asset_transfers_to_receivers_address(_funder_address : String, _funder_mnemonic : String, _receivers_address : String , _receivers_mnemonic): # 
-	print(" -- _test_asset_transfers")
+func _send_asset_transfers_to_receivers_address(_funder_address : String, _funder_mnemonic : String, _receivers_address : String , _receivers_mnemonic): # 
+	print(" -- _sending_asset_transfers")
 	
 	
 	
@@ -440,10 +440,6 @@ func create_assets(asset_name : String, to_address : String, Total_supply: int):
 		"GTC"		# Unit name
 	)
 	return tx
-
-func destroy_assets():
-	"placehlder function, would arrange logic later"
-	pass
 
 
 func construct_asset_transfer( from_address : String, to_address : String, amount_ : int ):

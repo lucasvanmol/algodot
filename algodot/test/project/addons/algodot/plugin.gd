@@ -10,6 +10,16 @@ var show_documentation : bool
 #var _export_plugin
 func _init():
 	add_autoload_singleton('DocsHelper', "res://addons/algodot/Documentation/Scripts/DocsHelper.gd")
+	#####for buiilt in documentation
+	#if get_editor_interface().is_plugin_enabled("algodot"):
+	_add_custom_editor_view()
+	
+	"Adds a Custom Tab for Documentations"
+	#get_editor_interface().get_editor_viewport().add_child(_editor_view)
+	
+	get_editor_interface().get_inspector().get_parent_control().get_parent().add_child(_editor_view)
+	
+	#get_editor_interface().get_inspector().add_child(_editor_view)
 
 
 func _enter_tree():
@@ -36,33 +46,6 @@ func _enter_tree():
 	
 
 
-func _ready():
-	#####for buiilt in documentation
-	#if get_editor_interface().is_plugin_enabled("algodot"):
-	var _t = Node.new()#placeholder
-	
-	_add_custom_editor_view()
-	
-	"Adds a Custom Tab for Documentations"
-	get_editor_interface().get_editor_viewport().add_child(_editor_view)
-	#_t.add_child(_editor_view)
-	#get_editor_interface().get_editor_viewport().add_child(_t)
-	
-	
-	#get_editor_interface().get_inspector().add_child(_editor_view)
-	
-	#_editor_view.editor_interface = get_editor_interface()
-	"set scale"
-	#var _1 =_editor_view.get_parent_control()  #parent is a vbox Container
-	#_1.set_alignment(1)  # vbox parent is a panel container
-	
-	#var scale =get_editor_interface().get_editor_viewport().siz
-	#print (scale)
-
-
-#	if Engine.editor_hint:
-#		# Force Godot to show the dialogic folder #change documentation
-#		get_editor_interface().get_resource_filesystem().scan()
 
 
 func _exit_tree():
