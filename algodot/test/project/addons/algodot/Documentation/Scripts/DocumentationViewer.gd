@@ -16,6 +16,11 @@ extends Control
 onready var DocTree = $HSplit/VBoxContainer/DocumentationTree
 onready var DocPageViewer = $HSplit/DocsPageViewer
 
+# ************* Connecting Signals **************
+onready var FilterEntry = $HSplit/VBoxContainer/FilterEntry
+
+func _ready():
+	connect_signals()
 
 func _on_DocsPageViewer_open_non_html_link(link, section):
 	#print ("VVVVVVVVVVVVVVVVVV") #for debug purposes only
@@ -47,4 +52,8 @@ func connect_signals() -> void:
 	filder entry node, documentation tree node and
 	docs page node once this scene is ready
 	"""
+	DocTree.connect("_page_selected", self,"_on_DocumentationTree__page_selected")
+	FilterEntry.connect("text_changed", self,"_on_FilterEntry_text_changed")
+	DocPageViewer.connect("meta_clicked",self,"_on_DocsPageViewer_open_non_html_link")
+	
 	pass
