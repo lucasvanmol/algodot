@@ -39,3 +39,12 @@ func _on_FilterEntry_text_changed(new_text):
 func _on_DocumentationTree__page_selected(path):
 	#print ("UUUUUUUUUUUUUUUUUUUUUUUU") #for debug purposes only
 	_on_DocumentationTree_page_selected(path)
+
+
+func connect_signals() -> void:
+	"""
+	placeholder script to programmatically connect
+	filder entry node, documentation tree node and
+	docs page node once this scene is ready
+	"""
+	pass
