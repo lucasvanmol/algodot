@@ -1,0 +1,13 @@
+[gd_resource type="GDNativeLibrary" format=2]
+
+[resource]
+entry/Windows.64 = "res://addons/algodot/lib/algodot.dll"
+entry/X11.64 = "res://addons/algodot/lib/libalgodot.so"
+entry/X11.32 = "res://addons/algodot/lib/libalgodot.so"
+entry/Server.32="res://addons/algodot/lib/libalgodot.so"
+entry/Server.64="res://addons/algodot/lib/libalgodot.so"
+dependency/Windows.64 = [  ]
+dependency/X11.64 = [  ]
+dependency/X11.32 = [  ]
+dependency/Server.32 = [  ]
+dependency/Server.64 = [  ]
