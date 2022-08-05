@@ -25,8 +25,9 @@
 
 extends Node
 
-var algod: Algod
+var algod: Algod 
 
+class_name Algorand, "res://addons/algodot/icon.png"
 
 export (String) var funder_mnemonic
 export (String) var funder_address
