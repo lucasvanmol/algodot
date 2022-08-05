@@ -1,0 +1,3 @@
+# show available rust build targets
+
+rustc --print target-list

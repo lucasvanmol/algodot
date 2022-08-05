@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-=======
-
-//////////////////////////
-
->>>>>>> d2563ad3dd805622d8e5209ef5e2c9393855240f
 use gdnative::prelude::*;
 use tokio::{
     runtime::{Builder, Runtime},
