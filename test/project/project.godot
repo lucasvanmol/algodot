@@ -15,9 +15,9 @@ _global_script_classes=[ {
 "path": "res://addons/algodot/gdnative/algod.gdns"
 }, {
 "base": "Node",
-"class": "Algorand",
+"class": "Algodot",
 "language": "GDScript",
-"path": "res://Algod.gd"
+"path": "res://addons/algodot/Algod.gd"
 }, {
 "base": "Node",
 "class": "AsyncExecutorDriver",
@@ -31,7 +31,7 @@ _global_script_classes=[ {
 } ]
 _global_script_class_icons={
 "Algod": "",
-"Algorand": "res://addons/algodot/icon.png",
+"Algodot": "res://addons/algodot/icon.png",
 "AsyncExecutorDriver": "",
 "ReferenceCollector": ""
 }
