@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [package]
 name = "algodot"
 version = "0.2.0"
@@ -17,3 +18,12 @@ algodot_macros = { path = "../macros" }
 algodot_core = { path = "../core" }
 serde_json = "1.0"
 serde = "1.0"
+=======
+[workspace]
+
+members = [
+    "algodot",
+    "macros"
+]
+
+>>>>>>> d2563ad3dd805622d8e5209ef5e2c9393855240f

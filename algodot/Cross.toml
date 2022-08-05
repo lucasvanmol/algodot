@@ -1,0 +1,6 @@
+# For cross-compilation with cross (https://github.com/cross-rs/cross)
+#
+# `cross build --target x86_64-unknown-linux-gnu`
+
+[target.x86_64-unknown-linux-gnu.dockerfile]
+file = "./docker/Dockerfile"

@@ -1,0 +1,62 @@
+{
+    "alloc": [
+        {
+            "addr": "7777777777777777777777777777777777777777777777777774MSJUVU",
+            "comment": "RewardsPool",
+            "state": {
+                "algo": 125000000000000,
+                "onl": 2
+            }
+        },
+        {
+            "addr": "A7NMWS3NT3IUDMLVO26ULGXGIIOUQ3ND2TXSER6EBGRZNOBOUIQXHIBGDE",
+            "comment": "FeeSink",
+            "state": {
+                "algo": 100000,
+                "onl": 2
+            }
+        },
+        {
+            "addr": "QA5SSHODRUTW6QM3CTJPBYWMUVCR43CXIHMJOLIG5DDQO2YAYDRUBGYVBM",
+            "comment": "Wallet1",
+            "state": {
+                "algo": 4000000000000000,
+                "onl": 1,
+                "sel": "4oYvmggPl7uEgZcEtEKcAIstcMvxOZWv2pFHrviCrP8=",
+                "vote": "HF7lIee3yXvWhNoQXIe/ONkT+AW2/XDxqAfVciTvp2Q=",
+                "voteKD": 10000,
+                "voteLst": 3000000
+            }
+        },
+        {
+            "addr": "S5THZ2PD5POQGXAEAGUBPUM3X5NLJWBBBCVXK7WLSH6DMEEW6UJB45TBNE",
+            "comment": "Wallet2",
+            "state": {
+                "algo": 4000000000000000,
+                "onl": 1,
+                "sel": "+0tVJBLIvJyxedN0tb0EukbrsqwK1s7jKOZ6kivqF+Q=",
+                "vote": "69ci1xfCCPvSxKECQ9yp7j8nY00B9LyTXJ3/0gTVneo=",
+                "voteKD": 10000,
+                "voteLst": 3000000
+            }
+        },
+        {
+            "addr": "3WG6QOO3GRIGGHCXL473CHUG65UJKRPXKACKOVNWIIKCD37QOCPVXE3SAM",
+            "comment": "Wallet3",
+            "state": {
+                "algo": 2000000000000000,
+                "onl": 1,
+                "sel": "JPfrcfb2vBssngXqCgO0aYIMbvwd3aZiEJEGnd+6gjY=",
+                "vote": "tGuCC4uyw3ji92goTUQGgfFitcw7wHqqwFBf+O8lkPM=",
+                "voteKD": 10000,
+                "voteLst": 3000000
+            }
+        }
+    ],
+    "devmode": true,
+    "fees": "A7NMWS3NT3IUDMLVO26ULGXGIIOUQ3ND2TXSER6EBGRZNOBOUIQXHIBGDE",
+    "id": "v1",
+    "network": "sandnet",
+    "proto": "future",
+    "rwd": "7777777777777777777777777777777777777777777777777774MSJUVU"
+}
