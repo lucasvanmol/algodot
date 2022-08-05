@@ -1,14 +1,9 @@
 [gd_scene load_steps=2 format=2]
 
-[ext_resource path="res://addons/algodot/Algod.gd" type="Script" id=1]
+[ext_resource path="res://main.gd" type="Script" id=1]
 
 [node name="Node" type="Node"]
 script = ExtResource( 1 )
-funder_mnemonic = "height decade cable deliver magnet approve chief only bicycle minute afford toilet increase scene armed thrive then grief spy away medal quiz copper able broccoli"
-funder_address = "L5ESENBL23J2GJGM64Y767IXWGBCKXMGS2OGZ3MC5BBGWJAKJJAUK7BJK4"
-url = "http://localhost:8980"
-receivers_mnemonic = "dream choose rent holiday access human repeat brush unveil junk tooth chair orbit bullet gain jar hawk inflict mansion fiscal pride rice noodle ability code"
-receivers_address = "2MVQEMG7I2BRKQZHLSF6XA6MXRI23N5HRLJENQRU75FNP64VSJ5RRWWVV4"
 
 [node name="Timer" type="Timer" parent="."]
 wait_time = 30.0
