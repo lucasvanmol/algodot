@@ -27,7 +27,7 @@ extends Node
 
 var algod: Algod
 
-
+class_name Algodot, 'res://addons/algodot/icon.png'
 export (String) var funder_mnemonic
 export (String) var funder_address
 export (String) var url
@@ -38,7 +38,7 @@ var params
 export (String) var receivers_mnemonic
 export (String) var receivers_address
 
-onready var parent = $parent #for holding algod child node
+#onready var parent = get_tree().get_root() #for holding algod child node
 
 # placeholder variables
 export ( bool) var debug_txn   #debugs my code
@@ -59,42 +59,48 @@ var optin_tx #placeholder for opt in asset transaction
 var _info : Dictionary# account asset info placeholder
 
 var wait # debugs the transaction by waiting until it's completed
-
-func create_algod_node():
-	print(" -- Initialize Algod")
-	algod = Algod.new() 
-
-	algod.url = "http://localhost:4001" #duplicate of Url variable
-	algod.token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-	
-	
-	# Sorts Node arrangement in the scene tree
-	parent.add_child(algod)
+var status: bool
 
 
 
 func _ready():
-	create_algod_node()
+	#create_algod_node() #causes a bug
+	
+	if  debug_txn:
+		_run_debug_test()
+
+func create_algod_node(): #causes a wierd bug
+	print(" -- Initialize Algod")
+	algod = Algod.new() 
+
+	#duplicate of Url variable
+	algod.url = "http://localhost:4001"  #for sandbox environment. Used Change this variable for testnet
+	algod.token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" #for sandbox environment. Used Change this variable for testnet
+	
+	
+	# Sorts Node arrangement in the scene tree
+	#get_tree().get_root().add_child(algod)
+
+
+
+func _run_debug_test():
+	#create_algod_node()
 	
 	# Sorts Node arrangement in the scene tree
 	#parent.add_child(algod)
 
 
-	var status = true
+	
 
 	print(" -- Get funder account")
-	#funder_mnemonic = OS.get_environment("ALGODOT_FUNDER_MNEMONIC") #Huh? #This does what # not needed
-	if funder_mnemonic == "":
-		printerr("   !! Funder's Mnemonic cannot be an empty string. Initialization failed")
-		_timeout(1)
 
-	#funder_address = algod.get_address(funder_mnemonic) 
+
 
 	" These are custom tests for the Script. Run to test that Script works"
 	if debug_txn == true: 
 		status = status && yield(_test_algod_connection(), "completed") #works
-		#status = status && yield(_send_transaction_to_receiver_addr(funder_address , funder_mnemonic , receivers_address , receivers_mnemonic), "completed") #works
-		status = status && yield(_send_asset_transfers_to_receivers_address(funder_address , funder_mnemonic , receivers_address , receivers_mnemonic), "completed") #untested
+		status = status && yield(_send_transaction_to_receiver_addr(funder_address , funder_mnemonic , receivers_address , receivers_mnemonic), "completed") #works
+		status = status && yield(_send_asset_transfers_to_receivers_address(funder_address , funder_mnemonic , receivers_address , receivers_mnemonic), "completed") #works
 		print (status)
 
 	if status:
@@ -104,7 +110,7 @@ func _ready():
 		OS.exit_code = 1
 
 	print(" -- exiting.")
-	get_tree().quit()
+	get_tree().queue_delete(self)
 
 func _timeout( wait_time : int):
 	yield(get_tree().create_timer(wait_time), "timeout")
@@ -288,16 +294,17 @@ func _send_asset_transfers_to_receivers_address(_funder_address : String, _funde
 			return false
 
 " This function can be expanded upon to print lots of Account specific details"
-func _check_account_information(address : String, mnemonic : String, info : String)-> Dictionary: #account debugger #works
+#expand to include asset Url
+func _check_account_information(address : String, mnemonic : String, info : String) -> Dictionary: #account debugger #works
 	_info = yield(algod.account_information(address,mnemonic), "completed")
 	if info == "" or null:
-		return (print (_info))
+		return (_info)
 	elif info == "assets" :
 		var _a = _info.assets
-		return (print (_a))
+		return (_a)
 	elif info == "asset-id":
 		var _b = _info.get("asset-id")
-		return (print (_b))
+		return (_b)
 	else:
 		return 
 
@@ -347,6 +354,22 @@ func opt_in_asset_transaction( from_address: String, _asset_index):
 		_asset_index
 		)
 	return optin_tx
+
+func create_NFT(asset_name : String, to_address : String, Total_supply: int, Unit_name: String, url: String): # a modified version of create assets
+	print("-----creating NFT----", asset_name, "/", url)
+	generate_suggested_transaction_parameters()
+	tx = algod.construct_asset_create( #breaks
+		params,
+		to_address, # Creator #SDK uses default sandbox wallet and ignores this creator (fixed)
+		asset_name,	# Asset name
+		0,			# Decimals #i.e how many decimals from the total supply
+		false,		# Default frozen?
+		Total_supply,		# Total supply # This is 1000.00
+		Unit_name,		# Unit name eg GTC, TC, GC
+		url		# Unit name eg GTC, TC, GC
+	)
+	return tx
+
 # Path is the loaded path to the teal script to be compiled
 func compile_teal(path : String): # Teal programs only use Approve()  and Clear() functions
 	yield (algod.compile_teal( path), "completed") #compiling teal from pyteal seems more efficient, this is a placeholder code
@@ -354,8 +377,10 @@ func compile_teal(path : String): # Teal programs only use Approve()  and Clear(
 "Placeholder Functions"
 func encrypt():
 	print ("Placeholder function")
+	Crypto.new() #check Crypto documentation to cryptographically sign script
 	pass
 
 func decrypt():
 	print ("Placeholder function")
+	Crypto.new() #check Crypto documentation to cryptographically sign script
 	pass
