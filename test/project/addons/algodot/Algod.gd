@@ -89,7 +89,7 @@ func _run_debug_test():
 	" These are custom tests for the Script. Run to test that Script works"
 	if debug_txn == true: 
 		status = status && yield(_test_algod_connection(), "completed") #works
-		status = status && yield(_send_transaction_to_receiver_addr(funder_address , funder_mnemonic , receivers_address , receivers_mnemonic), "completed") #works
+		status = status && yield(_send_transaction_to_receiver_addr(funder_address , funder_mnemonic , receivers_address , receivers_mnemonic,1000000000000000), "completed") #works
 		status = status && yield(_send_asset_transfers_to_receivers_address(funder_address , funder_mnemonic , receivers_address , receivers_mnemonic), "completed") #works
 		print (status)
 
@@ -140,7 +140,7 @@ func create_new_account(_account : Array): #it should be fed the account varible
 
 
 " Sends transaction btw two accounts"
-func _send_transaction_to_receiver_addr( _funder_address : String, _funder_mnemonic : String, _receivers_address : String , _receivers_mnemonic: String  ): #works #should be fed the receiver and sender's accounts as parameters
+func _send_transaction_to_receiver_addr( _funder_address : String, _funder_mnemonic : String, _receivers_address : String , _receivers_mnemonic: String  , _amount: int): #works #should be fed the receiver and sender's accounts as parameters
 	print(" -- _sending_transaction")
 	
 	print("sending tx")
@@ -152,7 +152,7 @@ func _send_transaction_to_receiver_addr( _funder_address : String, _funder_mnemo
 	
 
 	#create and sign transaction
-	tx = algod.construct_payment(params, _funder_address, _receivers_address, 1000000000000000)
+	tx = algod.construct_payment(params, _funder_address, _receivers_address, _amount)
 	
 	#sending the signed transaction
 	stx = algod.sign_transaction(tx, _funder_mnemonic)
