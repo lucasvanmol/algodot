@@ -1,8 +1,6 @@
 tool
 extends EditorPlugin
 
-var gdn
-
 
 var _editor_view
 
@@ -13,17 +11,11 @@ func _init():
 	_add_custom_editor_view()
 	
 	"Adds a Custom Tab for Documentations"
-
-	
-	get_editor_interface().get_inspector().get_parent_control().get_parent().add_child(_editor_view)
-	
-	
-
+	get_editor_interface().get_editor_viewport().add_child(_editor_view)
+	make_visible(false)
 
 func _enter_tree():
-	
 
-	
 	var gui = get_editor_interface().get_base_control()
 	var node_icon = gui.get_icon("Node", "EditorIcons")
 
@@ -33,15 +25,7 @@ func _enter_tree():
 		preload("res://addons/algodot/gdnative/algod.gdns"),
 		node_icon
 	)
-	
-	
 	add_autoload_singleton("AsyncExecutorDriver", "res://addons/algodot/gdnative/async_executor.gdns")
-	
-
-	
-	
-
-	
 
 
 
@@ -60,7 +44,7 @@ func _exit_tree():
 
 
 #***********For Builtin Documentation***********#
-func get_plugin_name():
+func get_plugin_name()-> String:
 	return "Algodot"
 
 
@@ -72,6 +56,15 @@ func _add_custom_editor_view():
 
 func _remove_custom_editor_view():
 	if _editor_view:
-		
-		remove_control_from_docks(_editor_view)
+		_editor_view.queue_free()
+
+func has_main_screen()-> bool:
+	return true
+
+func make_visible(visible: bool) -> void:
+	if _editor_view:
+		_editor_view.visible=visible
+
+func get_plugin_icon()-> Texture:
+	return get_editor_interface().get_base_control().get_icon("Spatial", "EditorIcons")
 
