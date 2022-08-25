@@ -1,11 +1,12 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
+[ext_resource path="res://main.gd" type="Script" id=1]
 [ext_resource path="res://addons/algodot/Algod.gd" type="Script" id=2]
 
 [node name="Node" type="Node"]
+script = ExtResource( 1 )
 
 [node name="Algodot" type="Node" parent="."]
 script = ExtResource( 2 )
 funder_mnemonic = "height decade cable deliver magnet approve chief only bicycle minute afford toilet increase scene armed thrive then grief spy away medal quiz copper able broccoli"
 receivers_mnemonic = "rigid steak better media circle nothing range tray firm fatigue pool damage welcome supply police spoon soul topic grant offer chimney total bronze able human"
-debug_txn = true

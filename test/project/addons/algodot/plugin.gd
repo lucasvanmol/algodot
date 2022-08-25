@@ -33,7 +33,7 @@ func _enter_tree():
 func _exit_tree():
 	
 	remove_custom_type("Algod")
-	remove_autoload_singleton("AsyncExecutorDriver")
+	#remove_autoload_singleton("AsyncExecutorDriver") #causes leaked memory bug
 
 #************For Builtin Documentation***********#
 	
