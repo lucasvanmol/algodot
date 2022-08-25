@@ -27,14 +27,14 @@ var algod: Algod
 
 class_name Algodot, 'res://addons/algodot/icon.png'
 export (String) var funder_mnemonic
-export (String) var funder_address
+#export (String) var funder_address
 
 
 var params
 
 " For Testing purpose only. Should be encrypted in release build"
 export (String) var receivers_mnemonic
-export (String) var receivers_address
+#export (String) var receivers_address
 
 
 
@@ -87,16 +87,16 @@ func _run_debug_test():
 
 
 	" These are custom tests for the Script. Run to test that Script works"
-	if debug_txn == true: 
-		status = status && yield(_test_algod_connection(), "completed") #works
-		status = status && yield(_send_transaction_to_receiver_addr(funder_address , funder_mnemonic , receivers_address , receivers_mnemonic,1000000000000000), "completed") #works
-		status = status && yield(_send_asset_transfers_to_receivers_address(funder_address , funder_mnemonic , receivers_address , receivers_mnemonic), "completed") #works
-		print (status)
 
+	status = status && yield(_test_algod_connection(), "completed") #works
+	status = status && yield(_send_transaction_to_receiver_addr(funder_mnemonic , receivers_mnemonic,1000000000000000), "completed") #works
+	status = status && yield(_send_asset_transfers_to_receivers_address(funder_mnemonic ,  receivers_mnemonic), "completed") #works
+		
 	if status:
 		print(" -- Test run completed successfully.")
-	else:
+	else: #returns false even though transaction runs
 		print(" -- Test run completed with errors.")
+		print (status)
 		OS.exit_code = 1
 
 	print(" -- exiting.")
@@ -140,17 +140,22 @@ func create_new_account(_account : Array): #it should be fed the account varible
 
 
 " Sends transaction btw two accounts"
-func _send_transaction_to_receiver_addr( _funder_address : String, _funder_mnemonic : String, _receivers_address : String , _receivers_mnemonic: String  , _amount: int): #works #should be fed the receiver and sender's accounts as parameters
+func _send_transaction_to_receiver_addr( _funder_mnemonic : String, _receivers_mnemonic: String  , _amount: int): #works #should be fed the receiver and sender's accounts as parameters
+	
+	
 	print(" -- _sending_transaction")
 	
 	print("sending tx")
-	
-	 
+	var _funder_address=algod.get_address(_funder_mnemonic)
+	var _receivers_address=algod.get_address(_receivers_mnemonic)
 	
 	#get suggested parameters
 	params = yield(algod.suggested_transaction_params(), "completed")
 	
-
+	#get initial address amount
+	var _account_info: Dictionary=(yield(algod._check_account_information(_funder_address,_funder_mnemonic, ""), "completed"))
+	
+	var initial_amount: int = _account_info["amount"]
 	#create and sign transaction
 	tx = algod.construct_payment(params, _funder_address, _receivers_address, _amount)
 	
@@ -167,16 +172,20 @@ func _send_transaction_to_receiver_addr( _funder_address : String, _funder_mnemo
 	# getting the account infromation
 	var info = yield(algod.account_information(_receivers_address), "completed")
 	
-	
+	assert(info.amount == initial_amount + _amount)
 	#verifying the receiver's account's algo holdings
-	return info.amount 
+	print (info.amount, (initial_amount+_amount))
+	return info.amount == initial_amount + _amount
 
 
 " Make Sure the Funder's Address has sufficient Algos or the Code will Break"
-func _send_asset_transfers_to_receivers_address(_funder_address : String, _funder_mnemonic : String, _receivers_address : String , _receivers_mnemonic): # 
+func _send_asset_transfers_to_receivers_address( _funder_mnemonic : String, _receivers_mnemonic : String): # 
 	print(" -- _sending_asset_transfers")
 
 	params = yield(algod.suggested_transaction_params(), "completed") #duplicate of :generate_suggested_transaction_parameters()
+	
+	var _funder_address=algod.get_address(_funder_mnemonic)
+	var _receivers_address=algod.get_address(_receivers_mnemonic)
 	
 	#creates assets
 	create_assets("SamCoin", _receivers_address, 1000, "SC") 
