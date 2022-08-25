@@ -133,3 +133,7 @@ func _on_EditPage_pressed():
 
 func _on_RefreshPage_pressed():
 	load_page(current_page)
+
+
+func _exit_tree():
+	MarkdownParser.queue_free()
