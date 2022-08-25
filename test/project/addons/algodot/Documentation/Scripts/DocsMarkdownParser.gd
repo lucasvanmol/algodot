@@ -2,6 +2,7 @@
 
 extends Node
 
+var regex: RegEx
 
 var heading1_font = "res://addons/algodot/Documentation/Theme/DocumentationH1.tres"
 var heading2_font = "res://addons/algodot/Documentation/Theme/DocumentationH2.tres"
@@ -10,22 +11,22 @@ var heading4_font = "res://addons/algodot/Documentation/Theme/DocumentationH4.tr
 var heading5_font = "res://addons/algodot/Documentation/Theme/DocumentationH5.tres"
 
 ## These will change with each parsing, but can be saved manually after parsing 
-var heading1s = []
-var heading2s = []
-var heading3s = []
-var heading4s = []
-var heading5s = []
-var result = ""
-var bolded = []
-var italics = []
-var striked = []
-var coded = []
-var linknames = []
-var links = []
-var imagenames = []
-var imagelinks = []
-var lists = []
-var underlined = []
+var heading1s
+var heading2s
+var heading3s
+var heading4s
+var heading5s
+var result 
+var bolded 
+var italics 
+var striked 
+var coded 
+var linknames 
+var links 
+var imagenames 
+var imagelinks 
+var lists 
+var underlined 
 
 ################################################################################
 ##							PUBLIC FUNCTIONS 								  ##
@@ -51,7 +52,7 @@ func parse(content : String):
 	lists = []
 	underlined = []
 
-	var regex = RegEx.new()
+	regex=regex.new()
 
 	## Find all occurences of bold text
 	regex.compile('\\*\\*(?<boldtext>.*)\\*\\*')
@@ -196,3 +197,24 @@ func parse(content : String):
 			content = content.replace("+"+element,"[indent]-"+element+"[/indent]")
 	#print (" DocsMarkdown Parser debug : ",content) #for deug purposes only
 	return content
+
+func clear_memory(): #delete leaked objects from the scene tree
+	heading1s=null
+	heading2s=null
+	heading3s=null
+	heading4s=null
+	heading5s=null
+	result=null 
+	bolded=null 
+	italics=null 
+	striked=null 
+	coded=null 
+	linknames=null 
+	links=null 
+	imagenames=null 
+	imagelinks=null 
+	lists=null 
+	underlined=null 
+
+	italics= null
+	self.queue_free()
