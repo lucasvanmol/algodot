@@ -91,24 +91,24 @@ impl Algodot {
 
 #[methods]
 impl Algodot {
-    #[method]
-    fn _enter_tree<'a>(&mut self, _owner: TRef<Node>) {
+    #[export]
+    fn _enter_tree(&mut self, _owner: TRef<Node>) {
         self.update_algod(_owner);
     }
 
-    #[method]
+    #[export]
     fn set_url(&mut self, _owner: TRef<Node>, url: String) {
         self.url = url;
         self.update_algod(_owner);
     }
 
-    #[method]
+    #[export]
     fn set_token(&mut self, _owner: TRef<Node>, token: String) {
         self.token = token;
         self.update_algod(_owner);
     }
 
-    #[method]
+    #[export]
     fn set_headers(&mut self, _owner: TRef<Node>, headers: StringArray) {
         self.headers = headers;
         self.update_algod(_owner);
@@ -157,18 +157,18 @@ impl Algodot {
         }
     }
 
-    #[method]
+    #[export]
     fn generate_key(&self, _owner: TRef<Node>) -> (String, String) {
         let acc = Account::generate();
         (acc.address().to_string(), acc.mnemonic())
     }
 
-    #[method]
+    #[export]
     fn get_address(&self, _owner: TRef<Node>, mnemonic: Account) -> Address {
         mnemonic.address().into()
     }
 
-    #[method]
+    #[export]
     fn sign_transaction(
         &self,
         _owner: TRef<Node>,
@@ -179,7 +179,7 @@ impl Algodot {
         godot_unwrap!(stxn).map(SignedTransaction::from)
     }
 
-    #[method]
+    #[export]
     fn construct_payment(
         &self,
         _owner: TRef<Node>,
@@ -197,7 +197,7 @@ impl Algodot {
         .into()
     }
 
-    #[method]
+    #[export]
     #[allow(clippy::too_many_arguments)]
     fn construct_asset_xfer(
         &self,
@@ -224,7 +224,7 @@ impl Algodot {
         .into()
     }
 
-    #[method]
+    #[export]
     #[allow(clippy::too_many_arguments)]
     fn construct_asset_create(
         &self,
@@ -270,7 +270,7 @@ impl Algodot {
         .into()
     }
 
-    #[method]
+    #[export]
     #[allow(clippy::too_many_arguments)]
     fn construct_app_call(
         &self,
@@ -340,7 +340,7 @@ impl Algodot {
         .into()
     }
 
-    #[method]
+    #[export]
     fn construct_asset_opt_in(
         &self,
         _owner: TRef<Node>,
@@ -360,7 +360,7 @@ impl Algodot {
         .into()
     }
 
-    #[method]
+    #[export]
     /// Give transactions same group id
     fn group_transactions(
         &self,
