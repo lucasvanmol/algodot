@@ -1,3 +1,4 @@
+
 use algodot_core::*;
 use algodot_macros::*;
 use algonaut::algod::v2::Algod;
@@ -11,13 +12,11 @@ use algonaut::transaction::tx_group::TxGroup;
 use algonaut::transaction::{Pay, TransactionType, TxnBuilder};
 use gdnative::api::Engine;
 use gdnative::prelude::*;
-use gdnative::prelude::Node;
 use gdnative::tasks::{Async, AsyncMethod, Spawner};
 use std::rc::Rc;
 
 #[derive(NativeClass)]
 #[inherit(Node)]
-
 #[register_with(Self::register)]
 pub struct Algodot {
     #[property(set = "Self::set_url")]
