@@ -1,4 +1,3 @@
-
 use algodot_core::*;
 use algodot_macros::*;
 use algonaut::algod::v2::Algod;
@@ -93,29 +92,29 @@ impl Algodot {
 #[methods]
 impl Algodot {
     #[method]
-    fn _enter_tree(&mut self, _owner: Node) {
-        self.update_algod(_owner);
+    fn _enter_tree(&mut self,#[base] base: &Node) {
+        self.update_algod(base);
     }
 
     #[method]
-    fn set_url(&mut self, _owner: Node, url: String) {
+    fn set_url(&mut self,#[base] base: &Node, url: String) {
         self.url = url;
-        self.update_algod(_owner);
+        self.update_algod(base);
     }
 
     #[method]
-    fn set_token(&mut self, _owner: Node, token: String) {
+    fn set_token(&mut self,#[base] base: &Node, token: String) {
         self.token = token;
         self.update_algod(_owner);
     }
 
     #[method]
-    fn set_headers(&mut self, _owner: Node, headers: StringArray) {
+    fn set_headers(&mut self, _owner: TRef<Node>, headers: StringArray) {
         self.headers = headers;
         self.update_algod(_owner);
     }
 
-    fn update_algod(&mut self, _owner: Node) {
+    fn update_algod(&mut self, #[base] base: &Node) {
         // Do not update while in editor
         // e.g. editing properties in the inspector
         if Engine::godot_singleton().is_editor_hint() {
@@ -159,20 +158,20 @@ impl Algodot {
     }
 
     #[method]
-    fn generate_key(&self, _owner: Node) -> (String, String) {
+    fn generate_key(&self, #[base] base: &Node) -> (String, String) {
         let acc = Account::generate();
         (acc.address().to_string(), acc.mnemonic())
     }
 
     #[method]
-    fn get_address(&self, _owner: Node, mnemonic: Account) -> Address {
+    fn get_address(&self, #[base] base: &Node, mnemonic: Account) -> Address {
         mnemonic.address().into()
     }
 
     #[method]
     fn sign_transaction(
         &self,
-        _owner: Node,
+        #[base] base: &Node,
         txn: Transaction,
         signer: Account,
     ) -> Option<SignedTransaction> {
@@ -183,7 +182,7 @@ impl Algodot {
     #[method]
     fn construct_payment(
         &self,
-        _owner: Node,
+        #[base] base: &Node,
         params: SuggestedTransactionParams,
         sender: Address,
         receiver: Address,
@@ -202,7 +201,7 @@ impl Algodot {
     #[allow(clippy::too_many_arguments)]
     fn construct_asset_xfer(
         &self,
-        _owner: Node,
+        #[base] base: &Node,
         params: SuggestedTransactionParams,
         sender: Address,
         receiver: Address,
@@ -229,7 +228,7 @@ impl Algodot {
     #[allow(clippy::too_many_arguments)]
     fn construct_asset_create(
         &self,
-        _owner: Node,
+        #[base] base: &Node,
         params: SuggestedTransactionParams,
         sender: Address,
         asset_name: String,
@@ -275,7 +274,7 @@ impl Algodot {
     #[allow(clippy::too_many_arguments)]
     fn construct_app_call(
         &self,
-        _owner: Node,
+        _owner: TRef<Node>,
         params: SuggestedTransactionParams,
         sender: Address,
         #[opt] app_id: Option<u64>,
@@ -344,7 +343,7 @@ impl Algodot {
     #[method]
     fn construct_asset_opt_in(
         &self,
-        _owner: Node,
+        #[base] base: &Node,
         params: SuggestedTransactionParams,
         sender: Address,
         asset_id: u64,
@@ -365,7 +364,7 @@ impl Algodot {
     /// Give transactions same group id
     fn group_transactions(
         &self,
-        _owner: TRef<Node>,
+        #[base] base: &Node,
         mut txns: Vec<Transaction>,
     ) -> Option<Vec<Transaction>> {
         let mut txns_mut_refs: Vec<&mut algonaut::transaction::Transaction> =
