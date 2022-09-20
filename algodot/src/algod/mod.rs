@@ -11,6 +11,9 @@ use algonaut::transaction::tx_group::TxGroup;
 use algonaut::transaction::{Pay, TransactionType, TxnBuilder};
 use gdnative::api::Engine;
 use gdnative::prelude::*;
+
+gdnative::prelude::Node;
+
 use gdnative::tasks::{Async, AsyncMethod, Spawner};
 use std::rc::Rc;
 
