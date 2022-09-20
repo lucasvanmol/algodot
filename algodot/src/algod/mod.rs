@@ -19,6 +19,7 @@ use std::rc::Rc;
 
 #[derive(NativeClass)]
 #[inherit(Node)]
+
 #[register_with(Self::register)]
 pub struct Algodot {
     #[property(set = "Self::set_url")]
@@ -367,7 +368,7 @@ impl Algodot {
     /// Give transactions same group id
     fn group_transactions(
         &self,
-        _owner: &Node,
+        _owner: TRef<Node>,
         mut txns: Vec<Transaction>,
     ) -> Option<Vec<Transaction>> {
         let mut txns_mut_refs: Vec<&mut algonaut::transaction::Transaction> =
