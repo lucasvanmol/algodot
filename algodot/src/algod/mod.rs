@@ -17,18 +17,7 @@ use std::rc::Rc;
 #[derive(NativeClass)]
 #[inherit(Node)]
 #[register_with(Self::register)]
-pub struct Algodot {
-    #[property(set = "Self::set_url")]
-    url: String,
-
-    #[property(set = "Self::set_token")]
-    token: String,
-
-    #[property(set = "Self::set_headers")]
-    headers: StringArray,
-
-    algod: Rc<Algod>,
-}
+pub struct Algodot {}
 
 impl Algodot {
     fn new(#[base] base: &Node) -> Self {
