@@ -114,7 +114,7 @@ impl Algodot {
         self.update_algod();
     }
 
-    fn update_algod() {
+    fn update_algod(&self) {
         // Do not update while in editor
         // e.g. editing properties in the inspector
         if Engine::godot_singleton().is_editor_hint() {
