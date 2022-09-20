@@ -93,7 +93,7 @@ impl Algodot {
 impl<'a> Algodot {
     #[method]
     fn _enter_tree(&mut self, _owner: TRef<'a, Node>) {
-        self.update_algod(_owner);
+        self.update_algod('a, _owner);
     }
 
     #[method]
