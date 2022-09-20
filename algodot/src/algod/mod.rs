@@ -97,24 +97,24 @@ impl<'a> Algodot {
     }
 
     #[method]
-    fn set_url(&mut self, _owner: TRef<Node>, url: String) {
+    fn set_url(&mut self, _owner: TRef<'a, Node>, url: String) {
         self.url = url;
         self.update_algod(_owner);
     }
 
     #[method]
-    fn set_token(&mut self, _owner: TRef<Node>, token: String) {
+    fn set_token(&mut self, _owner: TRef<'a, Node>, token: String) {
         self.token = token;
         self.update_algod(_owner);
     }
 
     #[method]
-    fn set_headers(&mut self, _owner: TRef<Node>, headers: StringArray) {
+    fn set_headers(&mut self, _owner: TRef<'a, Node>, headers: StringArray) {
         self.headers = headers;
         self.update_algod(_owner);
     }
 
-    fn update_algod(&mut self, _owner: TRef<Node>) {
+    fn update_algod(&mut self, _owner: TRef<'a, Node>) {
         // Do not update while in editor
         // e.g. editing properties in the inspector
         if Engine::godot_singleton().is_editor_hint() {
@@ -158,20 +158,20 @@ impl<'a> Algodot {
     }
 
     #[method]
-    fn generate_key(&self, _owner: TRef<Node>) -> (String, String) {
+    fn generate_key(&self, _owner: TRef<'a, Node>) -> (String, String) {
         let acc = Account::generate();
         (acc.address().to_string(), acc.mnemonic())
     }
 
     #[method]
-    fn get_address(&self, _owner: TRef<Node>, mnemonic: Account) -> Address {
+    fn get_address(&self, _owner: TRef<'a, Node>, mnemonic: Account) -> Address {
         mnemonic.address().into()
     }
 
     #[method]
     fn sign_transaction(
         &self,
-        _owner: TRef<Node>,
+        _owner: TRef<'a, Node>,
         txn: Transaction,
         signer: Account,
     ) -> Option<SignedTransaction> {
@@ -182,7 +182,7 @@ impl<'a> Algodot {
     #[method]
     fn construct_payment(
         &self,
-        _owner: TRef<Node>,
+        _owner: TRef<'a, Node>,
         params: SuggestedTransactionParams,
         sender: Address,
         receiver: Address,
@@ -201,7 +201,7 @@ impl<'a> Algodot {
     #[allow(clippy::too_many_arguments)]
     fn construct_asset_xfer(
         &self,
-        _owner: TRef<Node>,
+        _owner: TRef<'a, Node>,
         params: SuggestedTransactionParams,
         sender: Address,
         receiver: Address,
@@ -228,7 +228,7 @@ impl<'a> Algodot {
     #[allow(clippy::too_many_arguments)]
     fn construct_asset_create(
         &self,
-        _owner: TRef<Node>,
+        _owner: TRef<'a, Node>,
         params: SuggestedTransactionParams,
         sender: Address,
         asset_name: String,
@@ -274,7 +274,7 @@ impl<'a> Algodot {
     #[allow(clippy::too_many_arguments)]
     fn construct_app_call(
         &self,
-        _owner: TRef<Node>,
+        _owner: TRef<'a, Node>,
         params: SuggestedTransactionParams,
         sender: Address,
         #[opt] app_id: Option<u64>,
@@ -343,7 +343,7 @@ impl<'a> Algodot {
     #[method]
     fn construct_asset_opt_in(
         &self,
-        _owner: TRef<Node>,
+        _owner: TRef<'a, Node>,
         params: SuggestedTransactionParams,
         sender: Address,
         asset_id: u64,
@@ -364,7 +364,7 @@ impl<'a> Algodot {
     /// Give transactions same group id
     fn group_transactions(
         &self,
-        _owner: TRef<Node>,
+        _owner: TRef<'a, Node>,
         mut txns: Vec<Transaction>,
     ) -> Option<Vec<Transaction>> {
         let mut txns_mut_refs: Vec<&mut algonaut::transaction::Transaction> =
