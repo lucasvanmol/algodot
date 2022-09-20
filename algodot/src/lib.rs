@@ -49,7 +49,7 @@ impl AsyncExecutorDriver {
 
 #[methods]
 impl AsyncExecutorDriver {
-    #[export]
+    #[method]
     fn _process(&self, _owner: &Node, _delta: f64) {
         EXECUTOR.with(|e| {
             self.runtime
