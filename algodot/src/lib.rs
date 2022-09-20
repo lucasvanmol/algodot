@@ -50,7 +50,7 @@ impl AsyncExecutorDriver {
 #[methods]
 impl AsyncExecutorDriver {
     #[method]
-    fn _process(&self, #[base] _base: &Node, _delta: f64) {  
+    fn _process(&self, _owner: &Node, _delta: f64) {  
         //runs a process function in rust
         EXECUTOR.with(|e| {
             self.runtime
