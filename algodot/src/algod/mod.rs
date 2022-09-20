@@ -92,18 +92,18 @@ impl Algodot {
 #[methods]
 impl Algodot {
     #[method]
-    fn _enter_tree(&mut self,#[base] base: &Node) {
+    fn _enter_tree(&mut self, #[base] base: &Node) {
         self.update_algod(base);
     }
 
     #[method]
-    fn set_url(&mut self,#[base] base: &Node, url: String) {
+    fn set_url(&mut self, #[base] base: &Node, url: String) {
         self.url = url;
         self.update_algod(base);
     }
 
     #[method]
-    fn set_token(&mut self,#[base] base: &Node, token: String) {
+    fn set_token(&mut self, #[base] base: &Node, token: String) {
         self.token = token;
         self.update_algod(_owner);
     }
