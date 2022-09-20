@@ -50,12 +50,12 @@ impl AsyncExecutorDriver {
 #[methods]
 impl AsyncExecutorDriver {
     #[method]
-    fn _process(&self, _owner: TRef<Node>, _delta: f64) {
+    fn _process(&self, #[base] _base: &Node, _delta: f64)  //runs a process function in rust
         EXECUTOR.with(|e| {
             self.runtime
                 .block_on(async {
                     e.local_set
-                        .run_until(async { tokio::task::spawn_local(async {}).await })
+                        .run_until(async { tokio::task::spawn_local(async {}).await }) //uses tokio dependencies
                         .await
                 })
                 .unwrap()
@@ -63,7 +63,7 @@ impl AsyncExecutorDriver {
     }
 }
 
-fn init(handle: InitHandle) {
+fn init(handle: InitHandle) { //binder
     gdnative::tasks::register_runtime(&handle);
     gdnative::tasks::set_executor(EXECUTOR.with(|e| *e));
 
@@ -71,4 +71,4 @@ fn init(handle: InitHandle) {
     handle.add_class::<AsyncExecutorDriver>();
 }
 
-godot_init!(init);
+godot_init!(init); //init script for godot
