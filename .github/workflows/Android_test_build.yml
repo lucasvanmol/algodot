@@ -40,8 +40,8 @@ env:
 on:
   push:
     branches:
-      - staging
-      - trying
+      - main
+      
 
 defaults:
   run:
