@@ -22,7 +22,7 @@
 # Note: if CI becomes more complex, we might look into code-generation of the action and workflow files at some point.
 # 300+ LOC for a few platform tests is still OK, but there's a lot of repetition, and quite some limitations that could be addressed.
 
-name: Full CI
+name: Full CI Test
 
 env:
   # Environment variables used by toolchain
