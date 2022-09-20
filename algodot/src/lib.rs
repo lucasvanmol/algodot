@@ -48,9 +48,9 @@ impl AsyncExecutorDriver {
 }
 
 #[methods]
-impl<'a> AsyncExecutorDriver {
+impl AsyncExecutorDriver {
     #[method]
-    fn _process(&self, _owner: &Node, _delta: f64) {
+    fn _process(&self, _owner: Node, _delta: f64) {
         EXECUTOR.with(|e| {
             self.runtime
                 .block_on(async {
