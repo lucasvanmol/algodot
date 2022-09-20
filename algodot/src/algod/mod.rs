@@ -111,7 +111,7 @@ impl Algodot {
     #[method]
     fn set_headers(&mut self, #[base] base: &Node, headers: StringArray) {
         self.headers = headers;
-        self.update_algod(_owner);
+        self.update_algod(base);
     }
 
     fn update_algod(&mut self) {
