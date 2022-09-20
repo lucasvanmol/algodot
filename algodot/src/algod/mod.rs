@@ -367,7 +367,7 @@ impl Algodot {
     /// Give transactions same group id
     fn group_transactions(
         &self,
-        _owner: Node,
+        _owner: &Node,
         mut txns: Vec<Transaction>,
     ) -> Option<Vec<Transaction>> {
         let mut txns_mut_refs: Vec<&mut algonaut::transaction::Transaction> =
