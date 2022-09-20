@@ -18,7 +18,7 @@ use std::rc::Rc;
 #[inherit(Node)]
 #[register_with(Self::register)]
 pub struct Algodot {
-   #[property(set = "Self::set_url")]
+    #[property(set = "Self::set_url")]
     url: String,
 
     #[property(set = "Self::set_token")]
