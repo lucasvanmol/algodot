@@ -93,19 +93,19 @@ impl Algodot {
 impl Algodot {
     #[method]
     fn _enter_tree(&mut self, #[base] base: &Node) {
-        self.update_algod(base);
+        self.update_algod();
     }
 
     #[method]
     fn set_url(&mut self, #[base] base: &Node, url: String) {
         self.url = url;
-        self.update_algod(base);
+        self.update_algod();
     }
 
     #[method]
     fn set_token(&mut self, #[base] base: &Node, token: String) {
         self.token = token;
-        self.update_algod(base);
+        self.update_algod();
     }
 
     #[method]
