@@ -105,16 +105,16 @@ impl Algodot {
     #[method]
     fn set_token(&mut self, #[base] base: &Node, token: String) {
         self.token = token;
-        self.update_algod(_owner);
+        self.update_algod(base);
     }
 
     #[method]
-    fn set_headers(&mut self, _owner: TRef<Node>, headers: StringArray) {
+    fn set_headers(&mut self, #[base] base: &Node, headers: StringArray) {
         self.headers = headers;
         self.update_algod(_owner);
     }
 
-    fn update_algod(&mut self, #[base] base: &Node) {
+    fn update_algod(&mut self) {
         // Do not update while in editor
         // e.g. editing properties in the inspector
         if Engine::godot_singleton().is_editor_hint() {
@@ -274,7 +274,7 @@ impl Algodot {
     #[allow(clippy::too_many_arguments)]
     fn construct_app_call(
         &self,
-        _owner: TRef<Node>,
+        #[base] base: &Node,
         params: SuggestedTransactionParams,
         sender: Address,
         #[opt] app_id: Option<u64>,
