@@ -111,10 +111,10 @@ impl Algodot {
     #[method]
     fn set_headers(&mut self, #[base] base: &Node, headers: StringArray) {
         self.headers = headers;
-        self.update_algod(base);
+        self.update_algod();
     }
 
-    fn update_algod(&mut self) {
+    fn update_algod() {
         // Do not update while in editor
         // e.g. editing properties in the inspector
         if Engine::godot_singleton().is_editor_hint() {
