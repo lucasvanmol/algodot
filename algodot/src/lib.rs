@@ -48,7 +48,7 @@ impl AsyncExecutorDriver {
 }
 
 #[methods]
-impl AsyncExecutorDriver {
+impl<'a> AsyncExecutorDriver {
     #[method]
     fn _process(&self, _owner: &Node, _delta: f64) {  
         //runs a process function in rust
