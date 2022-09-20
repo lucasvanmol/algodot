@@ -28,7 +28,6 @@ pub struct Algodot {
     headers: StringArray,
 
     algod: Rc<Algod>,
-
 }
 
 impl Algodot {
