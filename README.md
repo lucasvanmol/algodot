@@ -1,6 +1,6 @@
 # Algodot
 Algorand integration in Godot.
-![Screenshot](https://github.com/Sam2much96/algodot/blob/master/algorand_logo.png)
+![Screenshot](https://github.com/Sam2much96/algodot/blob/master/test/project/addons/algodot/icon.png)
 
 -Contains Builtin Documentation
 -Comes with Prebuilt Godot Alog Class
