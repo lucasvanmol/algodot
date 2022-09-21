@@ -31,7 +31,7 @@ pub struct Algodot {
 }
 
 impl Algodot {
-    fn new(Self: &Node) -> Self {
+    fn new(&Node) -> Self {
         Algodot {
             url: String::new(),
             token: String::new(),
@@ -99,7 +99,7 @@ impl Algodot {
     #[method]
     fn set_url(&mut self, #[base] base: &Node, url: String) {
         self.url = url;
-        self.update_algod(&self);
+        self.update_algod();
     }
 
     #[method]
@@ -114,7 +114,7 @@ impl Algodot {
         self.update_algod();
     }
 
-    fn update_algod(&self) {
+    fn update_algod(&mut self) {
         // Do not update while in editor
         // e.g. editing properties in the inspector
         if Engine::godot_singleton().is_editor_hint() {
