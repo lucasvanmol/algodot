@@ -31,7 +31,7 @@ pub struct Algodot {
 }
 
 impl Algodot {
-    fn new(&Node) -> Self {
+    fn new(_:&Node) -> Self {
         Algodot {
             url: String::new(),
             token: String::new(),
