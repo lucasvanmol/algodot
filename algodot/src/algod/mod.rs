@@ -158,7 +158,7 @@ impl Algodot {
     }
 
     #[method]
-    fn generate_key(&self, #[base] base: &Node) -> (String, String) {
+    fn generate_key(&self, #[base] _base: &Node) -> (String, String) {
         let acc = Account::generate();
         (acc.address().to_string(), acc.mnemonic())
     }
@@ -228,7 +228,7 @@ impl Algodot {
     #[allow(clippy::too_many_arguments)]
     fn construct_asset_create(
         &self,
-        #[base] base: &Node,
+        #[base] _base: &Node,
         params: SuggestedTransactionParams,
         sender: Address,
         asset_name: String,
