@@ -1,6 +1,6 @@
 name: CI
 
-# Continuous Integration w/ Godot Engine and private Algorand Network
+# Continuous Integration w/ Godot Engine and private Algorand Network.
 # Godot CI inspired by: https://github.com/godot-rust/godot-rust/tree/master/.github/workflows
 
 on:
