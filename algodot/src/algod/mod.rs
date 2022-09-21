@@ -16,7 +16,6 @@ use std::rc::Rc;
 
 #[derive(NativeClass)]
 #[inherit(Node)]
-#[inherit(TRef)]
 #[register_with(Self::register)]
 pub struct Algodot {
     #[property(set = "Self::set_url")]
@@ -98,19 +97,19 @@ impl Algodot {
     }
 
     #[method]
-    fn set_url(&mut self, #[base] base: &Node, url: String) {
+    fn set_url(&mut self, #[base] base: TRef<Node>, url: String) {
         self.url = url;
         self.update_algod();
     }
 
     #[method]
-    fn set_token(&mut self, #[base] base: &Node, token: String) {
+    fn set_token(&mut self, #[base] base: TRef<Node>, token: String) {
         self.token = token;
         self.update_algod();
     }
 
     #[method]
-    fn set_headers(&mut self, #[base] base: &Node, headers: StringArray) {
+    fn set_headers(&mut self, #[base] base: TRef<Node>, headers: StringArray) {
         self.headers = headers;
         self.update_algod();
     }
