@@ -36,7 +36,7 @@ struct AsyncExecutorDriver {
 }
 
 impl AsyncExecutorDriver {
-    fn new(_owner: &Node) -> Self {
+    fn new(_base: &Node) -> Self {
         AsyncExecutorDriver {
             runtime: Builder::new_current_thread()
                 .enable_io() // optional, depending on your needs
