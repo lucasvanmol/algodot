@@ -16,6 +16,7 @@ use std::rc::Rc;
 
 #[derive(NativeClass)]
 #[inherit(Node)]
+#[inherit(TRef)]
 #[register_with(Self::register)]
 pub struct Algodot {
     #[property(set = "Self::set_url")]
