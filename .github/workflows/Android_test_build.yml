@@ -71,7 +71,7 @@ jobs:
           cd ${{ github.workspace }}/openssl_android
           sudo ./build_openssl.sh
           
-          
+          cd
       
           #copy include files and ssl libraries
           sudo cp -a ${{ github.workspace }}/openssl_android/openssl-1.1.1l/include ${{ github.workspace }}/openssl_android
