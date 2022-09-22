@@ -84,8 +84,8 @@ jobs:
           
           export ARMV7_LINUX_ANDROIDEABI_OPENSSL_LIB_DIR="openssl_android/libs/android/clang/android-arm"
           
-          export OPENSSL=$"openssl_anroid/libs/android/clang/android-arm" #arm
-
+          export OPENSSL="openssl_anroid/libs/android/clang/android-arm" #arm
+          
           export OPENSSL_LIB_DIR="openssl_android"
           export PKG_CONFIG_PATH="openssl_android"
           
