@@ -76,7 +76,7 @@ jobs:
           cd
           
           #verify openssl android
-          cd ${{ github.workspace }}/openssl_android/libs/android/clang/android-arm && ls *.so
+          cd ${{ github.workspace }}/openssl_android/libs/android/clang/android-arm && ls -al
           
           
           
