@@ -66,6 +66,12 @@ jobs:
           git clone "https://github.com/Sam2much96/openssl_android"
           cd openssl_android
           sudo ./build_openssl.sh
+          
+          cd
+          
+          #copy openssl include files
+          cp openssl_android/include /openssl_android/libs/android/clang/android-arm
+          cp openssl_android/include /openssl_android/libs/android/clang/android-arm64
         
           
       - name: "Install Rust NDK"
