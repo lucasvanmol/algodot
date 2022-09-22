@@ -65,31 +65,22 @@ jobs:
         run: |
           
           git clone "https://github.com/Sam2much96/openssl_android"
-          
-          #build openssl
-          
-          cd ${{ github.workspace }}/openssl_android/openssl-1.1.1l
-          chmod +x ./config
-          ./config
-          make
-         
-          
-          cd #leave openssl directory
+   
           
           #build openssl android
           cd ${{ github.workspace }}/openssl_android
           sudo ./build_openssl.sh
           
           
-          #copy openssl include files
-          #sudo cp -a ${{ github.workspace }}/openssl_android/openssl-1.1.1l/include ${{ github.workspace }}/openssl_android/libs/android/clang/android-arm
-          #sudo cp -a ${{ github.workspace }}/openssl_android/openssl-1.1.1l/include ${{ github.workspace }}/openssl_android/libs/android/clang/android-arm64
-          
-          #copy include files
+      
+          #copy include files and ssl libraries
           sudo cp -a ${{ github.workspace }}/openssl_android/openssl-1.1.1l/include ${{ github.workspace }}/openssl_android
+          cp ${{ github.workspace }}/openssl_android/lib/android/clang/android-arm/libssl.so ${{ github.workspace }}/openssl_android
+          cp ${{ github.workspace }}/openssl_android/lib/android/clang/android-arm/libcrypto.so ${{ github.workspace }}/openssl_android
           
-          #verify include files
-          cd ${{ github.workspace }}/openssl_android/include && ls -al
+       
+          #verify include files and shared libraries
+          cd ${{ github.workspace }}/openssl_android && ls -al
           
           
       - name: "Install Rust NDK"
