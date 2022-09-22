@@ -61,12 +61,27 @@ jobs:
         run: >
           find -L $ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION -name libunwind.a
           -execdir sh -c 'echo "INPUT(-lunwind)" > libgcc.a' \;
+      - name: "Clone Openssl Android Repository"
+        run: |
+          git clone "https://github.com/Sam2much96/openssl_android"
+          
+      - name: "Install Rust NDK"
+        run: |
+          cargo install cargo-ndk
+      
       - name: "Build Rust for targets: aarch64-linux-android, armv7-linux-androideabi"
         run: |
+          #link external libraries
           export CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang++
           export CARGO_TARGET_ARMV7_LINUX_ANDROIDEABI_LINKER=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi21-clang++
-          cargo build --target aarch64-linux-android --release
-          cargo build --target armv7-linux-androideabi --release
+          #use cargo-ndk instead
+          
+          export OPENSSL="openssl_android/libs/android/clang/android-arm"
+          
+          cargo ndk -t armeabi-v7a  -o ./jniLibs build --release
+          
+          #cargo build --target aarch64-linux-android --release
+          #cargo build --target armv7-linux-androideabi --release 
 
 
       
