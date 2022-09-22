@@ -81,7 +81,8 @@ jobs:
       - name: "Check workspace"
         run: |
           ls -al
-          cd openssl_android/libs/android/clang/android-arm && ls -al
+          test -d "openssl_android/libs/android/clang/android-arm" && echo "Directory Exists"
+
       
       - name: "Build Rust for targets: aarch64-linux-android, armv7-linux-androideabi"
         run: |
@@ -94,7 +95,7 @@ jobs:
           
           export ARMV7_LINUX_ANDROIDEABI_OPENSSL_LIB_DIR="openssl_android/libs/android/clang/android-arm"
           
-          export OPENSSL="openssl_anroid/libs/android/clang/android-arm" #arm
+          export OPENSSL="openssl_android/libs/android/clang/android-arm" #arm
           
           export OPENSSL_LIB_DIR="openssl_android"
           export PKG_CONFIG_PATH="openssl_android"
