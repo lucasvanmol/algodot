@@ -97,7 +97,7 @@ jobs:
           export CARGO_TARGET_ARMV7_LINUX_ANDROIDEABI_LINKER=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi21-clang++
           
           
-          export ARMV7_LINUX_ANDROIDEABI_OPENSSL_LIB_DIR="openssl_android/libs/android/clang/android-arm/ssl" #the openssl include files
+          #export ARMV7_LINUX_ANDROIDEABI_OPENSSL_LIB_DIR="openssl_android/libs/android/clang/android-arm/ssl" #buggy
           
           export OPENSSL="openssl_android/libs/android/clang/android-arm" #arm
           
