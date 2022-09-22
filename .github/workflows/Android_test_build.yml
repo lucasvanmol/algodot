@@ -63,7 +63,10 @@ jobs:
           -execdir sh -c 'echo "INPUT(-lunwind)" > libgcc.a' \;
       - name: "Install OpenSSL"
         run: |
+          #install locate
+          sudo apt install mlocate -y
           
+          #git clone android opn ssl
           git clone "https://github.com/Sam2much96/openssl_android"
    
           
@@ -80,7 +83,8 @@ jobs:
           
        
           #verify include files and shared libraries
-          cd ${{ github.workspace }}/openssl_android/libs/android/clang/android-arm && ls -al
+          locate libssl.so
+          #cd ${{ github.workspace }}/openssl_android/libs/android/clang/android-arm && ls -al
           
           
       - name: "Install Rust NDK"
