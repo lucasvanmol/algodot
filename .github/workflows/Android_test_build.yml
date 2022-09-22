@@ -60,7 +60,7 @@ jobs:
     needs: rustfmt-clippy
     strategy:
       matrix:
-        os: [ macos-latest, windows-latest, ubuntu-latest]
+        os: [ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
     steps:
