@@ -71,8 +71,10 @@ jobs:
    
           
           #build openssl android
-          cd ${{ github.workspace }}/openssl_android
-          sudo ./build_openssl.sh
+          cd ${{ github.workspace }}/openssl_android 
+          
+          #wipes out precompiled libraries
+          #sudo ./build_openssl.sh
           
           cd
           locate libssl.so 
