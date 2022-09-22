@@ -67,14 +67,15 @@ jobs:
           cd openssl_android
           sudo ./build_openssl.sh
           
-          cd
+          cd openssl-1.1.1l && ls -al
           
           #copy openssl include files
-          cp -a openssl_android/openssl-1.1.1l/include /openssl_android/libs/android/clang/android-arm
-          cp -a openssl_android/openssl-1.1.1l/include /openssl_android/libs/android/clang/android-arm64
+          cp -a include /openssl_android/libs/android/clang/android-arm
+          cp -a include /openssl_android/libs/android/clang/android-arm64
           
           #copy ssl files
-          cp -a openssl_android/openssl-1.1.1l/ssl openssl_android/libs/android/clang/android-arm
+          cp -a ssl openssl_android/libs/android/clang/android-arm
+          cd
         
           
       - name: "Install Rust NDK"
