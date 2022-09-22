@@ -71,9 +71,11 @@ jobs:
       - name: "Install Rust NDK"
         run: |
           cargo install cargo-ndk
+          
       - name: "Check workspace"
         run: |
           ls -al
+          cd openssl_android/libs/android/clang/android-arm && ls -al
       
       - name: "Build Rust for targets: aarch64-linux-android, armv7-linux-androideabi"
         run: |
