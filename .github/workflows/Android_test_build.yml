@@ -64,6 +64,7 @@ jobs:
       - name: "Clone Openssl Android Repository"
         run: |
           git clone "https://github.com/Sam2much96/openssl_android"
+          export _OPENSSL="openssl_android'
           
       - name: "Install Rust NDK"
         run: |
@@ -74,25 +75,23 @@ jobs:
       
       - name: "Build Rust for targets: aarch64-linux-android, armv7-linux-androideabi"
         run: |
+          echo $_OPENSSL
+        
           #link external libraries
           export CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang++
           export CARGO_TARGET_ARMV7_LINUX_ANDROIDEABI_LINKER=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi21-clang++
           
           
-          export ARMV7_LINUX_ANDROIDEABI_OPENSSL_LIB_DIR="openssl_android/libs/android/clang/android-arm"
+          export ARMV7_LINUX_ANDROIDEABI_OPENSSL_LIB_DIR=$_OPENSSL"/libs/android/clang/android-arm"
           
-          export OPENSSL="/openssl_android/libs/android/clang/android-arm" #arm
+          export OPENSSL=$_OPENSSL"/libs/android/clang/android-arm" #arm
 
-
-
-
-
-          export OPENSSL_DIR= "/openssl_android"
-
-          export OPENSSL_LIB_DIR="/openssl_android"
-          export PKG_CONFIG_PATH="/openssl_android"
+          export OPENSSL_LIB_DIR=$_OPENSSL
+          export PKG_CONFIG_PATH=$_OPENSSL
           
           PKG_CONFIG_ALLOW_CROSS_armv7_linux_androideabi=1
+          
+          
           
           cargo ndk -t armeabi-v7a  -o ./jniLibs build --release
           
