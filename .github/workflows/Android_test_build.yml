@@ -75,12 +75,12 @@ jobs:
       
           #copy include files and ssl libraries
           sudo cp -a ${{ github.workspace }}/openssl_android/openssl-1.1.1l/include ${{ github.workspace }}/openssl_android
-          cp ${{ github.workspace }}/openssl_android/libs/android/clang/android-arm/libssl.so ${{ github.workspace }}/openssl_android
-          cp ${{ github.workspace }}/openssl_android/libs/android/clang/android-arm/libcrypto.so ${{ github.workspace }}/openssl_android
+          #cp ${{ github.workspace }}/openssl_android/libs/android/clang/android-arm/libssl.so ${{ github.workspace }}/openssl_android
+          #cp ${{ github.workspace }}/openssl_android/libs/android/clang/android-arm/libcrypto.so ${{ github.workspace }}/openssl_android
           
        
           #verify include files and shared libraries
-          cd ${{ github.workspace }}/openssl_android && ls -al
+          cd ${{ github.workspace }}/openssl_android/libs/android/clang/android-arm && ls -al
           
           
       - name: "Install Rust NDK"
