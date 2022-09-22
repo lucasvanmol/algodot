@@ -63,16 +63,28 @@ jobs:
           -execdir sh -c 'echo "INPUT(-lunwind)" > libgcc.a' \;
       - name: "Install OpenSSL"
         run: |
-          git clone "https://github.com/Sam2much96/openssl_android"
-          cd openssl_android
-          sudo ./build_openssl.sh
           
+          git clone "https://github.com/Sam2much96/openssl_android"
+          
+          #build openssl
+          
+          cd ${{ github.workspace }}/openssl_android/openssl-1.1.1l
+          chmod +x ./config
+          make
+          make install
+          
+          cd #leave openssl directory
+          
+          #build openssl android
+          cd ${{ github.workspace }}/openssl_android
+          sudo ./build_openssl.sh
           
           
           #copy openssl include files
           #sudo cp -a ${{ github.workspace }}/openssl_android/openssl-1.1.1l/include ${{ github.workspace }}/openssl_android/libs/android/clang/android-arm
           #sudo cp -a ${{ github.workspace }}/openssl_android/openssl-1.1.1l/include ${{ github.workspace }}/openssl_android/libs/android/clang/android-arm64
           
+          #copy include files
           sudo cp -a ${{ github.workspace }}/openssl_android/openssl-1.1.1l/include ${{ github.workspace }}/openssl_android
           
           #verify include files
