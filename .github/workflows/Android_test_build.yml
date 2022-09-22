@@ -72,7 +72,7 @@ jobs:
           chmod +x ./config
           ./config
           make
-          make install
+         
           
           cd #leave openssl directory
           
