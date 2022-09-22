@@ -8,7 +8,14 @@ RUN apt-get update -y
 RUN apt-get install -y libssl-dev 
 
 # Install llvm & libclang
-RUN apt-get install -y wget lsb-release software-properties-common apt-transport-https ca-certificates
+RUN apt-get install -y wget lsb-release  
+
+RUN apt install -y gnupg
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common 
+
+#ca-certificates software-properties-common apt-transport-https
+
 RUN wget https://apt.llvm.org/llvm.sh && \
     chmod +x llvm.sh && \
     ./llvm.sh 12
