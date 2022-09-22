@@ -77,9 +77,20 @@ jobs:
           #link external libraries
           export CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang++
           export CARGO_TARGET_ARMV7_LINUX_ANDROIDEABI_LINKER=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi21-clang++
-          #use cargo-ndk instead
+          
           
           export ARMV7_LINUX_ANDROIDEABI_OPENSSL_LIB_DIR="openssl_android/libs/android/clang/android-arm"
+          
+          export OPENSSL="/openssl_android/libs/android/clang/android-arm" #arm
+
+
+
+
+
+          export OPENSSL_DIR= "/openssl_android"
+
+          export OPENSSL_LIB_DIR="/openssl_android"
+          export PKG_CONFIG_PATH="/openssl_android"
           
           PKG_CONFIG_ALLOW_CROSS_armv7_linux_androideabi=1
           
