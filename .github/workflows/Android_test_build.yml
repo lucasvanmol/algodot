@@ -64,7 +64,8 @@ jobs:
       - name: "Install OpenSSL"
         run: |
           git clone "https://github.com/Sam2much96/openssl_android"
-          sudo apt install libssl-dev -y
+          #sudo apt install libssl-dev -y #openssl is already installed
+          rustup target install armv7-linux-androideabi
         
           
       - name: "Install Rust NDK"
