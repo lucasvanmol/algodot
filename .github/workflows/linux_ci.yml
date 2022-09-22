@@ -1,4 +1,4 @@
-name: Android CI
+name: Linux CI
 
 on:
   push:
@@ -47,3 +47,10 @@ jobs:
         run: |
           # Linux
           RUST_BACKTRSCE=full cargo build --target x86_64-unknown-linux-gnu  --release
+   
+          
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: linux
+          path: target/x86_64-unknown-linux-gnu
