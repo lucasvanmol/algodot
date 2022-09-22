@@ -63,26 +63,24 @@ jobs:
           -execdir sh -c 'echo "INPUT(-lunwind)" > libgcc.a' \;
       - name: "Install OpenSSL"
         run: |
-          #install locate
-          sudo apt install mlocate -y
           
           #git clone android opn ssl
           git clone "https://github.com/Sam2much96/openssl_android"
    
           
           #build openssl android
-          cd ${{ github.workspace }}/openssl_android 
+          cd ${{ github.workspace }}/openssl_android/libs/android/clang/android-arm && ls *.so
           
           #wipes out precompiled libraries
           #sudo ./build_openssl.sh
           
           cd
-          locate libssl.so 
+           
       
           #copy include files and ssl libraries
           sudo cp -a ${{ github.workspace }}/openssl_android/openssl-1.1.1l/include ${{ github.workspace }}/openssl_android
           
-          cp ${{ github.workspace }}/algodotopenssl_android/libs/android/clang/android-arm/libcrypto.so ${{ github.workspace }}/openssl_android
+          cp ${{ github.workspace }}/openssl_android/libs/android/clang/android-arm/libcrypto.so ${{ github.workspace }}/openssl_android
           cp ${{ github.workspace }}/openssl_android/libs/android/clang/android-arm/libssl.so ${{ github.workspace }}/openssl_android
           
        
@@ -97,9 +95,7 @@ jobs:
           
       - name: "Check workspace"
         run: |
-          ls -al
-          test -d "openssl_android/libs/android/clang/android-arm" && echo "Directory Exists"
-
+         cd ${{ github.workspace }}/openssl_android/libs/android/clang/android-arm && ls -al
       
       - name: "Build Rust for targets: aarch64-linux-android, armv7-linux-androideabi"
         run: |
