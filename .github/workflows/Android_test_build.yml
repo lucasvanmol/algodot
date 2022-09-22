@@ -61,9 +61,10 @@ jobs:
         run: >
           find -L $ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION -name libunwind.a
           -execdir sh -c 'echo "INPUT(-lunwind)" > libgcc.a' \;
-      - name: "Clone Openssl Android Repository"
+      - name: "Install OpenSSL"
         run: |
           git clone "https://github.com/Sam2much96/openssl_android"
+          apt install libssl-dev -y
         
           
       - name: "Install Rust NDK"
