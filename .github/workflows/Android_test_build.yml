@@ -70,11 +70,11 @@ jobs:
           cd openssl-1.1.1l && ls -al
           
           #copy openssl include files
-          cp -a include /openssl_android/libs/android/clang/android-arm
-          cp -a include /openssl_android/libs/android/clang/android-arm64
+          cp -a include ../libs/android/clang/android-arm
+          cp -a include ../libs/android/clang/android-arm64
           
           #copy ssl files
-          cp -a ssl openssl_android/libs/android/clang/android-arm
+          cp -a ssl ../libs/android/clang/android-arm
           cd
         
           
