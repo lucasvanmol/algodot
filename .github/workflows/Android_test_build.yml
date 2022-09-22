@@ -42,5 +42,31 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: check
+          
+      - name: "Install Java + NDK"
+        run: |
+          # aarch64 and armv7 cover most Android phones & tablets.
+          rustup target add aarch64-linux-android armv7-linux-androideabi
+          sudo apt-get update
+          sudo apt-get install llvm-dev libclang-dev clang g++-multilib gcc-multilib libc6-dev libc6-dev-arm64-cross
+      # Relies on ls listing alphabetically, NDK versions having fixed
+      # digits, and the folder not containing any other files
+      - name: "Find highest Android NDK version"
+        run: |
+          highestNdk=$(ls $ANDROID_SDK_ROOT/ndk | tail -n1)
+          echo "Highest Android NDK: $highestNdk"
+          echo "ANDROID_NDK_VERSION=$highestNdk" >> $GITHUB_ENV
+      # See https://github.com/godot-rust/godot-rust/pull/920
+      - name: "Found version ${{ env.ANDROID_NDK_VERSION }}. Workaround Rust bug..."
+        run: >
+          find -L $ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION -name libunwind.a
+          -execdir sh -c 'echo "INPUT(-lunwind)" > libgcc.a' \;
+      - name: "Build Rust for targets: aarch64-linux-android, armv7-linux-androideabi"
+        run: |
+          export CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang++
+          export CARGO_TARGET_ARMV7_LINUX_ANDROIDEABI_LINKER=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi21-clang++
+          cargo build --target aarch64-linux-android --release
+          cargo build --target armv7-linux-androideabi --release
+
 
       
