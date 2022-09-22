@@ -141,6 +141,11 @@ jobs:
           
           #cargo build --target aarch64-linux-android --release
           #cargo build --target armv7-linux-androideabi --release 
-
+          
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: "android armv7-linux-androideabi"
+          path: target/armv7-linux-androideabi/release/libalgodot.so
 
       
