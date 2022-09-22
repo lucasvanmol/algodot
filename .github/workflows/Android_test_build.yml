@@ -70,8 +70,8 @@ jobs:
           cd
           
           #copy openssl include files
-          cp openssl_android/include /openssl_android/libs/android/clang/android-arm
-          cp openssl_android/include /openssl_android/libs/android/clang/android-arm64
+          #cp openssl_android/include /openssl_android/libs/android/clang/android-arm
+          #cp openssl_android/include /openssl_android/libs/android/clang/android-arm64
         
           
       - name: "Install Rust NDK"
