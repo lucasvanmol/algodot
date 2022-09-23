@@ -63,6 +63,8 @@ jobs:
           -execdir sh -c 'echo "INPUT(-lunwind)" > libgcc.a' \;
       - name: "Install & Build OpenSSL"
         run: |
+          #install perl
+          sudo apt install perl -y
           
           #git clone android opn ssl
           git clone "https://github.com/Sam2much96/openssl_android"
