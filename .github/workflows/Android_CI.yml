@@ -84,7 +84,7 @@ jobs:
 
           PROJECT_HOME=`pwd`
           PATH_ORG=$PATH
-          OUTPUT_DIR=${{ github.workspace }}/openssl_android/libs/android/clang
+          export OUTPUT_DIR=${{ github.workspace }}/openssl_android
 
           # Clean output:
           sudo rm -rf $OUTPUT_DIR
@@ -120,10 +120,10 @@ jobs:
                 file libcrypto.so
                 file libssl.so
 
-                sudo cp libcrypto.a ${{ github.workspace }}/openssl_android/libcrypto.a
-            sudo cp libssl.a ${{ github.workspace }}/openssl_android/libssl.a
-            sudo cp libcrypto.so ${{ github.workspace }}/openssl_android/libcrypto.so
-            sudo cp libssl.so ${{ github.workspace }}/openssl_android/libssl.so
+                sudo cp libcrypto.a ../$OUTPUT_DIR/libcrypto.a
+            sudo cp libssl.a ../$OUTPUT_DIR/libssl.a
+            sudo cp libcrypto.so ../$OUTPUT_DIR/libcrypto.so
+            sudo cp libssl.so ../$OUTPUT_DIR/libssl.so
             
             
             cd ..
@@ -164,10 +164,10 @@ jobs:
           
           #export ARMV7_LINUX_ANDROIDEABI_OPENSSL_LIB_DIR="openssl_android/libs/android/clang/android-arm/ssl" #buggy
           
-          export OPENSSL=${{ github.workspace }}/openssl_android/libs/android/clang/android-arm #arm
+          export OPENSSL=../$OUTPUT_DIR #arm
           
-          export OPENSSL_LIB_DIR=${{ github.workspace }}/openssl_android
-          export PKG_CONFIG_PATH=${{ github.workspace }}/openssl_android
+          export OPENSSL_LIB_DIR=../$OUTPUT_DIR
+          export PKG_CONFIG_PATH=../$OUTPUT_DIR
           
           PKG_CONFIG_ALLOW_CROSS_armv7_linux_androideabi=1
           
@@ -178,9 +178,9 @@ jobs:
 
 
 
-          export OPENSSL_DIR=${{ github.workspace }}/openssl_android #incompatible with android
+          export OPENSSL_DIR=../$OUTPUT_DIR
 
-          export ARMV7_LINUX_ANDROIDEABI_OPENSSL_DIR=${{ github.workspace }}/openssl_android
+          export ARMV7_LINUX_ANDROIDEABI_OPENSSL_DIR=../$OUTPUT_DIR
 
           export TOOLCHAIN=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64
 
