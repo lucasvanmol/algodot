@@ -84,7 +84,7 @@ jobs:
 
           PROJECT_HOME=`pwd`
           PATH_ORG=$PATH
-          OUTPUT_DIR="libs/android/clang"
+          OUTPUT_DIR=${{ github.workspace }}/openssl_android/libs/android/clang
 
           # Clean output:
           sudo rm -rf $OUTPUT_DIR
