@@ -66,9 +66,9 @@ jobs:
         
           
           #git clone android opn ssl
-          git clone "https://github.com/Sam2much96/openssl_android"
+          #git clone "https://github.com/Sam2much96/openssl_android"
           
-          cd ${{ github.workspace }}/openssl_android/openssl-1.1.1l
+          cd ${{ github.workspace }}/openssl_android
    
           if [[ -z "${ANDROID_NDK_HOME}" ]]; then
             # need change
@@ -120,36 +120,24 @@ jobs:
                 file libcrypto.so
                 file libssl.so
 
-                sudo cp libcrypto.a ../$OUTPUT_DIR/${ARCHITECTURE}/libcrypto.a
-            sudo cp libssl.a ../$OUTPUT_DIR/${ARCHITECTURE}/libssl.a
-            sudo cp libcrypto.so ../$OUTPUT_DIR/${ARCHITECTURE}/libcrypto.so
-            sudo cp libssl.so ../$OUTPUT_DIR/${ARCHITECTURE}/libssl.so
+                sudo cp libcrypto.a ${{ github.workspace }}/openssl_android/libcrypto.a
+            sudo cp libssl.a ${{ github.workspace }}/openssl_android/libssl.a
+            sudo cp libcrypto.so ${{ github.workspace }}/openssl_android/libcrypto.so
+            sudo cp libssl.so ${{ github.workspace }}/openssl_android/libssl.so
+            
+            
             cd ..
           }
 
-          # Build libcrypto for armeabi-v7a, x86 and arm64-v8a.
+          # Build libcrypto for armeabi-v7a 
           build_android_clang  "21"    	"android-arm"
-          build_android_clang  "21"    	"android-x86"
-          build_android_clang  "21"    	"android-arm64"
+          #build_android_clang  "21"    	"android-x86"
+          #build_android_clang  "21"    	"android-arm64"
 
           exit 0
 
           
-          #reset cd
-          cd ..
-          
-          #verify openssl android compile
-          cd $OUTPUT_DIR/${ARCHITECTURE} && ls -al
-          
-          
-          
-          #copy openssl file
-          #cp libcrypto.so ${{ github.workspace }}/openssl_android
-          #cp libssl.so ${{ github.workspace }}/openssl_android
-          
-          #reset cd
-          cd
-           
+       
           
           
       - name: "Install Rust NDK"
@@ -160,9 +148,10 @@ jobs:
         run: |
          #copy openssl shared libraries and headers to compiler working directory
          sudo cp -a ${{ github.workspace }}/openssl_android/openssl-1.1.1l/include ${{ github.workspace }}/openssl_android
-         cd ${{ github.workspace }}/openssl_android/libs/android/clang && ls -al
-         #sudo cp libcrypto.so ${{ github.workspace }}/openssl_android
-         #sudo cp libssl.so ${{ github.workspace }}/openssl_android
+         
+         #verify all files
+         cd ${{ github.workspace }}/openssl_android && ls -al
+         
       
       - name: "Build Rust for targets: armv7-linux-androideabi" # aarch64-linux-android
         run: |
