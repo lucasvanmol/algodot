@@ -84,7 +84,7 @@ jobs:
 
           PROJECT_HOME=`pwd`
           PATH_ORG=$PATH
-          export OUTPUT_DIR=${{ github.workspace }}
+          export OUTPUT_DIR=${{ github.workspace }}/openssl_android
 
           # Clean output:
           sudo rm -rf $OUTPUT_DIR
@@ -130,6 +130,8 @@ jobs:
             ls -al
             
             cd ..
+            echo "Parent Dir"
+            ls -al
           }
 
           # Build libcrypto for armeabi-v7a 
@@ -153,7 +155,7 @@ jobs:
          #sudo cp -a ${{ github.workspace }}/openssl_android/openssl-1.1.1l/include ${{ github.workspace }}/openssl_android
          
          #verify all files
-         cd ${{ github.workspace }} && ls -al
+         cd ${{ github.workspace }}/openssl_android && ls -al
          
       
       - name: "Build Rust for targets: armv7-linux-androideabi" # aarch64-linux-android
@@ -167,10 +169,10 @@ jobs:
           
           #export ARMV7_LINUX_ANDROIDEABI_OPENSSL_LIB_DIR="openssl_android/libs/android/clang/android-arm/ssl" #buggy
           
-          export OPENSSL=${{ github.workspace }} #arm
+          export OPENSSL=${{ github.workspace }}/openssl_android #arm
           
-          export OPENSSL_LIB_DIR=${{ github.workspace }}
-          export PKG_CONFIG_PATH=${{ github.workspace }}
+          export OPENSSL_LIB_DIR=${{ github.workspace }}/openssl_android
+          export PKG_CONFIG_PATH=${{ github.workspace }}/openssl_android
           
           PKG_CONFIG_ALLOW_CROSS_armv7_linux_androideabi=1
           
