@@ -128,8 +128,8 @@ jobs:
           }
 
           # Build libcrypto for armeabi-v7a, x86 and arm64-v8a.
-          build_android_clang  "16"    	"android-arm"
-          build_android_clang  "16"    	"android-x86"
+          build_android_clang  "21"    	"android-arm"
+          build_android_clang  "21"    	"android-x86"
           build_android_clang  "21"    	"android-arm64"
 
           exit 0
