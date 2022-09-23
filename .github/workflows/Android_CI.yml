@@ -168,7 +168,11 @@ jobs:
           
       - name: "Check workspace"
         run: |
+         #copy openssl shared libraries and headers to compiler working directory
+         sudo cp -a ${{ github.workspace }}/openssl_android/openssl-1.1.1l/include ${{ github.workspace }}/openssl_android
          cd ${{ github.workspace }}/openssl_android/libs/android/clang/android-arm && ls -al
+         sudo cp libcrypto.so ${{ github.workspace }}/openssl_android
+         sudo cp libssl.so ${{ github.workspace }}/openssl_android
       
       - name: "Build Rust for targets: armv7-linux-androideabi" # aarch64-linux-android
         run: |
