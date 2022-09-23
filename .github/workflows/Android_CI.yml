@@ -120,17 +120,17 @@ jobs:
                 file libcrypto.so
                 file libssl.so
 
-                cp libcrypto.a ../$OUTPUT_DIR/${ARCHITECTURE}/libcrypto.a
-            cp libssl.a ../$OUTPUT_DIR/${ARCHITECTURE}/libssl.a
-            cp libcrypto.so ../$OUTPUT_DIR/${ARCHITECTURE}/libcrypto.so
-            cp libssl.so ../$OUTPUT_DIR/${ARCHITECTURE}/libssl.so
+                sudo cp libcrypto.a ../$OUTPUT_DIR/${ARCHITECTURE}/libcrypto.a
+            sudo cp libssl.a ../$OUTPUT_DIR/${ARCHITECTURE}/libssl.a
+            sudo cp libcrypto.so ../$OUTPUT_DIR/${ARCHITECTURE}/libcrypto.so
+            sudo cp libssl.so ../$OUTPUT_DIR/${ARCHITECTURE}/libssl.so
             cd ..
           }
 
           # Build libcrypto for armeabi-v7a, x86 and arm64-v8a.
-          build_android_clang  "21"    	"android-arm"
-          build_android_clang  "21"    	"android-x86"
-          build_android_clang  "21"    	"android-arm64"
+          build_android_clang  "25"    	"android-arm"
+          build_android_clang  "25"    	"android-x86"
+          build_android_clang  "25"    	"android-arm64"
 
           exit 0
 
