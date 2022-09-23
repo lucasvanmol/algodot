@@ -105,7 +105,7 @@ jobs:
 
             # Clean openssl:
             cd "${OPENSSL_VERSION}"
-            make clean
+            #make clean
 
             # Build openssl libraries
             #perl -pi -w -e 's/\-mandroid//g;' ./Configure
