@@ -134,7 +134,7 @@ jobs:
             ls -al
             
             echo "openssl_android Dir"
-            cd openssl_anroid && ls -al
+            cd openssl_android && ls -al
           }
 
           # Build libcrypto for armeabi-v7a 
