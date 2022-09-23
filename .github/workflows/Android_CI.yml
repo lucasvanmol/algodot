@@ -120,12 +120,12 @@ jobs:
                 file libcrypto.so
                 file libssl.so
 
-                sudo cp libcrypto.a ../$OUTPUT_DIR/libcrypto.a
-            sudo cp libssl.a ../$OUTPUT_DIR/libssl.a
-            sudo cp libcrypto.so ../$OUTPUT_DIR/libcrypto.so
-            sudo cp libssl.so ../$OUTPUT_DIR/libssl.so
+                sudo cp libcrypto.a $OUTPUT_DIR/libcrypto.a
+            sudo cp libssl.a $OUTPUT_DIR/libssl.a
+            sudo cp libcrypto.so $OUTPUT_DIR/libcrypto.so
+            sudo cp libssl.so $OUTPUT_DIR/libssl.so
             
-            sudo cp -a include ../$OUTPUT_DIR
+            sudo cp -a include $OUTPUT_DIR
             
             ls -al
             
