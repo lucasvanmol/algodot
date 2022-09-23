@@ -125,6 +125,8 @@ jobs:
             sudo cp libcrypto.so ../$OUTPUT_DIR/libcrypto.so
             sudo cp libssl.so ../$OUTPUT_DIR/libssl.so
             
+            sudo cp -a include ../$OUTPUT_DIR
+            
             ls -al
             
             cd ..
