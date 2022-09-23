@@ -151,7 +151,7 @@ jobs:
          #sudo cp -a ${{ github.workspace }}/openssl_android/openssl-1.1.1l/include ${{ github.workspace }}/openssl_android
          
          #verify all files
-         cd ${{ github.workspace }}/openssl_android && ls -al
+         cd $OUTPUT_DIR && ls -al
          
       
       - name: "Build Rust for targets: armv7-linux-androideabi" # aarch64-linux-android
@@ -165,10 +165,10 @@ jobs:
           
           #export ARMV7_LINUX_ANDROIDEABI_OPENSSL_LIB_DIR="openssl_android/libs/android/clang/android-arm/ssl" #buggy
           
-          export OPENSSL=../$OUTPUT_DIR #arm
+          export OPENSSL=$OUTPUT_DIR #arm
           
-          export OPENSSL_LIB_DIR=../$OUTPUT_DIR
-          export PKG_CONFIG_PATH=../$OUTPUT_DIR
+          export OPENSSL_LIB_DIR=$OUTPUT_DIR
+          export PKG_CONFIG_PATH=$OUTPUT_DIR
           
           PKG_CONFIG_ALLOW_CROSS_armv7_linux_androideabi=1
           
@@ -179,9 +179,9 @@ jobs:
 
 
 
-          export OPENSSL_DIR=../$OUTPUT_DIR
+          export OPENSSL_DIR=$OUTPUT_DIR
 
-          export ARMV7_LINUX_ANDROIDEABI_OPENSSL_DIR=../$OUTPUT_DIR
+          export ARMV7_LINUX_ANDROIDEABI_OPENSSL_DIR=$OUTPUT_DIR
 
           export TOOLCHAIN=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64
 
