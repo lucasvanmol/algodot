@@ -63,8 +63,7 @@ jobs:
           -execdir sh -c 'echo "INPUT(-lunwind)" > libgcc.a' \;
       - name: "Install & Build OpenSSL"
         run: |
-          #install perl
-          sudo apt install perl -y
+        
           
           #git clone android opn ssl
           git clone "https://github.com/Sam2much96/openssl_android"
@@ -116,7 +115,7 @@ jobs:
             ./Configure  $CONFIGURE_PLATFORM -D__ANDROID_API__=$ANDROID_API shared threads no-asm no-sse2 no-ssl2 no-ssl3 no-comp no-hw no-engine
 
                 make build_libs -j8
-            mkdir -p ../$OUTPUT_DIR/${ARCHITECTURE}/
+            sudo mkdir -p ../$OUTPUT_DIR/${ARCHITECTURE}/
 
                 file libcrypto.so
                 file libssl.so
