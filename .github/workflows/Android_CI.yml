@@ -61,7 +61,7 @@ jobs:
         run: >
           find -L $ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION -name libunwind.a
           -execdir sh -c 'echo "INPUT(-lunwind)" > libgcc.a' \;
-      - name: "Install OpenSSL"
+      - name: "Install & Build OpenSSL"
         run: |
           
           #git clone android opn ssl
@@ -69,34 +69,49 @@ jobs:
           
           cd ${{ github.workspace }}/openssl_android
    
-          #recompiles precompiled libraries
-          sudo ./build_openssl.sh
+          PATH=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi21-clang++
+          ANDROID_API=21
+          CONFIGURE_PLATFORM=android-arm
+          ARCHITECTURE=$CONFIGURE_PLATFORM
+          PROJECT_HOME=`pwd`
+          PATH_ORG=$PATH
+          OUTPUT_DIR=${{ github.workspace }}/openssl_android
+          export CFLAGS="-Wno-macro-redefined -O3"
+          ./Configure  $CONFIGURE_PLATFORM -D__ANDROID_API__=$ANDROID_API shared threads no-asm no-sse2 no-ssl2 no-ssl3 no-comp no-hw no-engine
+          make build_libs -j8
+          mkdir -p ../$OUTPUT_DIR/${ARCHITECTURE}
+          file libcrypto.so
+          file libssl.so    	
+          cp libcrypto.a ../$OUTPUT_DIR/${ARCHITECTURE}/libcrypto.a
+          cp libssl.a ../$OUTPUT_DIR/${ARCHITECTURE}/libssl.a
+          cp libcrypto.so ../$OUTPUT_DIR/${ARCHITECTURE}/libcrypto.so
+          cp libssl.so ../$OUTPUT_DIR/${ARCHITECTURE}/libssl.so
           
           #reset cd
-          cd
+          cd ..
           
-          #verify openssl android
-          cd ${{ github.workspace }}/openssl_android/libs/android/clang/android-arm && ls -al
+          #verify openssl android compile
+          cd $OUTPUT_DIR/${ARCHITECTURE} && ls -al
           
           
           
           #copy openssl file
-          cp libcrypto.so ${{ github.workspace }}/openssl_android
-          cp libssl.so ${{ github.workspace }}/openssl_android
+          #cp libcrypto.so ${{ github.workspace }}/openssl_android
+          #cp libssl.so ${{ github.workspace }}/openssl_android
           
           #reset cd
           cd
            
       
           #copy include files and ssl libraries
-          sudo cp -a ${{ github.workspace }}/openssl_android/openssl-1.1.1l/include ${{ github.workspace }}/openssl_android
+          #sudo cp -a ${{ github.workspace }}/openssl_android/openssl-1.1.1l/include ${{ github.workspace }}/openssl_android
           
           #cp ${{ github.workspace }}/openssl_android/libs/android/clang/android-arm/libcrypto.so ${{ github.workspace }}/openssl_android
           #cp ${{ github.workspace }}/openssl_android/libs/android/clang/android-arm/libssl.so ${{ github.workspace }}/openssl_android
           
        
          
-          cd ${{ github.workspace }}/openssl_android/libs/android/clang/android-arm && ls *.so
+          #cd ${{ github.workspace }}/openssl_android/libs/android/clang/android-arm && ls *.so
           
           
       - name: "Install Rust NDK"
@@ -107,7 +122,7 @@ jobs:
         run: |
          cd ${{ github.workspace }}/openssl_android/libs/android/clang/android-arm && ls -al
       
-      - name: "Build Rust for targets: aarch64-linux-android, armv7-linux-androideabi"
+      - name: "Build Rust for targets: armv7-linux-androideabi" # aarch64-linux-android
         run: |
           
         
