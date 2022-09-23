@@ -132,6 +132,9 @@ jobs:
             cd ..
             echo "Parent Dir"
             ls -al
+            
+            echo "openssl_android Dir"
+            cd openssl_anroid && ls -al
           }
 
           # Build libcrypto for armeabi-v7a 
