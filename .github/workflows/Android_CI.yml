@@ -125,6 +125,7 @@ jobs:
             sudo cp libcrypto.so ../$OUTPUT_DIR/libcrypto.so
             sudo cp libssl.so ../$OUTPUT_DIR/libssl.so
             
+            ls -al
             
             cd ..
           }
@@ -147,7 +148,7 @@ jobs:
       - name: "Check workspace"
         run: |
          #copy openssl shared libraries and headers to compiler working directory
-         sudo cp -a ${{ github.workspace }}/openssl_android/openssl-1.1.1l/include ${{ github.workspace }}/openssl_android
+         #sudo cp -a ${{ github.workspace }}/openssl_android/openssl-1.1.1l/include ${{ github.workspace }}/openssl_android
          
          #verify all files
          cd ${{ github.workspace }}/openssl_android && ls -al
