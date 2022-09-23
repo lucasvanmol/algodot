@@ -67,7 +67,7 @@ jobs:
           #git clone android opn ssl
           git clone "https://github.com/Sam2much96/openssl_android"
           
-          cd ${{ github.workspace }}/openssl_android
+          cd ${{ github.workspace }}/openssl_android/openssl-1.1.1l
    
           PATH=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi21-clang++
           ANDROID_API=21
