@@ -68,7 +68,7 @@ jobs:
           #git clone android opn ssl
           #git clone "https://github.com/Sam2much96/openssl_android"
           
-          cd ${{ github.workspace }}/openssl_android
+          #cd ${{ github.workspace }}/openssl_android
    
           if [[ -z "${ANDROID_NDK_HOME}" ]]; then
             # need change
