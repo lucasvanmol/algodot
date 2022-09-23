@@ -177,19 +177,14 @@ jobs:
           export OPENSSL_LIB_DIR=${{ github.workspace }}/openssl_android
           export PKG_CONFIG_PATH=${{ github.workspace }}/openssl_android
           
+          export ARMV7_LINUX_ANDROIDEABI_OPENSSL_DIR=${{ github.workspace }}/openssl_android
+          
           PKG_CONFIG_ALLOW_CROSS_armv7_linux_androideabi=1
           
          
           export ANDROID_NDK_VERSION=25.1.8937393
 
-
-
-
-
           export OPENSSL_DIR=${{ github.workspace }}
-
-          export ARMV7_LINUX_ANDROIDEABI_OPENSSL_DIR=${{ github.workspace }}
-
           export TOOLCHAIN=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64
 
           export TARGET=armeabi-v7a
