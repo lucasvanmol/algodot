@@ -13,14 +13,11 @@ func _ready():
 	var status = true
 
 	print(" -- Initialize Algod")
-	#algod = Algod.new()
-	
-	var test = Algod.new()
-	print(test.get_script().get_instance_base_type())
+	algod = Algod.new()
 	
 	algod.url = "http://localhost:4001"
 	algod.token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-	#add_child(algod)
+	add_child(algod)
 	
 	print(" -- Get funder account")
 	funder_mnemonic = OS.get_environment("ALGODOT_FUNDER_MNEMONIC")
