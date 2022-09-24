@@ -1,23 +1,20 @@
 # Algodot
 Algorand integration in Godot.
-![Screenshot](https://github.com/Sam2much96/algodot/blob/master/test/project/addons/algodot/icon.png)
 
-
-
-
-
-
-
--Contains Builtin Documentation
--Comes with Prebuilt Godot Alog Class
 
 ## Download the addon
 
 https://godotengine.org/asset-library/asset/1219
 
+https://inhumanity-arts.itch.io/algodot
+
 ## Usage
 
-Initializing the Algod object
+This addon comes with prebuilt Logic scripts in Algod.gd that can be used in your godot project and 
+Built-in documentation on how to use them in your scene's viewport tab. But should you decide to construct 
+additional logic for your project, here are some valid examples
+
+Initializing the Algod object for Local Testnet
 
 ```gdscript
 algod = Algod.new()
@@ -64,13 +61,13 @@ For more examples, check out the test script in the `./test/project` directory.
 
 See the README in `./test`
 
-## Building
+## Building on Windows
 
 ```
 ./build.ps1
 ```
 
-On windows, there maybe some errors with bindgen not finding C headers: see https://godot-rust.github.io/book/faq/configuration.html#c-headers-not-found-by-bindgen
+On windows and Linux, there maybe some errors with bindgen not finding C headers: see https://godot-rust.github.io/book/faq/configuration.html#c-headers-not-found-by-bindgen. It's advisable to built in a fresh docker environment for optimal builds
 
 Running in the Visual Studio Developer Console should set the appropriate env vars, notable one called `INCLUDE`. For my installation, this looked something like: 
 
@@ -80,4 +77,12 @@ INCLUDE=C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\Tools\
 
 #Android
 
-This fork contains a tested Android Build using cargo ndk and  openssl 1.1.1 android. 
+This fork contains a tested Android Build CI using cargo ndk and  openssl 1.1.1 android. It uploads them as artifacts, or download prebuilt binaries for Windows, Linux and Android armv7 architecture. The android build currently only supports armv7 and there are plans to support arch 64 android.
+
+#Dependencies
+
+Linux and Android builds come with prebuilt dependencies for openssl libssl.so and libcrypto.so. These are needed for Algodot to commmunicate with the Algorand Blcokchain. If compiling for macOS and windows architecture, be sure to have openssl preinstalled in your computer or supply them as dependencies inalgodot gdnlib.tres file.
+
+
+
+![Screenshot](https://github.com/Sam2much96/algodot/blob/master/test/project/addons/algodot/icon.png)
