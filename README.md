@@ -77,7 +77,7 @@ INCLUDE=C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\Tools\
 
 #Android
 
-This fork contains a tested Android Build CI using cargo ndk and  openssl 1.1.1 android. It uploads them as artifacts, or download prebuilt binaries for Windows, Linux and Android armv7 architecture. The android build currently only supports armv7 and there are plans to support arch 64 android.
+This fork contains a tested Android Build CI using cargo ndk and  openssl 1.1.1 android. It uploads them as artifacts, or optionally you can download prebuilt binaries for Windows, Linux and Android armv7 architecture through the links listed above. The android build currently only supports armv7 and there are plans to support arch 64 android.
 
 #Dependencies
 
