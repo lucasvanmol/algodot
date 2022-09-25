@@ -81,7 +81,7 @@ This fork contains a tested Android Build CI using cargo ndk and  openssl 1.1.1 
 
 #Dependencies
 
-Linux and Android builds come with prebuilt dependencies for openssl libssl.so and libcrypto.so. These are needed for Algodot to commmunicate with the Algorand Blcokchain. If compiling for macOS and windows architecture, be sure to have openssl preinstalled in your computer or supply them as dependencies inalgodot gdnlib.tres file.
+Linux and Android builds come with prebuilt dependencies for openssl libssl.so and libcrypto.so. These are needed for Algodot to commmunicate with the Algorand Blockchain. If compiling for macOS and Windows architecture, be sure to have openssl preinstalled in your computer or supply them as dependencies in algodot's gdnlib.tres file.
 
 
 
