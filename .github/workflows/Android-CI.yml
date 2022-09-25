@@ -290,8 +290,8 @@ jobs:
         with:
           name: "Openssl dependencies arm64-v8a"
           path: |
-            ${{ github.workspace }}/openssl_android/libssl.so
-            ${{ github.workspace }}/openssl_android/libcrypto.so
+            libssl.so
+            libcrypto.so
          
       
       
