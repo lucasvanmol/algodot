@@ -150,10 +150,7 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: "Openssl dependencies arm-v7a"
-          path: |
-            libssl.so
-            libcrypto.so
-         
+          path: openssl_android
       
       - name: "Build Rust for targets: armv7-linux-androideabi" # aarch64-linux-android
         run: |
@@ -289,9 +286,7 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: "Openssl dependencies arm64-v8a"
-          path: |
-            libssl.so
-            libcrypto.so
+          path: openssl_android
          
       
       
