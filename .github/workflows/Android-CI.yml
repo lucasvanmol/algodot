@@ -144,6 +144,15 @@ jobs:
          
          #verify all files
          cd ${{ github.workspace }}/openssl_android && ls -al
+      
+      
+      - name: Upload Artifact openssl 32 bit
+        uses: actions/upload-artifact@v1
+        with:
+          name: "Openssl dependencies arm-v7a"
+          path: |
+            ${{ github.workspace }}/openssl_android/libssl.so
+            ${{ github.workspace }}/openssl_android/libcrypto.so
          
       
       - name: "Build Rust for targets: armv7-linux-androideabi" # aarch64-linux-android
@@ -184,7 +193,7 @@ jobs:
           #cargo build --target aarch64-linux-android --release
           #cargo build --target armv7-linux-androideabi --release 
           
-      - name: Upload Artifact
+      - name: Upload Artifact 1
         uses: actions/upload-artifact@v1
         with:
           name: "android armabi-v7a"
@@ -276,6 +285,17 @@ jobs:
          cd ${{ github.workspace }}/openssl_android && ls -al
          
       
+      - name: Upload Artifact openssl 64 bit
+        uses: actions/upload-artifact@v1
+        with:
+          name: "Openssl dependencies arm64-v8a"
+          path: |
+            ${{ github.workspace }}/openssl_android/libssl.so
+            ${{ github.workspace }}/openssl_android/libcrypto.so
+         
+      
+      
+      
       - name: "Build Rust for targets: armv8-linux-androideabi" # aarch64-linux-android
         run: |
           
@@ -308,7 +328,7 @@ jobs:
           cargo ndk -t arm64-v8a  -o ./jniLibs build --release
          
           
-      - name: Upload Artifact
+      - name: Upload Artifact 2
         uses: actions/upload-artifact@v1
         with:
           name: "android arm64-v8a"
