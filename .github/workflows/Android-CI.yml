@@ -151,8 +151,8 @@ jobs:
         with:
           name: "Openssl dependencies arm-v7a"
           path: |
-            ${{ github.workspace }}/openssl_android/libssl.so
-            ${{ github.workspace }}/openssl_android/libcrypto.so
+            libssl.so
+            libcrypto.so
          
       
       - name: "Build Rust for targets: armv7-linux-androideabi" # aarch64-linux-android
