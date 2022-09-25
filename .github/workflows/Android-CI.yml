@@ -296,7 +296,7 @@ jobs:
          
           export ANDROID_NDK_VERSION=25.1.8937393
 
-          export OPENSSL_DIR=${{ github.workspace }}
+          export OPENSSL_DIR=${{ github.workspace }}/openssl_android
           export TOOLCHAIN=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64
 
           export TARGET=arm64-v8a
