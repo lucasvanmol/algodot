@@ -186,10 +186,7 @@ jobs:
           export DEBUG= true
 
           
-          cargo ndk -t armeabi-v7a  -o ./jniLibs build --release
-          
-          #cargo build --target aarch64-linux-android --release
-          #cargo build --target armv7-linux-androideabi --release 
+          RUST_BACKTRACE=full cargo ndk -t armeabi-v7a  -o ./jniLibs build --release
           
       - name: Upload Artifact 1
         uses: actions/upload-artifact@v1
