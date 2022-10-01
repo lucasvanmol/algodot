@@ -41,7 +41,8 @@ impl Algodot {
             // leave these default values here for now
             algod: Rc::new(
                 Algod::new(
-                   &str,"node.testnet.algoexplorerapi.io",
+                   "node.testnet.algoexplorerapi.io",
+                    "",
                 )
                 .unwrap(),
             ),
