@@ -157,11 +157,8 @@ jobs:
           
         
           #link external libraries
-          export CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang++
+          #export CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang++
           export CARGO_TARGET_ARMV7_LINUX_ANDROIDEABI_LINKER=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi21-clang++
-          
-          
-          export ARMV7_LINUX_ANDROIDEABI_OPENSSL_LIB_DIR=${{ github.workspace }}/openssl_android
           
           
           export OPENSSL=${{ github.workspace }}/openssl_android #arm
@@ -180,7 +177,7 @@ jobs:
           export OPENSSL_DIR=${{ github.workspace }}
           export TOOLCHAIN=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64
 
-          export TARGET=armeabi-v7a
+          #export TARGET=armeabi-v7a
 
           export DEBUG= true
 
@@ -237,8 +234,8 @@ jobs:
             #perl -pi -w -e 's/\-mandroid//g;' ./Configure
             PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
             #turn off warning  macro-redefined
-            # export CFLAGS="-Wno-macro-redefined -O3"
-            ./Configure  $CONFIGURE_PLATFORM -D__ANDROID_API__=$ANDROID_API shared threads no-asm no-sse2 no-ssl2 no-ssl3 no-comp no-hw no-engine
+             export CFLAGS="-Wno-macro-redefined -O3"
+            ./Configure  $CONFIGURE_PLATFORM -D__ANDROID_API__=21 shared threads no-asm no-sse2 no-ssl2 no-ssl3 no-comp no-hw no-engine
 
                 make build_libs -j8
             sudo mkdir -p ../$OUTPUT_DIR/${ARCHITECTURE}/
