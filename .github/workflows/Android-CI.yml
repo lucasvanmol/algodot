@@ -18,9 +18,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install latest nightly
-        uses: actions-rs/toolchain@v1
+        uses: actions-rs/toolchain@v1.0.1
         with:
-            toolchain: stable
+            toolchain: nightly
             override: true
             components: rustfmt, clippy
             
@@ -139,9 +139,6 @@ jobs:
           
       - name: "Check workspace"
         run: |
-         #copy openssl shared libraries and headers to compiler working directory
-         #sudo cp -a ${{ github.workspace }}/openssl_android/openssl-1.1.1l/include ${{ github.workspace }}/openssl_android
-         
          #verify all files
          cd ${{ github.workspace }}/openssl_android && ls -al
       
@@ -157,7 +154,7 @@ jobs:
           
         
           #link external libraries
-          #export CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang++
+          export CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang++
           export CARGO_TARGET_ARMV7_LINUX_ANDROIDEABI_LINKER=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi21-clang++
           
           
@@ -235,7 +232,7 @@ jobs:
             PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
             #turn off warning  macro-redefined
              export CFLAGS="-Wno-macro-redefined -O3"
-            ./Configure  $CONFIGURE_PLATFORM -D__ANDROID_API__=21 shared threads no-asm no-sse2 no-ssl2 no-ssl3 no-comp no-hw no-engine
+            ./Configure  $CONFIGURE_PLATFORM -D__ANDROID_API__=$ANDROID_API shared threads no-asm no-sse2 no-ssl2 no-ssl3 no-comp no-hw no-engine
 
                 make build_libs -j8
             sudo mkdir -p ../$OUTPUT_DIR/${ARCHITECTURE}/
