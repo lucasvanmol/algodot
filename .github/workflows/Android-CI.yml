@@ -21,6 +21,7 @@ jobs:
         uses: actions-rs/toolchain@v1.0.1
         with:
             toolchain: nightly
+            target: armv7-unknown-linux-gnueabihf
             override: true
             components: rustfmt, clippy
             
@@ -31,6 +32,7 @@ jobs:
         uses: actions-rs/cargo@v1.0.1
         with:
           command: check
+          args: --target armv7-unknown-linux-gnueabihf
           
       - name: "Install Java + NDK"
         run: |
