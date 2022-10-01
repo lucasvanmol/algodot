@@ -172,7 +172,7 @@ jobs:
           export TOOLCHAIN=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64
 
           export TARGET=armeabi-v7a
-
+          export API=21
           export DEBUG= true
 
           
