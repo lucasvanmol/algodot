@@ -125,8 +125,7 @@ jobs:
 
           # Build libcrypto for armeabi-v7a 
           build_android_clang  "21"    	"android-arm" #32 bit arm
-          #build_android_clang  "21"    	"android-x86"
-          #build_android_clang  "21"    	"android-arm64"
+     
 
           exit 0
 
@@ -174,6 +173,7 @@ jobs:
           export TARGET=armeabi-v7a
           export API=21
           export DEBUG= true
+          -DANDROID_PLATFORM=android-21
 
           
           cargo ndk -t armeabi-v7a  -o ./jniLibs build --release
