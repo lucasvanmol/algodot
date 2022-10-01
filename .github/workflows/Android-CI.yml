@@ -164,9 +164,7 @@ jobs:
           
           
           export PKG_CONFIG_ALLOW_CROSS_armv7_linux_androideabi=1
-          
-          export PKG_CONFIG_armv7-unknown-linux-gnueabihf=1
-          
+      
          
           export ANDROID_NDK_VERSION=25.1.8937393
 
@@ -178,7 +176,7 @@ jobs:
           export DEBUG= true
 
           
-          #RUST_BACKTRACE=full cargo ndk -t armeabi-v7a  -o ./jniLibs build --release
+          cargo ndk -t armeabi-v7a  -o ./jniLibs build --release
           
       - name: Build for Armv7
         uses: actions-rs/cargo@v1.0.1
