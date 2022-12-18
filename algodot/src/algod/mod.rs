@@ -8,11 +8,12 @@ use algonaut::transaction::transaction::{
     AssetConfigurationTransaction, AssetParams, AssetTransferTransaction, StateSchema,
 };
 use algonaut::transaction::tx_group::TxGroup;
-use algonaut::transaction::{Pay, TransactionType, TxnBuilder};
+use algonaut::transaction::{Pay, TransactionType, TxnBuilder, builder::CallApplication, account::Account, };
 use gdnative::api::Engine;
 use gdnative::prelude::*;
 use gdnative::tasks::{Async, AsyncMethod, Spawner};
 use std::rc::Rc;
+
 
 #[derive(NativeClass)]
 #[inherit(Node)]
