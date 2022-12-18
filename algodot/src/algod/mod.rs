@@ -322,8 +322,7 @@ impl Algodot {
         TxnBuilder::with( 
             &params,
             CallApplication::new(sender,app_id)
-            .app_arguments(vec![vec![app_arguments]])
-            }),
+                .app_arguments(vec![vec![app_arguments]])
         )
         .build()
         .unwrap()
