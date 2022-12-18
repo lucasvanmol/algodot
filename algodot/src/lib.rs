@@ -9,7 +9,7 @@ mod algod;
 
 thread_local! {
     static EXECUTOR: &'static SharedLocalPool = {
-        Box::leak(Box::new(SharedLocalPool::default()))
+        Box::leak(Box::default())
     };
 }
 
