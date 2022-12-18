@@ -41,8 +41,8 @@ impl Algodot {
             // leave these default values here for now
             algod: Rc::new(
                 Algod::new(
-                   "node.testnet.algoexplorerapi.io",
-                    "",
+                   "http://localhost:4001",
+                    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                 )
                 .unwrap(),
             ),
