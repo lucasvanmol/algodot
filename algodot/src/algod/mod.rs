@@ -8,7 +8,7 @@ use algonaut::transaction::transaction::{
     AssetConfigurationTransaction, AssetParams, AssetTransferTransaction, StateSchema,
 };
 use algonaut::transaction::tx_group::TxGroup;
-use algonaut::transaction::{Pay, TransactionType, TxnBuilder, builder::CallApplication, account::Account, };
+use algonaut::transaction::{Pay, TransactionType, TxnBuilder, builder::CallApplication, };
 use gdnative::api::Engine;
 use gdnative::prelude::*;
 use gdnative::tasks::{Async, AsyncMethod, Spawner};
@@ -319,21 +319,10 @@ impl Algodot {
                 number_byteslices,
             });
 
-        TxnBuilder::with(
+        TxnBuilder::with( 
             &params,
-            TransactionType::ApplicationCallTransaction(ApplicationCallTransaction {
-                sender: *sender,
-                app_id,
-                on_complete: ApplicationCallOnComplete::NoOp,
-                accounts,
-                approval_program,
-                app_arguments,
-                clear_state_program,
-                foreign_apps,
-                foreign_assets,
-                global_state_schema,
-                local_state_schema,
-                extra_pages: extra_pages.unwrap_or(0),
+            CallApplication::new(sender,app_id)
+            .app_arguments(vec![vec![app_arguments]])
             }),
         )
         .build()
