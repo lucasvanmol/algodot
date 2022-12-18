@@ -27,7 +27,7 @@ pub fn to_json_dict<T: Serialize>(r: &T) -> Variant {
     let str = serde_json::to_string(r).unwrap();
     unsafe {
         JSON::godot_singleton()
-            .parse(&str)
+            .parse(str)
             .unwrap()
             .assume_safe()
             .result()
