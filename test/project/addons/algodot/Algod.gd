@@ -82,8 +82,14 @@ func create_algod_node(network_type: String):
 			algod_node_count += 1
 		elif network_type == "TESTNET":
 			algod = Algod.new() 
-			algod.url = "https://node.testnet.algoexplorerapi.io"
-			algod.token = ""
+			var url = "https://node.testnet.algoexplorerapi.io"
+			var token = ""
+			
+			var headers_ : PoolStringArray = ["User-Agent","DoYouLoveMe?"]
+			
+			algod.set_url(url)
+			algod.set_token(token)
+			algod.set_headers(headers_)
 			algod_node_count += 1
 		elif network_type == "MAINNET":
 			algod_node_count += 1
