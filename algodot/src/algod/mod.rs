@@ -279,7 +279,7 @@ impl Algodot {
         sender: Address,
         #[opt] app_id: Option<u64>,
         #[opt] accounts: Option<Vec<Address>>,
-        #[opt] app_arguments: Option<VariantArray>, // array of PoolByteArrays. Could perhaps be changed directily to Option<Vec<Vec<u8>>>
+        #[opt] app_arguments: Option<Vec<Vec<u8>>>, // array of PoolByteArrays. Could perhaps be changed directily to Option<Vec<Vec<u8>>> | was previously Option<VariantArray>
         #[opt] foreign_apps: Option<Int32Array>,
         #[opt] foreign_assets: Option<Int32Array>,
         #[opt] approval_program: Option<Vec<u8>>,
