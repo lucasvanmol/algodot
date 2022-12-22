@@ -4,7 +4,7 @@ use algonaut::algod::v2::Algod;
 use algonaut::core::{CompiledTeal, MicroAlgos, Round};
 use algonaut::model::algod::v2::{PendingTransaction, TransactionResponse};
 use algonaut::transaction::transaction::{
-    ApplicationCallOnComplete, ApplicationCallTransaction, AssetAcceptTransaction,
+    AssetAcceptTransaction,
     AssetConfigurationTransaction, AssetParams, AssetTransferTransaction, StateSchema,
 };
 use algonaut::transaction::tx_group::TxGroup;
@@ -278,16 +278,10 @@ impl Algodot {
         #[base] _base: &Node,
         params: SuggestedTransactionParams,
         sender: Address,
-        #[opt] app_id: Option<u64>,
-        #[opt] accounts: Option<Vec<Address>>,
-        #[opt] app_arguments: Option<VariantArray>, // array of PoolByteArrays. Could perhaps be changed directily to Option<Vec<Vec<u8>>>
-        #[opt] foreign_apps: Option<Int32Array>,
-        #[opt] foreign_assets: Option<Int32Array>,
-        #[opt] approval_program: Option<Vec<u8>>,
-        #[opt] clear_state_program: Option<Vec<u8>>,
-        #[opt] global_state_schema: Option<(u64, u64)>,
-        #[opt] local_state_schema: Option<(u64, u64)>,
-        #[opt] extra_pages: Option<u32>,
+        app_id: Option<u64>,
+        accounts: Option<Vec<Address>>,
+        app_arguments: Option<VariantArray>, // array of PoolByteArrays. Could perhaps be changed directily to Option<Vec<Vec<u8>>>
+   
     ) -> Transaction {
         let accounts: Option<Vec<algonaut::core::Address>> =
             accounts.map(|acc| acc.iter().map(|acc| **acc).collect());
@@ -298,31 +292,11 @@ impl Algodot {
                 .collect()
         });
 
-        let foreign_apps = foreign_apps.map(|fa| fa.read().iter().map(|num| *num as u64).collect());
-
-        let foreign_assets =
-            foreign_assets.map(|fa| fa.read().iter().map(|num| *num as u64).collect());
-
-        let approval_program = approval_program.map(CompiledTeal);
-
-        let clear_state_program = clear_state_program.map(CompiledTeal);
-
-        let global_state_schema =
-            global_state_schema.map(|(number_ints, number_byteslices)| StateSchema {
-                number_ints,
-                number_byteslices,
-            });
-
-        let local_state_schema =
-            local_state_schema.map(|(number_ints, number_byteslices)| StateSchema {
-                number_ints,
-                number_byteslices,
-            });
 
         TxnBuilder::with( 
             &params,
             CallApplication::new(sender,app_id)
-                .app_arguments(vec![vec![app_arguments]])
+                .app_arguments(vec![vec![*app_arguments]])
         )
         .build()
         .unwrap()
