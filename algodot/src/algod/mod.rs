@@ -279,13 +279,11 @@ impl Algodot {
         params: SuggestedTransactionParams,
         sender: Address,
         app_id: Option<u64>,
-        accounts: Option<Vec<Address>>,
+
         app_arguments: Option<VariantArray>, // array of PoolByteArrays. Could perhaps be changed directily to Option<Vec<Vec<u8>>>
    
     ) -> Transaction {
-        let accounts: Option<Vec<algonaut::core::Address>> =
-            accounts.map(|acc| acc.iter().map(|acc| **acc).collect());
-
+        
         let app_arguments: Option<Vec<Vec<u8>>> = app_arguments.map(|args| {
             args.iter()
                 .map(|var| var.to::<Vec<u8>>().unwrap())
@@ -295,8 +293,8 @@ impl Algodot {
 
         TxnBuilder::with( 
             &params,
-            CallApplication::new(sender,app_id)
-                .app_arguments(vec![vec![*app_arguments]])
+            CallApplication::new(*sender,app_id)
+                .app_arguments(vec![vec![app_arguments]])
         )
         .build()
         .unwrap()
