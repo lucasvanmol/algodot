@@ -1,11 +1,11 @@
 use algodot_core::*;
 use algodot_macros::*;
 use algonaut::algod::v2::Algod;
-use algonaut::core::{CompiledTeal, MicroAlgos, Round};
+use algonaut::core::{MicroAlgos, Round};
 use algonaut::model::algod::v2::{PendingTransaction, TransactionResponse};
 use algonaut::transaction::transaction::{
     AssetAcceptTransaction,
-    AssetConfigurationTransaction, AssetParams, AssetTransferTransaction, StateSchema,
+    AssetConfigurationTransaction, AssetParams, AssetTransferTransaction,
 };
 use algonaut::transaction::tx_group::TxGroup;
 use algonaut::transaction::{Pay, TransactionType, TxnBuilder, builder::CallApplication, };
