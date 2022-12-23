@@ -59,25 +59,4 @@ jobs:
         with: 
           name: linux
           
-      - name: Archive site content
-        uses: thedoctor0/zip-release@master
-        with:
-          filename: site.zip
-      - name: create github release
-        uses: actions/create-release@v1
-        id: create-new-release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ github.run_number }}
-          release_name: Release V${{ github.run_number }}
-          
-      - name: Upload asset
-        uses: actions/upload-release-asset@v1
-        env:
-         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create-new-release.outputs.upload_url }}
-          asset_path: target/x86_64-unknown-linux-gnu/release/libalgodot.so
-          asset_name: site-v${{ github.run_number }}.zip
-          asset_content_type: application/zip
+    
