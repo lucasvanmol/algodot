@@ -54,3 +54,13 @@ jobs:
         with:
           name: linux
           path: target/x86_64-unknown-linux-gnu/release/libalgodot.so
+
+      - name: Upload asset
+        uses: actions/upload-release-asset@v1
+        env:
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create-new-release.outputs.upload_url }}
+          asset_path: target/x86_64-unknown-linux-gnu/release/libalgodot.so
+          asset_name: site-v${{ github.run_number }}.zip
+          asset_content_type: application/zip
