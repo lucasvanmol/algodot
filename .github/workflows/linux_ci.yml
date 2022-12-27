@@ -41,7 +41,7 @@ jobs:
           sudo apt install make gcc -y
           wget  "https://www.openssl.org/source/${OPENSSL_VERSION}.tar.gz"
           tar -xzvf ${OPENSSL_VERSION}.tar.gz
-          sudo apt remove openssl -y
+          
           cd ${OPENSSL_VERSION}
           ./config --prefix=/opt/openssl --openssldir=/usr/local/ssl
           make
