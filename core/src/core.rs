@@ -9,7 +9,7 @@ use algonaut::transaction::transaction::{
     AssetAcceptTransaction, AssetConfigurationTransaction, AssetParams, AssetTransferTransaction,
     Payment, TransactionSignature,
 };
-use algonaut::transaction::{SignedTransaction, Transaction, TransactionType};
+use algonaut::transaction::{SignedTransaction, Transaction, TransactionType, builder::CallApplication};
 use algonaut::{core::Address, error::ServiceError};
 use derive_more::{Deref, DerefMut, From, Into};
 use gdnative::api::JSON;
