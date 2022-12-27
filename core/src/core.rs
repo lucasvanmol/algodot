@@ -1,4 +1,5 @@
 //Interracts with the godot debugger. Handles transaction types and prints out Algod node errors
+// It uses Transaction Types to trigger a state machine in Algodot core.rs
 
 use algonaut::core::{MicroAlgos, Round, SuggestedTransactionParams};
 use algonaut::crypto::{HashDigest, Signature};
@@ -142,7 +143,7 @@ impl ToVariant for MyTransaction {
         dict.insert("lv", self.last_valid.0);
         dict.insert(
             "type",
-            match &self.txn_type {
+            match &self.txn_type { //state machine: https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/enum.TransactionType.html
                 TransactionType::Payment(payment) => {
                     dict.insert("snd", MyAddress::from(payment.sender));
                     dict.insert("rcv", MyAddress::from(payment.receiver));
@@ -197,6 +198,8 @@ impl ToVariant for MyTransaction {
                     dict.insert("apar", apar);
                     "acfg"
                 }
+                
+                //https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.AssetTransferTransaction.html
                 TransactionType::AssetTransferTransaction(axfer) => {
                     dict.insert("snd", MyAddress::from(axfer.sender));
                     dict.insert("xaid", axfer.xfer);
@@ -214,7 +217,10 @@ impl ToVariant for MyTransaction {
                 }
                 TransactionType::AssetClawbackTransaction(_) => todo!(),
                 TransactionType::AssetFreezeTransaction(_) => todo!(),
-                //TransactionType::ApplicationCallTransaction(_) => todo!(),
+                TransactionType::ApplicationCallTransaction(app_txn) => { 
+                dict.insert("app id", app_txn.app_id)
+                
+                }
             },
         );
         if let Some(gen) = &self.genesis_id {
