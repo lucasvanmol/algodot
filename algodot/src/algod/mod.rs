@@ -285,10 +285,10 @@ impl Algodot {
     ) -> Transaction {       //unwraps into MyTransaction() From method in Core.rs
         TxnBuilder::with(
             &params,
-            TransactionType::ApplicationCallTransaction(ApplicationCallTransaction {
+            TransactionType::ApplicationCallTransaction(CallApplication {
                 sender: *sender,
                 app_id,
-                app_arguments,
+                app_arguments.expect("REASON").into_bytes(),
             }),
         )
         .build()?
