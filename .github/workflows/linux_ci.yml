@@ -69,9 +69,9 @@ jobs:
            export OPENSSL_LIB_DIR=${{ github.workspace }}/${OPENSSL_VERSION}
            
            export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_LIB_DIR = ${{ github.workspace }}/${OPENSSL_VERSION}
-           export TARGET=x86_64-unknown-linux-gnu
+           
           
-          RUST_BACKTRSCE=full cargo build --target x86_64-unknown-linux-gnu  --release
+           RUST_BACKTRSCE=full cargo build --target x86_64-unknown-linux-gnu  --release
    
           
       - name: Upload Artifact
