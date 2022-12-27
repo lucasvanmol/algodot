@@ -45,7 +45,7 @@ jobs:
           cd ${OPENSSL_VERSION}
           ./config --prefix=/opt/openssl --openssldir=/usr/local/ssl
           make
-          make install
+          sudo make install
 
 
 
