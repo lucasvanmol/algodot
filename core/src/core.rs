@@ -218,7 +218,7 @@ impl ToVariant for MyTransaction {
                 TransactionType::AssetClawbackTransaction(_) => todo!(),
                 TransactionType::AssetFreezeTransaction(_) => todo!(),
                 TransactionType::ApplicationCallTransaction(app_txn) => { 
-                dict.insert("app id", app_txn.app_id)
+                dict.insert("app id")
                 
                 }
             },
