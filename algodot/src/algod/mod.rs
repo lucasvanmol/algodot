@@ -281,15 +281,13 @@ impl Algodot {
         app_id: u64,
         #[opt] app_arguments: Option<String>, 
         
-        
-        arg_as_bytes : Vec<u8> = app_arguments.expect("REASON").into_bytes();
    
     ) -> Transaction {
 
         TxnBuilder::with( 
             &params,
             CallApplication::new(*sender,app_id)
-                .app_arguments(vec![arg_as_bytes])
+                .app_arguments(vec![app_arguments.expect("REASON").into_bytes()])
                 .build(),
         )
         .build()
