@@ -215,13 +215,13 @@ impl ToVariant for MyTransaction {
                     dict.insert("xaid", axfer.xfer);
                     "axfer"
                 }
-                TransactionType::AssetClawbackTransaction(_) => todo!(),
-                TransactionType::AssetFreezeTransaction(_) => todo!(),
                 TransactionType::ApplicationCallTransaction(app_txn) => { 
-                    CallApplication::new(app_txn.sender,app_txn.app_id)
-                        .app_arguments(vec![app_txn.app_arguments.expect("REASON")])
+                    CallApplication::new(app_txn.sender,Some(app_txn.app_id))
+                        .app_arguments(app_txn.app_arguments.expect("REASON"))
                         .build()
                 }
+                TransactionType::AssetClawbackTransaction(_) => todo!(),
+                TransactionType::AssetFreezeTransaction(_) => todo!(), 
             },
         );
         if let Some(gen) = &self.genesis_id {
