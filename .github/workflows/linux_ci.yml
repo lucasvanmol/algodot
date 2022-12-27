@@ -10,11 +10,12 @@ env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
   CARGO_INCREMENTAL: 0
+  OPENSSL_VERSION: oenssl-1.1.1l"
   
   
 jobs:
         
-  build-android:
+  build-linux:
     # Note: even though Android builds for another architecture than Linux, it can reuse downloaded crates (source code, maybe 'cargo check').
     
     #continue-on-error: ${{ matrix.rust == 'nightly' }}
@@ -34,7 +35,22 @@ jobs:
             toolchain: nightly
             override: true
             components: rustfmt, clippy
-            
+
+      - name: "Compile & install Openssl 1.1l"
+        run: |
+          sudo apt remove openssl -y
+          sudo apt install make gcc -y
+          wget  "https://www.openssl.org/source/${OPENSSL_VERSION}.tar.gz"
+          tar -xzvf ${OPENSSL_VERSION}.tar.gz
+          cd ${OPENSSL_VERSION}
+          ./config --prefix=/opt/openssl --openssldir=/usr/local/ssl
+          make
+          make test
+          make install
+
+
+
+
        # `cargo check` command here will use installed `nightly`
       # as it is set as an "override" for current directory
 
