@@ -216,7 +216,7 @@ impl ToVariant for MyTransaction {
                     "axfer"
                 }
                 TransactionType::ApplicationCallTransaction(app_txn) => { 
-                    dict.insert( "app_arg", app_txn.app_arguments)    
+                    dict.insert( "app_arg", Some(app_txn.app_arguments))    
                 }
                 TransactionType::AssetClawbackTransaction(_) => todo!(),
                 TransactionType::AssetFreezeTransaction(_) => todo!(), 
