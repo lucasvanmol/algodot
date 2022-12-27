@@ -217,12 +217,10 @@ impl ToVariant for MyTransaction {
                 }
                 TransactionType::AssetClawbackTransaction(_) => todo!(),
                 TransactionType::AssetFreezeTransaction(_) => todo!(),
-                TransactionType::ApplicationCallTransaction(txn) => { 
-                 
-                let signed_t = Algod.sign_transaction(txn)?;
-                dict.insert("broadcasting transaction");
-                dict.insert("response", Algod.broadcast_signed_transaction(&signed_t).await?);
-                
+                TransactionType::ApplicationCallTransaction(app_txn) => { 
+                    CallApplication::new(app_txn.sender,app_txn.app_id)
+                        .app_arguments(vec![app_txn.app_arguments.expect("REASON").into_bytes()])
+                        .build()
                 }
             },
         );
