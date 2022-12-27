@@ -216,12 +216,8 @@ impl ToVariant for MyTransaction {
                     "axfer"
                 }
                 TransactionType::ApplicationCallTransaction(app_txn) => { 
-                    dict.insert( "App",
-                        CallApplication::new(app_txn.sender,Some(app_txn.app_id))
-                            .app_arguments(app_txn.app_arguments.expect("REASON"))
-                            .build()
-                            .to_string()
-                })
+                    dict.insert( "app_arg", app_txn.app_arguments)    
+                }
                 TransactionType::AssetClawbackTransaction(_) => todo!(),
                 TransactionType::AssetFreezeTransaction(_) => todo!(), 
             },
