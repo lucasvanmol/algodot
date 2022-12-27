@@ -36,6 +36,15 @@ jobs:
             override: true
             components: rustfmt, clippy
 
+
+       # `cargo check` command here will use installed `nightly`
+      # as it is set as an "override" for current directory
+
+      - name: Run cargo check
+        uses: actions-rs/cargo@v1
+        with:
+          command: check
+
       - name: "Compile & install Openssl 1.1l"
         run: |
           sudo apt install make gcc -y
@@ -46,20 +55,7 @@ jobs:
           ./config --prefix=/opt/openssl --openssldir=/usr/local/ssl
           make
           sudo make install
-       
-      - name: "Verify files"
-        run: |
-          cd ${{ github.workspace }}/${OPENSSL_VERSION} && ls -al
-          cd
-
-       # `cargo check` command here will use installed `nightly`
-      # as it is set as an "override" for current directory
-
-      - name: Run cargo check
-        uses: actions-rs/cargo@v1
-        with:
-          command: check
-          
+             
       - name: "Linux compile"
         run: |
           # Linux
