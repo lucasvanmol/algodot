@@ -283,7 +283,6 @@ impl Algodot {
         
    
     ) -> Transaction {
-
         TxnBuilder::with( 
             &params,
             CallApplication::new(*sender,app_id)
