@@ -279,14 +279,17 @@ impl Algodot {
         params: SuggestedTransactionParams,
         sender: Address,
         app_id: u64,
-        app_arguments: u8, // array of PoolByteArrays. Could perhaps be changed directily to Option<Vec<Vec<u8>>>
+        app_arguments: String, 
+        
+        
+        let arg_as_bytes : Vec<u8> = app_arg.expect("REASON").into_bytes();
    
     ) -> Transaction {
 
         TxnBuilder::with( 
             &params,
             CallApplication::new(*sender,app_id)
-                .app_arguments(vec![vec![app_arguments]])
+                .app_arguments(vec![app_arguments])
                 .build(),
         )
         .build()
