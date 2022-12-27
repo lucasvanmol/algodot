@@ -10,7 +10,7 @@ env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
   CARGO_INCREMENTAL: 0
-  OPENSSL_VERSION: oenssl-1.1.1l"
+  OPENSSL_VERSION: openssl-1.1.1l
   
   
 jobs:
@@ -38,7 +38,7 @@ jobs:
 
       - name: "Compile & install Openssl 1.1l"
         run: |
-          sudo apt remove openssl -y
+          # sudo apt remove openssl -y
           sudo apt install make gcc -y
           wget  "https://www.openssl.org/source/${OPENSSL_VERSION}.tar.gz"
           tar -xzvf ${OPENSSL_VERSION}.tar.gz
