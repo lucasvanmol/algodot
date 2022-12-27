@@ -46,9 +46,11 @@ jobs:
           ./config --prefix=/opt/openssl --openssldir=/usr/local/ssl
           make
           sudo make install
-
-
-
+       
+      - name: "Verify files"
+        run: |
+          cd ${{ github.workspace }}/${OPENSSL_VERSION} && ls -al
+          cd
 
        # `cargo check` command here will use installed `nightly`
       # as it is set as an "override" for current directory
@@ -61,8 +63,8 @@ jobs:
       - name: "Linux compile"
         run: |
           # Linux
-          export OPENSSL=${OPENSSL_VERSION}
-          export OPENSSL_DIR=${OPENSSL_VERSION}
+          export OPENSSL=${{ github.workspace }}/${OPENSSL_VERSION}
+          export OPENSSL_DIR=${{ github.workspace }}/${OPENSSL_VERSION}
           RUST_BACKTRSCE=full cargo build --target x86_64-unknown-linux-gnu  --release
    
           
