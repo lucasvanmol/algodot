@@ -279,10 +279,10 @@ impl Algodot {
         params: SuggestedTransactionParams,
         sender: Address,
         app_id: u64,
-        app_arguments: String, 
+        #[opt] app_arguments: Option<String>, 
         
         
-        let arg_as_bytes : Vec<u8> = app_arg.expect("REASON").into_bytes();
+        let arg_as_bytes : Vec<u8> = app_arguments.expect("REASON").into_bytes();
    
     ) -> Transaction {
 
