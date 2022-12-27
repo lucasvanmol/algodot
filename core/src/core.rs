@@ -217,8 +217,11 @@ impl ToVariant for MyTransaction {
                 }
                 TransactionType::AssetClawbackTransaction(_) => todo!(),
                 TransactionType::AssetFreezeTransaction(_) => todo!(),
-                TransactionType::ApplicationCallTransaction(app_txn) => { 
-                dict.insert("snd", MyAddress::from(app_txn.sender))
+                TransactionType::ApplicationCallTransaction(txn) => { 
+                 
+                let signed_t = Algod.sign_transaction(txn)?;
+                dict.insert("broadcasting transaction");
+                dict.insert("response", Algod.broadcast_signed_transaction(&signed_t).await?);
                 
                 }
             },
