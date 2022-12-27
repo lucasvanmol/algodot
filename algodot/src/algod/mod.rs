@@ -282,7 +282,7 @@ impl Algodot {
         #[opt] app_arguments: Option<String>, 
         
    
-    ) -> Transaction {       
+    ) -> Transaction {       //unwraps into MyTransaction() From method in Core.rs
         TxnBuilder::with(
             &params,
             TransactionType::ApplicationCallTransaction(ApplicationCallTransaction {
