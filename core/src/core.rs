@@ -1,3 +1,5 @@
+//Interracts with the godot debugger. Handles transaction types and prints out Algod node errors
+
 use algonaut::core::{MicroAlgos, Round, SuggestedTransactionParams};
 use algonaut::crypto::{HashDigest, Signature};
 use algonaut::model::algod::v2::PendingTransaction;
