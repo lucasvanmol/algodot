@@ -219,7 +219,7 @@ impl ToVariant for MyTransaction {
                 TransactionType::AssetFreezeTransaction(_) => todo!(),
                 TransactionType::ApplicationCallTransaction(app_txn) => { 
                     CallApplication::new(app_txn.sender,app_txn.app_id)
-                        .app_arguments(vec![app_txn.app_arguments.expect("REASON").into_bytes()])
+                        .app_arguments(vec![app_txn.app_arguments.expect("REASON")])
                         .build()
                 }
             },
