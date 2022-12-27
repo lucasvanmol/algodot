@@ -61,8 +61,8 @@ jobs:
       - name: "Linux compile"
         run: |
           # Linux
-          export OPENSSL=/usr/local/ssl
-          export OPENSSL_DIR=/usr/local/ssl
+          export OPENSSL=${OPENSSL_VERSION}
+          export OPENSSL_DIR=${OPENSSL_VERSION}
           RUST_BACKTRSCE=full cargo build --target x86_64-unknown-linux-gnu  --release
    
           
