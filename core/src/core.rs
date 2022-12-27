@@ -212,7 +212,7 @@ impl ToVariant for MyTransaction {
                 }
                 TransactionType::AssetClawbackTransaction(_) => todo!(),
                 TransactionType::AssetFreezeTransaction(_) => todo!(),
-                TransactionType::ApplicationCallTransaction(_) => todo!(),
+                //TransactionType::ApplicationCallTransaction(_) => todo!(),
             },
         );
         if let Some(gen) = &self.genesis_id {
