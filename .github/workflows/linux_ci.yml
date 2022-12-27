@@ -67,7 +67,7 @@ jobs:
            export OPENSSL=${{ github.workspace }}/${OPENSSL_VERSION}
            export OPENSSL_DIR=${{ github.workspace }}/${OPENSSL_VERSION}
            export OPENSSL_LIB_DIR=${{ github.workspace }}/${OPENSSL_VERSION}
-           export OPENSSL_LIBS=${{ github.workspace }}/${OPENSSL_VERSION}
+           
            export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_LIB_DIR = ${{ github.workspace }}/${OPENSSL_VERSION}
            export TARGET=x86_64-unknown-linux-gnu
           
