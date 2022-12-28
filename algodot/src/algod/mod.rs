@@ -279,7 +279,7 @@ impl Algodot {
         params: SuggestedTransactionParams,
         sender: Address,
         app_id: u64,
-        app_arguments: String, 
+        #[opt] app_arguments: Option<String>, 
         
    
     ) -> Transaction {       //unwraps into MyTransaction() From method in Core.rs
