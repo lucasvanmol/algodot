@@ -9,7 +9,7 @@ use algonaut::transaction::transaction::{
     AssetAcceptTransaction, AssetConfigurationTransaction, AssetParams, AssetTransferTransaction,
     Payment, TransactionSignature,
 };
-use algonaut::transaction::{SignedTransaction, Transaction, TransactionType, builder::CallApplication};
+use algonaut::transaction::{SignedTransaction, Transaction, TransactionType};
 use algonaut::{core::Address, error::ServiceError};
 use derive_more::{Deref, DerefMut, From, Into};
 use gdnative::api::JSON;
@@ -216,7 +216,7 @@ impl ToVariant for MyTransaction {
                     "axfer"
                 }
                 TransactionType::ApplicationCallTransaction(app_txn) => { 
-                    dict.insert( "app_arg", Some(app_txn.app_arguments))    
+                    dict.insert( "app_arg", String::from("placeholder"))    
                 }
                 TransactionType::AssetClawbackTransaction(_) => todo!(),
                 TransactionType::AssetFreezeTransaction(_) => todo!(), 
