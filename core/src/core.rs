@@ -76,7 +76,8 @@ impl ToVariant for MyAddress {
     }
 }
 
-impl ToVariant for ApplicationCallOnComplete {
+//should ideally not a child of this struct
+impl ToVariant for ApplicationCallOnComplete::NoOp {
     fn to_variant(&self) -> Variant{
         (*self as u32).to_variant()
     }
