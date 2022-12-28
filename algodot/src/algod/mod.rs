@@ -287,7 +287,7 @@ impl Algodot {
             CallApplication::new {
                 sender: *sender,
                 app_id,
-                app_arguments: app_arguments.expect("REASON").into_bytes(),
+                app_arguments: vec![app_arguments.expect("REASON").into_bytes()],
             }),
         )
         .build()
