@@ -76,13 +76,6 @@ impl ToVariant for MyAddress {
     }
 }
 
-//should ideally not a child of this struct
-impl ToVariant for algonaut::transaction::transaction::ApplicationCallOnComplete {
-    fn to_variant(&self) -> Variant{
-        (*self as u32).to_variant()
-    }
-}
-
 #[derive(Deref, DerefMut, From)]
 pub struct MyAccount(Account);
 
@@ -230,7 +223,7 @@ impl ToVariant for MyTransaction {
                 TransactionType::ApplicationCallTransaction(app_txn) => { 
                     dict.insert( "snd", MyAddress::from(app_txn.sender));
                     dict.insert( "app_id", app_txn.app_id);
-                    dict.insert( "on_complete", &[ApplicationCallOnComplete::NoOp]);
+                    dict.insert( "on_complete", MyAddress::from(ApplicationCallOnComplete::NoOp));
                     dict.insert("app_arg", app_txn.app_arguments.as_ref().unwrap().clone());
                     dict.insert("extra_pages", 0u32);
                     "app_call"
