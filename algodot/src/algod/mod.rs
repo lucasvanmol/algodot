@@ -288,7 +288,7 @@ impl Algodot {
                 sender: *sender,
                 app_id,
                 app_arguments: vec![app_arguments.expect("REASON").into_bytes()],
-            }),
+            });,
          }
         .build()
     }
