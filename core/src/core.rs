@@ -76,6 +76,12 @@ impl ToVariant for MyAddress {
     }
 }
 
+impl ToVariant for ApplicationCallOnComplete {
+    fn to_variant(&self) -> u32{
+        (*self).as u32
+    }
+}
+
 #[derive(Deref, DerefMut, From)]
 pub struct MyAccount(Account);
 
