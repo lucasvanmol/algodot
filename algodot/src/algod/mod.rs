@@ -325,7 +325,7 @@ impl Algodot {
         let result = TxGroup::assign_group_id(txns_mut_refs.as_mut_slice());
         godot_unwrap!(result).map(|_| txns)
     }
-}
+
 
 asyncmethods!(algod, node, this,
     fn health(_ctx, _args) {
