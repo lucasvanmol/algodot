@@ -7,7 +7,7 @@ use algonaut::model::algod::v2::PendingTransaction;
 use algonaut::transaction::account::Account;
 use algonaut::transaction::transaction::{
     AssetAcceptTransaction, AssetConfigurationTransaction, AssetParams, AssetTransferTransaction, 
-    Payment, TransactionSignature, ApplicationCallOnComplete
+    Payment, TransactionSignature, ApplicationCallOnComplete,
 };
 
 use algonaut::transaction::{SignedTransaction, Transaction, TransactionType };
