@@ -59,7 +59,7 @@ impl From<ServiceError> for AlgodotError {
     }
 }
 
-#[derive(Debug, Deref, DerefMut, From)]
+#[derive(Debug, Deref, DerefMut, Into)]
 pub struct AppCall(ApplicationCallOnComplete)
 
 impl ToVariant for AppCall {
