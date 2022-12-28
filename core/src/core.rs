@@ -65,6 +65,7 @@ impl From<ServiceError> for AlgodotError {
 #[derive(Debug, Deref, DerefMut, From)]
 pub struct MyAddress(Address);
 
+//used when constructing a variant 
 impl FromVariant for MyAddress {
     fn from_variant(variant: &Variant) -> Result<Self, FromVariantError> {
         Address::from_str(&variant.to_string())
@@ -99,6 +100,7 @@ impl MyAccount {
 #[derive(Deref, DerefMut, From)]
 pub struct MySuggestedTransactionParams(SuggestedTransactionParams);
 
+//used when constructing To a variant
 impl ToVariant for MySuggestedTransactionParams {
     fn to_variant(&self) -> Variant {
         let dict = Dictionary::new();
