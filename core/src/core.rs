@@ -223,7 +223,7 @@ impl ToVariant for MyTransaction {
                 TransactionType::ApplicationCallTransaction(app_txn) => { 
                     dict.insert( "snd", MyAddress::from(app_txn.sender));
                     dict.insert( "app_id", app_txn.app_id);
-                    dict.insert( "on_complete", &'a ApplicationCallOnComplete::NoOp);
+                    dict.insert( "on_complete", &[ApplicationCallOnComplete::NoOp]);
                     dict.insert("app_arg", app_txn.app_arguments.as_ref().unwrap().clone());
                     dict.insert("extra_pages", 0u32);
                     "app_call"
