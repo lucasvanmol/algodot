@@ -1,7 +1,7 @@
 //Interracts with the godot debugger. Handles transaction types and prints out Algod node errors
 // It uses Transaction Types to trigger a state machine in Algodot core.rs
 
-use algonaut::core::{MicroAlgos, Round, SuggestedTransactionParams, ApplicationCallOnComplete::NoOp};
+use algonaut::core::{MicroAlgos, Round, SuggestedTransactionParams };
 use algonaut::crypto::{HashDigest, Signature};
 use algonaut::model::algod::v2::PendingTransaction;
 use algonaut::transaction::account::Account;
@@ -9,7 +9,7 @@ use algonaut::transaction::transaction::{
     AssetAcceptTransaction, AssetConfigurationTransaction, AssetParams, AssetTransferTransaction, 
     Payment, TransactionSignature,
 };
-use algonaut::transaction::{SignedTransaction, Transaction, TransactionType};
+use algonaut::transaction::{SignedTransaction, Transaction, TransactionType, ApplicationCallOnComplete::NoOp };
 use algonaut::{core::Address, error::ServiceError};
 use derive_more::{Deref, DerefMut, From, Into};
 use gdnative::api::JSON;
