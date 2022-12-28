@@ -284,7 +284,7 @@ impl Algodot {
     ) -> Transaction { 
         TxnBuilder::with(
             &params,
-            CallApplication::new(*mut sender, app_id)
+            CallApplication::new(*sender, app_id)
                 .app_arguments( vec![app_arguments.expect("REASON").into_bytes()])
                 .build(),
             )
