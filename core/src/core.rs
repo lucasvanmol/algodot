@@ -6,7 +6,7 @@ use algonaut::crypto::{HashDigest, Signature};
 use algonaut::model::algod::v2::PendingTransaction;
 use algonaut::transaction::account::Account;
 use algonaut::transaction::transaction::{
-    AssetAcceptTransaction, AssetConfigurationTransaction, AssetParams, AssetTransferTransaction,
+    AssetAcceptTransaction, AssetConfigurationTransaction, AssetParams, AssetTransferTransaction, ApplicationCallOnComplete,
     Payment, TransactionSignature,
 };
 use algonaut::transaction::{SignedTransaction, Transaction, TransactionType};
@@ -215,10 +215,14 @@ impl ToVariant for MyTransaction {
                     dict.insert("xaid", axfer.xfer);
                     "axfer"
                 }
+                
+                //https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.ApplicationCallTransaction.html
                 TransactionType::ApplicationCallTransaction(app_txn) => { 
                     dict.insert( "snd", MyAddress::from(app_txn.sender));
                     dict.insert( "app_id", app_txn.app_id);
+                    dict.insert( "on_complete", ApplicationCallOnComplete);
                     dict.insert("app_arg", app_txn.app_arguments.as_ref().unwrap().clone());
+                    dict.insert("extra_pages", 0u32);
                     "app_call"
                 }
                 TransactionType::AssetClawbackTransaction(_) => todo!(),
