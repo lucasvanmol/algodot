@@ -281,17 +281,14 @@ impl Algodot {
         #[opt] app_arguments: Option<String>, 
         
    
-    ) -> Transaction {       //unwraps into MyTransaction() From method in Core.rs
-        TxnBuilder::with(
+    ) -> TxnBuilder::with(
             &params,
             CallApplication::new(*sender, app_id)
                 .app_arguments( vec![app_arguments.expect("REASON").into_bytes()])
                 .build(),
             )
             .build()?;
-         }
-        
-    }
+    
 
     #[method]
     fn construct_asset_opt_in(
