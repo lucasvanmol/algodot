@@ -77,8 +77,8 @@ impl ToVariant for MyAddress {
 }
 
 impl ToVariant for ApplicationCallOnComplete {
-    fn to_variant(&self) -> u32{
-        (*self).as u32
+    fn to_variant(&self) -> Variant{
+        (*self as u32).to_variant()
     }
 }
 
