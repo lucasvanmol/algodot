@@ -1,12 +1,12 @@
 //Interracts with the godot debugger. Handles transaction types and prints out Algod node errors
 // It uses Transaction Types to trigger a state machine in Algodot core.rs
 
-use algonaut::core::{MicroAlgos, Round, SuggestedTransactionParams};
+use algonaut::core::{MicroAlgos, Round, SuggestedTransactionParams, ApplicationCallOnComplete::NoOp};
 use algonaut::crypto::{HashDigest, Signature};
 use algonaut::model::algod::v2::PendingTransaction;
 use algonaut::transaction::account::Account;
 use algonaut::transaction::transaction::{
-    AssetAcceptTransaction, AssetConfigurationTransaction, AssetParams, AssetTransferTransaction, ApplicationCallOnComplete,
+    AssetAcceptTransaction, AssetConfigurationTransaction, AssetParams, AssetTransferTransaction, 
     Payment, TransactionSignature,
 };
 use algonaut::transaction::{SignedTransaction, Transaction, TransactionType};
@@ -217,10 +217,12 @@ impl ToVariant for MyTransaction {
                 }
                 
                 //https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.ApplicationCallTransaction.html
+                //defaults to a noOp on transaction complete
+                //should be further customized to include ClearState,CloseOut,DeleteApplication
                 TransactionType::ApplicationCallTransaction(app_txn) => { 
                     dict.insert( "snd", MyAddress::from(app_txn.sender));
                     dict.insert( "app_id", app_txn.app_id);
-                    dict.insert( "on_complete", ApplicationCallOnComplete);
+                    dict.insert( "on_complete", ApplicationCallOnComplete::NoOp);
                     dict.insert("app_arg", app_txn.app_arguments.as_ref().unwrap().clone());
                     dict.insert("extra_pages", 0u32);
                     "app_call"
