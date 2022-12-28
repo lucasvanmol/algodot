@@ -9,7 +9,7 @@ use algonaut::transaction::transaction::{
     AssetAcceptTransaction, AssetConfigurationTransaction, AssetParams, AssetTransferTransaction, 
     Payment, TransactionSignature,
 };
-use algonaut_transaction::transaction::ApplicationCallOnComplete::NoOp
+use algonaut_transaction::transaction::ApplicationCallOnComplete::NoOp;
 use algonaut::transaction::{SignedTransaction, Transaction, TransactionType };
 use algonaut::{core::Address, error::ServiceError};
 use derive_more::{Deref, DerefMut, From, Into};
