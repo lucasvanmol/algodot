@@ -143,7 +143,7 @@ impl ToVariant for MyTransaction {
         dict.insert("lv", self.last_valid.0);
         dict.insert(
             "type",
-            match &self.txn_type { //state machine: https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/enum.TransactionType.html
+            match &self.txn_type { //state machine prints to debug log : https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/enum.TransactionType.html
                 TransactionType::Payment(payment) => {
                     dict.insert("snd", MyAddress::from(payment.sender));
                     dict.insert("rcv", MyAddress::from(payment.receiver));
