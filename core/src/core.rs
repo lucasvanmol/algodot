@@ -226,7 +226,7 @@ impl ToVariant for MyTransaction {
                 //defaults to a noOp on transaction complete
                 //should be further customized to include ClearState,CloseOut,DeleteApplication
                 TransactionType::ApplicationCallTransaction(appl) => { 
-                    dict.insert( "txn", MyApplCallTransaction::from(appl);
+                    dict.insert( "txn", MyApplCallTransaction::from(appl));
                     "appl"
                 }
                 TransactionType::AssetClawbackTransaction(_) => todo!(),
