@@ -227,7 +227,11 @@ impl ToVariant for MyTransaction {
                 //should be further customized to include ClearState,CloseOut,DeleteApplication
                 TransactionType::ApplicationCallTransaction(appl) => { 
                     //dict.insert( "txn", MyApplCallTransaction::from(appl));
-                    dict.insert( "txn", to_json_dict(appl));
+                    let w = Dictionary::new()
+                    w.insert( "snd", MyAddress::from(appl.sender));
+                    w.insert( "app_id", appl.app_id);
+                    w.insert("app_arg", appl.app_arguments.as_ref().unwrap().clone());
+                    dict.insert( "txn", w);
                     "appl"
                 }
                 TransactionType::AssetClawbackTransaction(_) => todo!(),
@@ -331,14 +335,14 @@ impl FromVariant for MySignedTransaction {
 }
 
 //Convert's appl call txn to Godot Variants
-#[derive(Deref, DerefMut, From, Debug)]
-pub struct MyApplCallTransaction(pub ApplicationCallTransaction);
+//#[derive(Deref, DerefMut, From, Debug)]
+//pub struct MyApplCallTransaction(pub ApplicationCallTransaction);
 
-impl FromVariant for MyApplCallTransaction {
-    fn from_variant(&self) -> Variant {
-     to_json_dict(&self)
-    }
-}    
+//impl FromVariant for MyApplCallTransaction {
+//    fn from_variant(&self) -> Variant {
+//     to_json_dict(&self)
+//    }
+//}    
  
 
 
