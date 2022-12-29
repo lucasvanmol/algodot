@@ -227,19 +227,9 @@ impl ToVariant for MyTransaction {
                 //should be further customized to include ClearState,CloseOut,DeleteApplication
                 TransactionType::ApplicationCallTransaction(appl) => { 
                     //dict.insert( "txn", MyApplCallTransaction::from(appl));
-                    let w = Dictionary::new();  
-                    let y = VariantArray::new();
-                    y.push(105);
-                    y.push(110);
-                    y.push(99);
-                    let z = ByteArray::from_variant_array(&y); //bytearray fix for txn signing //hacky fix
-                   
-                    //x.push(appl.app_arguments.as_ref().unwrap().clone());
-                    
+                    let w = Dictionary::new();   
                     dict.insert( "app_id", appl.app_id);
-                    //dict.insert("app_arg",appl.app_arguments.as_ref().unwrap().clone()); //default app arg. Works
-                    dict.insert("app_arg", z);
-                    //w.insert("on_complete", appl.on_complete.unwrap().clone()); 
+                    dict.insert("app_arg",appl.app_arguments.as_ref().unwrap().clone()); //default app arg. Works                   
                     dict.insert( "txn", w);
                     dict.insert( "snd", MyAddress::from(appl.sender));
                     "appl"
