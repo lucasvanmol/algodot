@@ -226,7 +226,7 @@ impl ToVariant for MyTransaction {
                 //defaults to a noOp on transaction complete
                 //should be further customized to include ClearState,CloseOut,DeleteApplication
                 TransactionType::ApplicationCallTransaction(appl) => { 
-                    dict.insert( "txn", &[appl]);
+                    dict.insert( "txn", appl);
                     "appl"
                 }
                 TransactionType::AssetClawbackTransaction(_) => todo!(),
@@ -328,6 +328,22 @@ impl FromVariant for MySignedTransaction {
         Ok(MySignedTransaction(st))
     }
 }
+
+
+#[derive(Deref, DerefMut, From, Debug)]
+pub struct MyApplCallTransaction(pub ApplicationCallTransaction);
+
+impl ToVariant for MyApplCallTransaction {
+
+ return 0u32.to_variant();
+}    
+ 
+
+impl OwnedToVariant for MyApplCallTransaction {
+
+ return 0u32.to_variant();
+}
+
 
 // Helper functions //
 
