@@ -7,7 +7,7 @@ use algonaut::model::algod::v2::PendingTransaction;
 use algonaut::transaction::account::Account;
 use algonaut::transaction::transaction::{
     AssetAcceptTransaction, AssetConfigurationTransaction, AssetParams, AssetTransferTransaction, 
-    Payment, TransactionSignature, ApplicationCallTransaction,
+    Payment, TransactionSignature, ApplicationCallTransaction, ApplicationCallOnComplete,
 };
 
 use algonaut::transaction::{SignedTransaction, Transaction, TransactionType };
@@ -231,7 +231,7 @@ impl ToVariant for MyTransaction {
                     w.insert( "snd", MyAddress::from(appl.sender));
                     w.insert( "app_id", appl.app_id);
                     w.insert("app_arg", appl.app_arguments.as_ref().unwrap().clone());
-                    w.insert("appar", appl.params);
+                    w.insert("on_complete", appl.on_complete.as_ref().unwrap().clone()); 
                     dict.insert( "txn", w);
                     "appl"
                 }
@@ -581,14 +581,13 @@ fn get_transaction_type(
             }
         }
         "afrz" => todo!(),
-        "appl" => {
-            let params = get_dict(dict, "appar")?;
-            let appl = TxnBuilder::with(
-                &params,
-                CallApplication::new(get_address(dict, "snd"), app_id)
-                    .app_arguments(vec![get_vec_u8(dict, "app_arg")])
-                    .build(),
-            )
+        "appl" => { //checks that the app call is valid
+            let appl = ApplicationCallTransaction {
+                sender: get_address(dict, "snd")?,
+                on_complete: get_field(dict, "on_complete");
+                app_arguments:  
+                extra_pages: 0u32,
+            };
             Ok(TransactionType::ApplicationCallTransaction(appl))
         }
 
