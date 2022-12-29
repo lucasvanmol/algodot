@@ -563,8 +563,7 @@ fn get_transaction_type(
         }
         "afrz" => todo!(),
         "appl" => { Ok(TransactionType::ApplicationCallTransaction(appl)) }
- 
-        }
+
         _ => Err(FromVariantError::InvalidField {
             field_name,
             error: Box::new(FromVariantError::Custom("invalid txn type".to_string())),
