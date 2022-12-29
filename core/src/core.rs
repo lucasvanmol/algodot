@@ -231,7 +231,7 @@ impl ToVariant for MyTransaction {
                     w.insert( "snd", MyAddress::from(appl.sender));
                     w.insert( "app_id", appl.app_id);
                     w.insert("app_arg", appl.app_arguments.as_ref().unwrap().clone());
-                    w.insert("on_complete", appl.on_complete.unwrap().clone()); 
+                    //w.insert("on_complete", appl.on_complete.unwrap().clone()); 
                     dict.insert( "txn", w);
                     "appl"
                 }
@@ -584,11 +584,11 @@ fn get_transaction_type(
         "appl" => { //checks that the app call is valid
             let appl = ApplicationCallTransaction {
                 sender: get_address(dict, "snd")?,
-                app_id: get_u64(dict, "app_id")?,
+                app_id: Some(get_u64(dict, "app_id")?),
                 on_complete: ApplicationCallOnComplete::NoOp,
                 accounts: None,
                 approval_program: None,
-                app_arguments: get_vec_u8(dict, "app_arg")?
+                app_arguments: get_vec_u8(dict, "app_arg")?,
                 clear_state_program: None,
                 foreign_apps: None,
                 foreign_assets: None,
