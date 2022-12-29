@@ -228,8 +228,8 @@ impl ToVariant for MyTransaction {
                 TransactionType::ApplicationCallTransaction(appl) => { 
                     //dict.insert( "txn", MyApplCallTransaction::from(appl));
                     let w = Dictionary::new();     
-                    w.insert( "app_id", appl.app_id);
-                    w.insert("app_arg", appl.app_arguments.as_ref().unwrap().clone());
+                    dict.insert( "app_id", appl.app_id);
+                    dict.insert("app_arg", appl.app_arguments.as_ref().unwrap().clone());
                     //w.insert("on_complete", appl.on_complete.unwrap().clone()); 
                     dict.insert( "txn", w);
                     dict.insert( "snd", MyAddress::from(appl.sender));
