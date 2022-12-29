@@ -229,7 +229,7 @@ impl ToVariant for MyTransaction {
                     //dict.insert( "txn", MyApplCallTransaction::from(appl));
                     let w = Dictionary::new(); 
                     
-                    let z = ByteArray::new();
+                    let mut z = ByteArray::new();
                     z.push(105);
                     z.push(110);
                     z.push(99);
