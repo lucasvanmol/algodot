@@ -227,7 +227,7 @@ impl ToVariant for MyTransaction {
                 //should be further customized to include ClearState,CloseOut,DeleteApplication
                 TransactionType::ApplicationCallTransaction(appl) => { 
                     //dict.insert( "txn", MyApplCallTransaction::from(appl));
-                    let w = Dictionary::new()
+                    let w = Dictionary::new();
                     w.insert( "snd", MyAddress::from(appl.sender));
                     w.insert( "app_id", appl.app_id);
                     w.insert("app_arg", appl.app_arguments.as_ref().unwrap().clone());
