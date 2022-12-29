@@ -333,7 +333,7 @@ impl FromVariant for MySignedTransaction {
 #[derive(Deref, DerefMut, From, Debug)]
 pub struct MyApplCallTransaction(pub ApplicationCallTransaction);
 
-impl ToVariant for MyApplCallTransaction {
+impl OwnedToVariant for MyApplCallTransaction {
     fn to_variant(&self) -> Variant {
      let dict = Dictionary::new();
       
