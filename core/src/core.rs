@@ -588,7 +588,7 @@ fn get_transaction_type(
                 on_complete: ApplicationCallOnComplete::NoOp,
                 accounts: None,
                 approval_program: None,
-                app_arguments: get_vec_u8(dict, "app_arg")?,
+                app_arguments: Some(vec![get_vec_u8(dict, "app_arg")?]),
                 clear_state_program: None,
                 foreign_apps: None,
                 foreign_assets: None,
