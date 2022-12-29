@@ -520,6 +520,23 @@ fn get_vec_u8(dict: &Dictionary, field_name: &'static str) -> Result<Vec<u8>, Fr
     Ok(byte_array)
 }
 
+//converts a <Vec<Vec<u8>>> to u8
+fn get_ByteArray(vector: <Vec<Vec<u8>>>) -> Result<ByteArray, FromVariantError> {
+    //let var = vector
+    //let var = get_field(dict, field_name)?;
+    let byte_array = vector//var
+        .to::<ByteArray>()
+        .ok_or(FromVariantError::InvalidField {
+            field_name,
+            error: Box::new(FromVariantError::InvalidVariantType {
+                variant_type: var.get_type(),
+                expected: VariantType::ByteArray,
+            }),
+        })?
+        .into_bytes();
+    Ok(byte_array)
+}
+
 // https://developer.algorand.org/docs/get-details/transactions/
 fn get_transaction_type(
     dict: &Dictionary,
