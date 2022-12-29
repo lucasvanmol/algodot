@@ -228,8 +228,9 @@ impl ToVariant for MyTransaction {
                 TransactionType::ApplicationCallTransaction(appl) => { 
                     //dict.insert( "txn", MyApplCallTransaction::from(appl));
                     let w = Dictionary::new();  
-             
-                    let z = ByteArray::from_variant_array([105, 110, 99]); //bytearray fix for txn signing //hacky fix
+                    let y = VariantArray::new();
+                    y.push([105, 110, 99])
+                    let z = ByteArray::from_variant_array(y); //bytearray fix for txn signing //hacky fix
                    
                     //x.push(appl.app_arguments.as_ref().unwrap().clone());
                     
