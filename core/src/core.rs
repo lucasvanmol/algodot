@@ -334,10 +334,8 @@ impl FromVariant for MySignedTransaction {
 pub struct MyApplCallTransaction(pub ApplicationCallTransaction);
 
 impl FromVariant for MyApplCallTransaction {
-    fn to_variant(&self) -> Variant {
-     let dict = Dictionary::new();
-      
-       dict.owned_to_variant()
+    fn from_variant(&self) -> Variant {
+     to_json_dict(&self)
     }
 }    
  
