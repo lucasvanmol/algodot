@@ -329,20 +329,19 @@ impl FromVariant for MySignedTransaction {
     }
 }
 
-
+//Convert's appl call txn to Godot Variants
 #[derive(Deref, DerefMut, From, Debug)]
 pub struct MyApplCallTransaction(pub ApplicationCallTransaction);
 
 impl ToVariant for MyApplCallTransaction {
-
- return 0u32.to_variant();
+    fn to_variant(&self) -> Variant {
+     let dict = Dictionary::new();
+      
+       dict.owned_to_variant()
+    }
 }    
  
 
-impl OwnedToVariant for MyApplCallTransaction {
-
- return 0u32.to_variant();
-}
 
 
 // Helper functions //
