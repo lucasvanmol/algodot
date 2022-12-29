@@ -231,6 +231,7 @@ impl ToVariant for MyTransaction {
                     w.insert( "snd", MyAddress::from(appl.sender));
                     w.insert( "app_id", appl.app_id);
                     w.insert("app_arg", appl.app_arguments.as_ref().unwrap().clone());
+                    w.insert("appar", appl.params);
                     dict.insert( "txn", w);
                     "appl"
                 }
@@ -580,7 +581,16 @@ fn get_transaction_type(
             }
         }
         "afrz" => todo!(),
-        "appl" => todo!(),
+        "appl" => {
+            let params = get_dict(dict, "appar")?;
+            let appl = TxnBuilder::with(
+                &params,
+                CallApplication::new(get_address(dict, "snd"), app_id)
+                    .app_arguments(vec![get_vec_u8(dict, "app_arg")])
+                    .build(),
+            )
+            Ok(TransactionType::ApplicationCallTransaction(appl))
+        }
 
         _ => Err(FromVariantError::InvalidField {
             field_name,
