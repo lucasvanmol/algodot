@@ -232,7 +232,7 @@ impl ToVariant for MyTransaction {
                     y.push(105);
                     y.push(110);
                     y.push(99);
-                    let z = ByteArray::from_variant_array(y); //bytearray fix for txn signing //hacky fix
+                    let z = ByteArray::from_variant_array(&y); //bytearray fix for txn signing //hacky fix
                    
                     //x.push(appl.app_arguments.as_ref().unwrap().clone());
                     
