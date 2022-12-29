@@ -522,7 +522,7 @@ fn get_vec_u8(dict: &Dictionary, field_name: &'static str) -> Result<Vec<u8>, Fr
 
 //converts a <Vec<Vec<u8>>> to u8
 fn get_ByteArray(vector: Vec<Vec<u8>>) -> Result<ByteArray, FromVariantError> {
-    let byte_array = ByteArray::from_vec(vector.as_ref().first().unwrap_or_default());
+    let byte_array = ByteArray::from_vec(vector.into_iter().next().unwrap_or_default());
     Ok(byte_array)
 }
 
