@@ -580,7 +580,7 @@ fn get_transaction_type(
             }
         }
         "afrz" => todo!(),
-        "appl" => { Ok(TransactionType::ApplicationCallTransaction(appl)) }
+        "appl" => todo!(),
 
         _ => Err(FromVariantError::InvalidField {
             field_name,
