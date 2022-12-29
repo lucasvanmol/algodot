@@ -7,7 +7,7 @@ use algonaut::model::algod::v2::PendingTransaction;
 use algonaut::transaction::account::Account;
 use algonaut::transaction::transaction::{
     AssetAcceptTransaction, AssetConfigurationTransaction, AssetParams, AssetTransferTransaction, 
-    Payment, TransactionSignature, ApplicationCallOnComplete,
+    Payment, TransactionSignature,
 };
 
 use algonaut::transaction::{SignedTransaction, Transaction, TransactionType };
@@ -225,13 +225,9 @@ impl ToVariant for MyTransaction {
                 //https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.ApplicationCallTransaction.html
                 //defaults to a noOp on transaction complete
                 //should be further customized to include ClearState,CloseOut,DeleteApplication
-                TransactionType::ApplicationCallTransaction(app_txn) => { 
-                    dict.insert( "snd", MyAddress::from(app_txn.sender));
-                    dict.insert( "app_id", app_txn.app_id);
-                    dict.insert( "on_complete", (*ApplicationCallOnComplete::NoOp as u32));
-                    dict.insert("app_arg", app_txn.app_arguments.as_ref().unwrap().clone());
-                    dict.insert("extra_pages", 0u32);
-                    "app_call"
+                TransactionType::ApplicationCallTransaction(appl) => { 
+                    dict.insert( "txn", appl));
+                    "appl"
                 }
                 TransactionType::AssetClawbackTransaction(_) => todo!(),
                 TransactionType::AssetFreezeTransaction(_) => todo!(), 
@@ -566,7 +562,9 @@ fn get_transaction_type(
             }
         }
         "afrz" => todo!(),
-        "appl" => todo!(),
+        "appl" => { Ok(TransactionType::ApplicationCallTransaction(appl)) }
+ 
+        }
         _ => Err(FromVariantError::InvalidField {
             field_name,
             error: Box::new(FromVariantError::Custom("invalid txn type".to_string())),
