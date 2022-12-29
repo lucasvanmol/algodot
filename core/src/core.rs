@@ -584,11 +584,12 @@ fn get_transaction_type(
         "appl" => { //checks that the app call is valid
             let appl = ApplicationCallTransaction {
                 sender: get_address(dict, "snd")?,
-                app_id: get_field(dict, "app_id")?,
-                on_complete: get_field(dict, "on_complete")?,
+                app_id: get_u64(dict, "app_id")?,
+                on_complete: ApplicationCallOnComplete::NoOp,
                 accounts: None,
-                approval_program:: None,
-                app_arguments: get_field(dict, "app_arg")?
+                approval_program: None,
+                app_arguments: get_vec_u8(dict, "app_arg")?
+                clear_state_program: None,
                 foreign_apps: None,
                 foreign_assets: None,
                 global_state_schema: None,
