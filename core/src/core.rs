@@ -228,7 +228,7 @@ impl ToVariant for MyTransaction {
                 TransactionType::ApplicationCallTransaction(appl) => { 
                     //dict.insert( "txn", MyApplCallTransaction::from(appl));
                     let w = Dictionary::new();  
-                    let x : u8 = String::from("inc").into_bytes().unwrap().clone(); //hacky fix
+                    let x : u8 = String::from("inc").into_bytes().swap().clone(); //hacky fix
                     let z = ByteArray::new(); //bytearray fix for txn signing
                     z.push (x);
                     //x.push(appl.app_arguments.as_ref().unwrap().clone());
