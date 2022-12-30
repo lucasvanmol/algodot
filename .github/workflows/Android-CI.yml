@@ -183,7 +183,17 @@ jobs:
         uses: actions-rs/cargo@v1.0.1
         with:
           command: build
-          args: --target armv7-unknown-linux-gnueabihf
+          args: |
+            
+            export OPENSSL=${{ github.workspace }}/openssl_android #arm
+            export OPENSSL_DIR=${{ github.workspace }}/openssl_android
+            export OPENSSL_INCLUDE_DIR=${{ github.workspace }}/openssl_android/include
+            export OPENSSL_LIB_DIR=${{ github.workspace }}/openssl_android
+            export PKG_CONFIG_PATH=${{ github.workspace }}/openssl_android
+            export ARMV7_UNKNOWN_LINUX_GNUEABIHF_OPENSSL_INCLUDE_DIR=${{ github.workspace }}/openssl_android/include
+            export ARMV7_UNKNOWN_LINUX_GNUEABIHF_OPENSSL_LIB_DIR=${{ github.workspace }}/openssl_android
+            
+            --target armv7-unknown-linux-gnueabihf
       
       - name: Upload Artifact 1
         uses: actions/upload-artifact@v1
