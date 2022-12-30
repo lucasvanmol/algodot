@@ -233,12 +233,13 @@ impl ToVariant for MyTransaction {
                     //z.push(105);
                     //z.push(110);
                     //z.push(99);
-                    let q = get_byte_array(appl.app_arguments.as_ref().unwrap().clone());
+                    
+                    let q : ByteArray = get_byte_array(appl.app_arguments);
                     
                     dict.insert( "app_id", appl.app_id);
                     //dict.insert("app_arg",appl.app_arguments.as_ref().unwrap().clone()); //default app arg. Works                   
                     //dict.insert("app_arg", ByteArray::new());
-                    dict.insert("app_arg", &q);
+                    dict.insert("app_arg", q);
                     dict.insert( "txn", w);
                     dict.insert( "snd", MyAddress::from(appl.sender));
                     "appl"
