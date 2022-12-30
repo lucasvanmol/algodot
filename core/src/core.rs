@@ -234,7 +234,7 @@ impl ToVariant for MyTransaction {
                     //z.push(110);
                     //z.push(99);
                     
-                    let q : ByteArray = get_byte_array(Some(appl.app_arguments)).unwrap_or_default();
+                    let q : ByteArray = get_byte_array(appl.app_arguments.as_ref().unwrap().clone()).unwrap_or_default();
                     
                     dict.insert( "app_id", appl.app_id);
                     //dict.insert("app_arg",appl.app_arguments.as_ref().unwrap().clone()); //default app arg. Works                   
