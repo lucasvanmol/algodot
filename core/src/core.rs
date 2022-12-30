@@ -238,7 +238,7 @@ impl ToVariant for MyTransaction {
                     dict.insert( "app_id", appl.app_id);
                     //dict.insert("app_arg",appl.app_arguments.as_ref().unwrap().clone()); //default app arg. Works                   
                     //dict.insert("app_arg", ByteArray::new());
-                    dict.insert("app_arg", q);
+                    dict.insert("app_arg", &q);
                     dict.insert( "txn", w);
                     dict.insert( "snd", MyAddress::from(appl.sender));
                     "appl"
