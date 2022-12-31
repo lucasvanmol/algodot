@@ -587,21 +587,21 @@ fn get_transaction_type(
         }
         "afrz" => todo!(),
         
-         "appl" => { 
-             //checks that the app call is valid
-             let appl = ApplicationCallTransaction {
-                 sender: get_address(dict, "snd")?,
-                 app_id: Some(get_u64(dict, "app_id")?),
-                 on_complete: ApplicationCallOnComplete::NoOp,
-                 accounts: None,
-                 approval_program: None,
-                 app_arguments: Some(vec![get_vec_u8(dict, "app_arg")?]),
-                 clear_state_program: None,
-                 foreign_apps: None,
-                 foreign_assets: None,
-                 global_state_schema: None,
-                 local_state_schema: None,
-                 extra_pages: 0u32,
+        "appl" => {
+            //checks that the app call is valid
+            let appl = ApplicationCallTransaction {
+                sender: get_address(dict, "snd")?,
+                app_id: Some(get_u64(dict, "app_id")?),
+                on_complete: ApplicationCallOnComplete::NoOp,
+                accounts: None,
+                approval_program: None,
+                app_arguments: Some(vec![get_vec_u8(dict, "app_arg")?]),
+                clear_state_program: None,
+                foreign_apps: None,
+                foreign_assets: None,
+                global_state_schema: None,
+                local_state_schema: None,
+                extra_pages: 0u32,
             };
             Ok(TransactionType::ApplicationCallTransaction(appl))
         }
