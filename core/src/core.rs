@@ -200,7 +200,7 @@ impl ToVariant for MyTransaction {
                         }
                     }
                     dict.insert("apar", apar);
-                    "acfg"             
+                    "acfg"
                 }             
                 //https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.AssetTransferTransaction.html
                 TransactionType::AssetTransferTransaction(axfer) => {
@@ -216,7 +216,7 @@ impl ToVariant for MyTransaction {
                 TransactionType::AssetAcceptTransaction(axfer) => {
                     dict.insert("snd", MyAddress::from(axfer.sender));
                     dict.insert("xaid", axfer.xfer);
-                    "axfer"         
+                    "axfer"
                 }             
                 ///https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.ApplicationCallTransaction.html
                 ///defaults to a noOp on transaction complete
