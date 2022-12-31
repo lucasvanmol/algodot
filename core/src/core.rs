@@ -1,19 +1,24 @@
 //Interracts with the godot debugger. Handles transaction types and prints out Algod node errors
 // It uses Transaction Types to trigger a state machine in Algodot core.rs
 
-use algonaut::core::{MicroAlgos, Round, SuggestedTransactionParams};
-use algonaut::crypto::{HashDigest, Signature};
+use algonaut::core::{ MicroAlgos, Round, SuggestedTransactionParams };
+use algonaut::crypto::{ HashDigest, Signature };
 use algonaut::model::algod::v2::PendingTransaction;
 use algonaut::transaction::account::Account;
 use algonaut::transaction::transaction::{
-    ApplicationCallOnComplete, ApplicationCallTransaction, AssetAcceptTransaction,
-    AssetConfigurationTransaction, AssetParams, AssetTransferTransaction, Payment,
+    ApplicationCallOnComplete,
+    ApplicationCallTransaction,
+    AssetAcceptTransaction,
+    AssetConfigurationTransaction,
+    AssetParams,
+    AssetTransferTransaction,
+    Payment,
     TransactionSignature,
 };
 
-use algonaut::transaction::{SignedTransaction, Transaction, TransactionType};
-use algonaut::{core::Address, error::ServiceError};
-use derive_more::{Deref, DerefMut, From, Into};
+use algonaut::transaction::{ SignedTransaction, Transaction, TransactionType };
+use algonaut::{ core::Address, error::ServiceError };
+use derive_more::{ Deref, DerefMut, From, Into };
 use gdnative::api::JSON;
 use gdnative::prelude::*;
 use serde::Serialize;
@@ -28,15 +33,10 @@ use thiserror::Error;
 
 // TODO: remove to_json_dict. Implement ToVariant for types instead
 //#[deprecated]
+
 pub fn to_json_dict<T: Serialize>(r: &T) -> Variant {
     let str = serde_json::to_string(r).unwrap();
-    unsafe {
-        JSON::godot_singleton()
-            .parse(str)
-            .unwrap()
-            .assume_safe()
-            .result()
-    }
+    unsafe { JSON::godot_singleton().parse(str).unwrap().assume_safe().result() }
 }
 
 #[allow(dead_code)]
@@ -48,10 +48,8 @@ pub fn to_json_string<T: OwnedToVariant + ToVariant>(r: &T) -> GodotString {
 pub enum AlgodotError {
     #[error("error parsing header")]
     HeaderParseError,
-    #[error("pool error: `{0}`")]
-    PoolError(String),
-    #[error("algonaut error:`{0}`")]
-    ServiceError(ServiceError),
+    #[error("pool error: `{0}`")] PoolError(String),
+    #[error("algonaut error:`{0}`")] ServiceError(ServiceError),
 }
 
 impl From<ServiceError> for AlgodotError {
@@ -65,9 +63,7 @@ pub struct MyAddress(Address);
 
 impl FromVariant for MyAddress {
     fn from_variant(variant: &Variant) -> Result<Self, FromVariantError> {
-        Address::from_str(&variant.to_string())
-            .map_err(FromVariantError::Custom)
-            .map(MyAddress)
+        Address::from_str(&variant.to_string()).map_err(FromVariantError::Custom).map(MyAddress)
     }
 }
 
@@ -114,12 +110,10 @@ impl ToVariant for MySuggestedTransactionParams {
 
 impl FromVariant for MySuggestedTransactionParams {
     fn from_variant(variant: &Variant) -> Result<Self, FromVariantError> {
-        let dict = variant
-            .to::<Dictionary>()
-            .ok_or(FromVariantError::InvalidVariantType {
-                variant_type: variant.get_type(),
-                expected: VariantType::Dictionary,
-            })?;
+        let dict = variant.to::<Dictionary>().ok_or(FromVariantError::InvalidVariantType {
+            variant_type: variant.get_type(),
+            expected: VariantType::Dictionary,
+        })?;
 
         let t = SuggestedTransactionParams {
             genesis_id: get_string(&dict, "genesis_id")?,
@@ -144,99 +138,97 @@ impl ToVariant for MyTransaction {
         dict.insert("fv", self.first_valid.0);
         dict.insert("gh", ByteArray::from_slice(&self.genesis_hash.0));
         dict.insert("lv", self.last_valid.0);
-        dict.insert(
-            "type",
-            match &self.txn_type {
-                //state machine prints to debug log : https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/enum.TransactionType.html
-                TransactionType::Payment(payment) => {
-                    dict.insert("snd", MyAddress::from(payment.sender));
-                    dict.insert("rcv", MyAddress::from(payment.receiver));
-                    dict.insert("amt", payment.amount.0);
-                    if let Some(close) = payment.close_remainder_to {
-                        dict.insert("close", MyAddress::from(close))
-                    };
-                    "pay"
+        dict.insert("type", match &self.txn_type {
+            //state machine prints to debug log : https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/enum.TransactionType.html
+            TransactionType::Payment(payment) => {
+                dict.insert("snd", MyAddress::from(payment.sender));
+                dict.insert("rcv", MyAddress::from(payment.receiver));
+                dict.insert("amt", payment.amount.0);
+                if let Some(close) = payment.close_remainder_to {
+                    dict.insert("close", MyAddress::from(close));
                 }
-                TransactionType::AssetConfigurationTransaction(cfg) => {
-                    dict.insert("snd", MyAddress(cfg.sender));
-                    let apar = Dictionary::new();
-                    if let Some(config_asset) = cfg.config_asset {
-                        apar.insert("caid", config_asset);
-                    }
-                    if let Some(params) = &cfg.params {
-                        if let Some(asset_name) = &params.asset_name {
-                            apar.insert("an", asset_name)
-                        }
-                        if let Some(decimals) = &params.decimals {
-                            apar.insert("dc", decimals)
-                        }
-                        if let Some(default_frozen) = &params.default_frozen {
-                            apar.insert("df", default_frozen)
-                        }
-                        if let Some(total) = &params.total {
-                            apar.insert("t", total)
-                        }
-                        if let Some(unit_name) = &params.unit_name {
-                            apar.insert("un", unit_name)
-                        }
-                        if let Some(meta_data_hash) = &params.meta_data_hash {
-                            apar.insert("am", meta_data_hash)
-                        }
-                        if let Some(url) = &params.url {
-                            apar.insert("au", url)
-                        }
-                        if let Some(clawback) = &params.clawback {
-                            apar.insert("c", MyAddress::from(*clawback))
-                        }
-                        if let Some(freeze) = &params.freeze {
-                            apar.insert("f", MyAddress::from(*freeze))
-                        }
-                        if let Some(manager) = &params.manager {
-                            apar.insert("m", MyAddress::from(*manager))
-                        }
-                        if let Some(reserve) = &params.reserve {
-                            apar.insert("r", MyAddress::from(*reserve))
-                        }
-                    }
-                    dict.insert("apar", apar);              
-                    "acfg"                    
+                "pay"
+            }
+            TransactionType::AssetConfigurationTransaction(cfg) => {
+                dict.insert("snd", MyAddress(cfg.sender));
+                let apar = Dictionary::new();
+                if let Some(config_asset) = cfg.config_asset {
+                    apar.insert("caid", config_asset);
                 }
-                //https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.AssetTransferTransaction.html.
-                TransactionType::AssetTransferTransaction(axfer) => {
-                    dict.insert("snd", MyAddress::from(axfer.sender));
-                    dict.insert("xaid", axfer.xfer);
-                    dict.insert("aamt", axfer.amount);
-                    dict.insert("arcv", MyAddress::from(axfer.receiver));
-                    if let Some(close_to) = axfer.close_to {
-                        dict.insert("aclose", MyAddress::from(close_to));
+                if let Some(params) = &cfg.params {
+                    if let Some(asset_name) = &params.asset_name {
+                        apar.insert("an", asset_name);
                     }
-                    "axfer"             
+                    if let Some(decimals) = &params.decimals {
+                        apar.insert("dc", decimals);
+                    }
+                    if let Some(default_frozen) = &params.default_frozen {
+                        apar.insert("df", default_frozen);
+                    }
+                    if let Some(total) = &params.total {
+                        apar.insert("t", total);
+                    }
+                    if let Some(unit_name) = &params.unit_name {
+                        apar.insert("un", unit_name);
+                    }
+                    if let Some(meta_data_hash) = &params.meta_data_hash {
+                        apar.insert("am", meta_data_hash);
+                    }
+                    if let Some(url) = &params.url {
+                        apar.insert("au", url);
+                    }
+                    if let Some(clawback) = &params.clawback {
+                        apar.insert("c", MyAddress::from(*clawback));
+                    }
+                    if let Some(freeze) = &params.freeze {
+                        apar.insert("f", MyAddress::from(*freeze));
+                    }
+                    if let Some(manager) = &params.manager {
+                        apar.insert("m", MyAddress::from(*manager));
+                    }
+                    if let Some(reserve) = &params.reserve {
+                        apar.insert("r", MyAddress::from(*reserve));
+                    }
                 }
-                TransactionType::AssetAcceptTransaction(axfer) => {
-                    dict.insert("snd", MyAddress::from(axfer.sender));
-                    dict.insert("xaid", axfer.xfer);
-                    "axfer"
-                }             
-                ///https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.ApplicationCallTransaction.html
-                ///defaults to a noOp on transaction complete
-                ///should be further customized to include ClearState,CloseOut,DeleteApplication
-                TransactionType::ApplicationCallTransaction(appl) => {
-                    //Creates a Txn Dictionary for Signing the App Call Txn
+                dict.insert("apar", apar);
+                "acfg"
+            }
+            //https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.AssetTransferTransaction.html.
+            TransactionType::AssetTransferTransaction(axfer) => {
+                dict.insert("snd", MyAddress::from(axfer.sender));
+                dict.insert("xaid", axfer.xfer);
+                dict.insert("aamt", axfer.amount);
+                dict.insert("arcv", MyAddress::from(axfer.receiver));
+                if let Some(close_to) = axfer.close_to {
+                    dict.insert("aclose", MyAddress::from(close_to));
+                }
+                "axfer"
+            }
+            TransactionType::AssetAcceptTransaction(axfer) => {
+                dict.insert("snd", MyAddress::from(axfer.sender));
+                dict.insert("xaid", axfer.xfer);
+                "axfer"
+            }
+            ///https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.ApplicationCallTransaction.html
+            ///defaults to a noOp on transaction complete
+            ///should be further customized to include ClearState,CloseOut,DeleteApplication
+            TransactionType::ApplicationCallTransaction(appl) => {
+                //Creates a Txn Dictionary for Signing the App Call Txn
 
-                    //creates a Byte Array from app_arg
-                    let q: ByteArray = get_byte_array(appl.app_arguments.as_ref().unwrap().clone())
-                        .unwrap_or_default();                    
-                    dict.insert("app_id", appl.app_id);
-                    dict.insert("app_arg", q);
-                    dict.insert("txn", Dictionary::new());
-                    dict.insert("snd", MyAddress::from(appl.sender));
-                    "appl"
-                }
-                TransactionType::AssetClawbackTransaction(_) => todo!(),
-                TransactionType::AssetFreezeTransaction(_) => todo!(),
-                TransactionType::KeyRegistration(_) => todo!(),
-            },
-        );
+                //creates a Byte Array from app_arg
+                let q: ByteArray = get_byte_array(
+                    appl.app_arguments.as_ref().unwrap().clone()
+                ).unwrap_or_default();
+                dict.insert("app_id", appl.app_id);
+                dict.insert("app_arg", q);
+                dict.insert("txn", Dictionary::new());
+                dict.insert("snd", MyAddress::from(appl.sender));
+                "appl"
+            }
+            TransactionType::AssetClawbackTransaction(_) => todo!(),
+            TransactionType::AssetFreezeTransaction(_) => todo!(),
+            TransactionType::KeyRegistration(_) => todo!(),
+        });
         if let Some(gen) = &self.genesis_id {
             dict.insert("gen", gen);
         }
@@ -259,12 +251,10 @@ impl ToVariant for MyTransaction {
 // https://developer.algorand.org/docs/get-details/transactions/transactions/#common-fields-header-and-type
 impl FromVariant for MyTransaction {
     fn from_variant(variant: &Variant) -> Result<Self, FromVariantError> {
-        let dict = variant
-            .to::<Dictionary>()
-            .ok_or(FromVariantError::InvalidVariantType {
-                variant_type: variant.get_type(),
-                expected: VariantType::Dictionary,
-            })?;
+        let dict = variant.to::<Dictionary>().ok_or(FromVariantError::InvalidVariantType {
+            variant_type: variant.get_type(),
+            expected: VariantType::Dictionary,
+        })?;
         let t = Transaction {
             fee: MicroAlgos(get_u64(&dict, "fee")?),
             first_valid: Round(get_u64(&dict, "fv")?),
@@ -312,12 +302,10 @@ impl ToVariant for MySignedTransaction {
 
 impl FromVariant for MySignedTransaction {
     fn from_variant(variant: &Variant) -> Result<Self, FromVariantError> {
-        let dict = variant
-            .to::<Dictionary>()
-            .ok_or(FromVariantError::InvalidVariantType {
-                variant_type: variant.get_type(),
-                expected: VariantType::Dictionary,
-            })?;
+        let dict = variant.to::<Dictionary>().ok_or(FromVariantError::InvalidVariantType {
+            variant_type: variant.get_type(),
+            expected: VariantType::Dictionary,
+        })?;
 
         let txn = MyTransaction::from_variant(&get_field(&dict, "txn")?)?;
         let id = txn.id().unwrap();
@@ -342,7 +330,7 @@ impl FromVariant for MySignedTransaction {
 ///     to_json_dict(&self)
 ///   }
 ///
-///}    
+///}
 
 // Helper functions //
 
@@ -370,29 +358,26 @@ fn get_signature(dict: &Dictionary) -> Result<TransactionSignature, FromVariantE
         godot_dbg!(lsig);
         todo!()
     } else {
-        Err(FromVariantError::Custom(
-            "Missing signature field".to_string(),
-        ))
+        Err(FromVariantError::Custom("Missing signature field".to_string()))
     }
 }
 
 fn get_field(dict: &Dictionary, field_name: &str) -> Result<Variant, FromVariantError> {
-    dict.get(field_name)
-        .ok_or_else(|| FromVariantError::Custom(format!("Missing field: {0}", field_name)))
+    dict.get(field_name).ok_or_else(||
+        FromVariantError::Custom(format!("Missing field: {0}", field_name))
+    )
 }
 
 fn get_hash_digest(
     dict: &Dictionary,
-    field_name: &'static str,
+    field_name: &'static str
 ) -> Result<HashDigest, FromVariantError> {
     let byte_array = get_field(dict, field_name)?;
 
-    let byte_array = byte_array
-        .to::<ByteArray>()
-        .ok_or(FromVariantError::InvalidField {
-            field_name,
-            error: Box::new(FromVariantError::Custom("must be byte array".to_string())),
-        })?;
+    let byte_array = byte_array.to::<ByteArray>().ok_or(FromVariantError::InvalidField {
+        field_name,
+        error: Box::new(FromVariantError::Custom("must be byte array".to_string())),
+    })?;
     let mut slice: [u8; 32] = [0; 32];
     if byte_array.len() == 32 {
         slice.copy_from_slice(byte_array.to_vec().as_slice());
@@ -400,9 +385,7 @@ fn get_hash_digest(
     } else {
         Err(FromVariantError::InvalidField {
             field_name,
-            error: Box::new(FromVariantError::Custom(
-                "must be 32 bytes long".to_string(),
-            )),
+            error: Box::new(FromVariantError::Custom("must be 32 bytes long".to_string())),
         })
     }
 }
@@ -410,11 +393,7 @@ fn get_hash_digest(
 fn parse_u64(var: &Variant) -> Option<u64> {
     var.to::<u64>().or_else(|| {
         var.to::<f64>().and_then(|num| {
-            if num == (num as u64) as f64 {
-                Some(num as u64)
-            } else {
-                None
-            }
+            if num == (num as u64 as f64) { Some(num as u64) } else { None }
         })
     })
 }
@@ -423,9 +402,7 @@ fn get_u64(dict: &Dictionary, field_name: &'static str) -> Result<u64, FromVaria
     let var = get_field(dict, field_name)?;
     parse_u64(&var).ok_or(FromVariantError::InvalidField {
         field_name,
-        error: Box::new(FromVariantError::Custom(
-            "must be positive integer".to_string(),
-        )),
+        error: Box::new(FromVariantError::Custom("must be positive integer".to_string())),
     })
 }
 
@@ -448,23 +425,19 @@ fn get_string(dict: &Dictionary, field_name: &'static str) -> Result<String, Fro
 }
 
 fn get_address(dict: &Dictionary, field_name: &'static str) -> Result<Address, FromVariantError> {
-    let addr_string =
-        get_field(dict, field_name)?
-            .to::<String>()
-            .ok_or(FromVariantError::InvalidField {
-                field_name,
-                error: Box::new(FromVariantError::Custom(
-                    "address must be a string".to_string(),
-                )),
-            })?;
-
-    let address =
-        Address::from_str(addr_string.as_str()).map_err(|e| FromVariantError::InvalidField {
+    let addr_string = get_field(dict, field_name)?
+        .to::<String>()
+        .ok_or(FromVariantError::InvalidField {
             field_name,
-            error: Box::new(FromVariantError::Custom(format!(
-                "error parsing address: {e}"
-            ))),
+            error: Box::new(FromVariantError::Custom("address must be a string".to_string())),
         })?;
+
+    let address = Address::from_str(addr_string.as_str()).map_err(
+        |e| FromVariantError::InvalidField {
+            field_name,
+            error: Box::new(FromVariantError::Custom(format!("error parsing address: {e}"))),
+        }
+    )?;
     Ok(address)
     //const HASH_LEN: usize = 32;
 
@@ -487,11 +460,10 @@ fn get_address(dict: &Dictionary, field_name: &'static str) -> Result<Address, F
 fn get_dict(dict: &Dictionary, field_name: &'static str) -> Result<Dictionary, FromVariantError> {
     let var = get_field(dict, field_name)?;
 
-    var.to::<Dictionary>()
-        .ok_or(FromVariantError::InvalidVariantType {
-            variant_type: var.get_type(),
-            expected: VariantType::Dictionary,
-        })
+    var.to::<Dictionary>().ok_or(FromVariantError::InvalidVariantType {
+        variant_type: var.get_type(),
+        expected: VariantType::Dictionary,
+    })
 }
 
 fn get_vec_u8(dict: &Dictionary, field_name: &'static str) -> Result<Vec<u8>, FromVariantError> {
@@ -519,17 +491,14 @@ fn get_byte_array(vector: Vec<Vec<u8>>) -> Result<ByteArray, FromVariantError> {
 // https://developer.algorand.org/docs/get-details/transactions/
 fn get_transaction_type(
     dict: &Dictionary,
-    field_name: &'static str,
+    field_name: &'static str
 ) -> Result<TransactionType, FromVariantError> {
-    let txn_type =
-        get_field(dict, field_name)?
-            .to::<String>()
-            .ok_or(FromVariantError::InvalidField {
-                field_name,
-                error: Box::new(FromVariantError::Custom(
-                    "txn field must be a string".to_string(),
-                )),
-            })?;
+    let txn_type = get_field(dict, field_name)?
+        .to::<String>()
+        .ok_or(FromVariantError::InvalidField {
+            field_name,
+            error: Box::new(FromVariantError::Custom("txn field must be a string".to_string())),
+        })?;
 
     #[allow(clippy::diverging_sub_expression)] // todo!()
     match txn_type.as_str() {
@@ -549,7 +518,9 @@ fn get_transaction_type(
                 sender: get_address(dict, "snd")?,
                 params: Some(AssetParams {
                     asset_name: get_string(&params, "an").ok(),
-                    decimals: get_u64(&params, "dc").ok().map(|num| num as u32),
+                    decimals: get_u64(&params, "dc")
+                        .ok()
+                        .map(|num| num as u32),
                     default_frozen: get_bool(&params, "df").ok(),
                     total: get_u64(&params, "t").ok(),
                     unit_name: get_string(&params, "un").ok(),
@@ -583,7 +554,7 @@ fn get_transaction_type(
                 };
                 Ok(TransactionType::AssetAcceptTransaction(axfer))
             }
-        }       
+        }
         "appl" => {
             //checks that the app call is valid
             let appl = ApplicationCallTransaction {
@@ -603,9 +574,10 @@ fn get_transaction_type(
             Ok(TransactionType::ApplicationCallTransaction(appl))
         }
 
-        _ => Err(FromVariantError::InvalidField {
-            field_name,
-            error: Box::new(FromVariantError::Custom("invalid txn type".to_string())),
-        }),
+        _ =>
+            Err(FromVariantError::InvalidField {
+                field_name,
+                error: Box::new(FromVariantError::Custom("invalid txn type".to_string())),
+            }),
     }
 }
