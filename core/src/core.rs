@@ -199,8 +199,7 @@ impl ToVariant for MyTransaction {
                         }
                     }
                     dict.insert("apar", apar);
-                    "acfg"
-                
+                    "acfg"                
                 }             
                 //https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.AssetTransferTransaction.html
                 TransactionType::AssetTransferTransaction(axfer) => {
