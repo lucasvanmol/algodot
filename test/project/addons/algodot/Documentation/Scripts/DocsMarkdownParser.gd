@@ -1,8 +1,7 @@
-# Bug likely comes from here
 
 extends Node
 
-var regex: RegEx
+var regex: RegEx = RegEx.new()
 
 var heading1_font = "res://addons/algodot/Documentation/Theme/DocumentationH1.tres"
 var heading2_font = "res://addons/algodot/Documentation/Theme/DocumentationH2.tres"
