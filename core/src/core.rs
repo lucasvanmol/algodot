@@ -60,13 +60,12 @@ impl From<ServiceError> for AlgodotError {
     }
 }
 
-
 #[derive(Debug, Deref, DerefMut, From)]
 pub struct MyAddress(Address);
- 
-impl FromVariant for MyAddress {
-    fn from_variant(variant: &Variant) -> Result<Self, FromVariantError> {
-        Address::from_str(&variant.to_string())
+
+  impl FromVariant for MyAddress {
+     fn from_variant(variant: &Variant) -> Result<Self, FromVariantError> {
+         Address::from_str(&variant.to_string())
             .map_err(FromVariantError::Custom)
             .map(MyAddress)
     }
