@@ -201,7 +201,6 @@ impl ToVariant for MyTransaction {
                     }
                     dict.insert("apar", apar);
                     "acfg"
- 
                 }             
                 //https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.AssetTransferTransaction.html
                 TransactionType::AssetTransferTransaction(axfer) => {
@@ -212,18 +211,20 @@ impl ToVariant for MyTransaction {
                     if let Some(close_to) = axfer.close_to {
                         dict.insert("aclose", MyAddress::from(close_to));
                     }
+                    
                     "axfer"             
                 }
                 TransactionType::AssetAcceptTransaction(axfer) => {
                     dict.insert("snd", MyAddress::from(axfer.sender));
                     dict.insert("xaid", axfer.xfer);
                     "axfer"
-                 }             
+                }             
                 ///https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.ApplicationCallTransaction.html
                 ///defaults to a noOp on transaction complete
                 ///should be further customized to include ClearState,CloseOut,DeleteApplication
                 TransactionType::ApplicationCallTransaction(appl) => {
                     //Creates a Txn Dictionary for Signing the App Call Txn
+                    
                     let w = Dictionary::new(); 
 
                     //creates a Byte Array from app_arg
@@ -231,6 +232,7 @@ impl ToVariant for MyTransaction {
                         .unwrap_or_default();
                      
                     dict.insert("app_id", appl.app_id);
+                    
                     dict.insert("app_arg", q); 
                     dict.insert("txn", w);
                     dict.insert("snd", MyAddress::from(appl.sender));
@@ -586,6 +588,7 @@ fn get_transaction_type(
                 Ok(TransactionType::AssetAcceptTransaction(axfer))
             }
         }
+        
         "afrz" => todo!(),       
         "appl" => {
             //checks that the app call is valid
