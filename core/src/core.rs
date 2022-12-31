@@ -225,7 +225,8 @@ impl ToVariant for MyTransaction {
                     //Creates a Txn Dictionary for Signing the App Call Txn
 
                     //creates a Byte Array from app_arg
-                    let q: ByteArray = get_byte_array(appl.app_arguments.as_ref().unwrap().clone()).unwrap_or_default();              
+                    let q: ByteArray = get_byte_array(appl.app_arguments.as_ref().unwrap().clone())
+                        .unwrap_or_default();                    
                     dict.insert("app_id", appl.app_id);
                     dict.insert("app_arg", q);
                     dict.insert("txn", Dictionary::new());
@@ -564,6 +565,7 @@ fn get_transaction_type(
             Ok(TransactionType::AssetConfigurationTransaction(acfg))
         }
         "keyreg" => todo!(),
+        "afrz" => todo!(),
         "axfer" => {
             if let Ok(amount) = get_u64(dict, "aamt") {
                 let axfer = AssetTransferTransaction {
@@ -581,8 +583,7 @@ fn get_transaction_type(
                 };
                 Ok(TransactionType::AssetAcceptTransaction(axfer))
             }
-        }
-        "afrz" => todo!(),       
+        }       
         "appl" => {
             //checks that the app call is valid
             let appl = ApplicationCallTransaction {
