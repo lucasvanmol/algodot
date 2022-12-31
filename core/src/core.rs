@@ -157,7 +157,6 @@ impl ToVariant for MyTransaction {
                     };
                     "pay"
                 }
-                TransactionType::KeyRegistration(_) => todo!(),
                 TransactionType::AssetConfigurationTransaction(cfg) => {
                     dict.insert("snd", MyAddress(cfg.sender));
                     let apar = Dictionary::new();
@@ -235,6 +234,7 @@ impl ToVariant for MyTransaction {
                 }
                 TransactionType::AssetClawbackTransaction(_) => todo!(),
                 TransactionType::AssetFreezeTransaction(_) => todo!(),
+                TransactionType::KeyRegistration(_) => todo!(),
             },
         );
         if let Some(gen) = &self.genesis_id {
