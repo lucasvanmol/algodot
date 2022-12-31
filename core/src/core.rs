@@ -69,7 +69,7 @@ impl FromVariant for MyAddress {
             .map_err(FromVariantError::Custom)
             .map(MyAddress)
     }
- }
+}
 
 impl ToVariant for MyAddress {
     fn to_variant(&self) -> Variant {
@@ -201,7 +201,7 @@ impl ToVariant for MyTransaction {
                     }
                     dict.insert("apar", apar);
                     "acfg"
-                }             
+                 }             
                 //https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.AssetTransferTransaction.html
                 TransactionType::AssetTransferTransaction(axfer) => {
                     dict.insert("snd", MyAddress::from(axfer.sender));
@@ -211,7 +211,7 @@ impl ToVariant for MyTransaction {
                     if let Some(close_to) = axfer.close_to {
                         dict.insert("aclose", MyAddress::from(close_to));
                     }
-                     "axfer"              
+                    "axfer"              
                 }
                 TransactionType::AssetAcceptTransaction(axfer) => {
                     dict.insert("snd", MyAddress::from(axfer.sender));
