@@ -63,13 +63,13 @@ impl From<ServiceError> for AlgodotError {
 #[derive(Debug, Deref, DerefMut, From)]
 pub struct MyAddress(Address);
 
- impl FromVariant for MyAddress {
-     fn from_variant(variant: &Variant) -> Result<Self, FromVariantError> {
-         Address::from_str(&variant.to_string())
-             .map_err(FromVariantError::Custom)
-             .map(MyAddress)
-      }
-}
+impl FromVariant for MyAddress {
+    fn from_variant(variant: &Variant) -> Result<Self, FromVariantError> {
+        Address::from_str(&variant.to_string())
+            .map_err(FromVariantError::Custom)
+            .map(MyAddress)
+    }
+ }
 
 impl ToVariant for MyAddress {
     fn to_variant(&self) -> Variant {
@@ -200,7 +200,7 @@ impl ToVariant for MyTransaction {
                         }
                     }
                     dict.insert("apar", apar);
-                    "acfg"             
+                    "acfg"
                 }             
                 //https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.AssetTransferTransaction.html
                 TransactionType::AssetTransferTransaction(axfer) => {
@@ -211,7 +211,7 @@ impl ToVariant for MyTransaction {
                     if let Some(close_to) = axfer.close_to {
                         dict.insert("aclose", MyAddress::from(close_to));
                     }
-                    "axfer"               
+                     "axfer"              
                 }
                 TransactionType::AssetAcceptTransaction(axfer) => {
                     dict.insert("snd", MyAddress::from(axfer.sender));
