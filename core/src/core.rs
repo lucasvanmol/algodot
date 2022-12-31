@@ -62,7 +62,6 @@ impl From<ServiceError> for AlgodotError {
 
 #[derive(Debug, Deref, DerefMut, From)]
 pub struct MyAddress(Address);
-
 //used when constructing a variant 
 impl FromVariant for MyAddress {
     fn from_variant(variant: &Variant) -> Result<Self, FromVariantError> {
@@ -225,7 +224,7 @@ impl ToVariant for MyTransaction {
                 TransactionType::ApplicationCallTransaction(appl) => { 
                     //Creates a Txn Dictionary for Signing the App Call Txn
                     let w = Dictionary::new(); 
-                    
+
                     //creates a Byte Array from app_arg
                     let q: ByteArray = get_byte_array(appl.app_arguments.as_ref().unwrap().clone())
                         .unwrap_or_default();
@@ -236,6 +235,7 @@ impl ToVariant for MyTransaction {
                     "appl"
                 }
                 TransactionType::AssetClawbackTransaction(_) => todo!(),
+                
                 TransactionType::AssetFreezeTransaction(_) => todo!(), 
             },
         );
@@ -343,9 +343,8 @@ impl FromVariant for MySignedTransaction {
 //    fn from_variant(&self) -> Variant {
 //     to_json_dict(&self)
 //    }
-//}    
- 
 
+//}    
 
 
 // Helper functions //
@@ -588,7 +587,8 @@ fn get_transaction_type(
             }
         }
         "afrz" => todo!(),
-        "appl" => { //checks that the app call is valid
+        "appl" => { 
+            //checks that the app call is valid
             let appl = ApplicationCallTransaction {
                 sender: get_address(dict, "snd")?,
                 app_id: Some(get_u64(dict, "app_id")?),
