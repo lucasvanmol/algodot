@@ -200,8 +200,7 @@ impl ToVariant for MyTransaction {
                         }
                     }
                     dict.insert("apar", apar);
-                    "acfg"
-                
+                    "acfg"           
                 }             
                 //https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.AssetTransferTransaction.html
                 TransactionType::AssetTransferTransaction(axfer) => {
@@ -226,8 +225,8 @@ impl ToVariant for MyTransaction {
                 TransactionType::ApplicationCallTransaction(appl) => {
                     //Creates a Txn Dictionary for Signing the App Call Txn
                     
-                    let w = Dictionary::new(); 
-
+                    let w = Dictionary::new();  
+                    
                     //creates a Byte Array from app_arg
                     let q: ByteArray = get_byte_array(appl.app_arguments.as_ref().unwrap().clone())
                         .unwrap_or_default();
