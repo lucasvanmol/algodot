@@ -18,10 +18,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install latest nightly
-        uses: actions-rs/toolchain@v1.0.1
+        uses: actions-rs/toolchain@v1
         with:
             toolchain: nightly
-            target: armv7-unknown-linux-gnueabihf
             override: true
             components: rustfmt, clippy
             
@@ -29,7 +28,7 @@ jobs:
       # as it is set as an "override" for current directory
 
       - name: Run cargo check
-        uses: actions-rs/cargo@v1.0.1
+        uses: actions-rs/cargo@v1
         with:
           command: check
           
@@ -97,9 +96,8 @@ jobs:
             #perl -pi -w -e 's/\-mandroid//g;' ./Configure
             PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
             #turn off warning  macro-redefined
-            
-            export CFLAGS="-Wno-macro-redefined -O3"
-            ./Configure  $CONFIGURE_PLATFORM -D__ANDROID_API__=$ANDROID_API -U__ANDROID_API__ shared threads no-asm no-sse2 no-ssl2 no-ssl3 no-comp no-hw no-engine
+            # export CFLAGS="-Wno-macro-redefined -O3"
+            ./Configure  $CONFIGURE_PLATFORM -D__ANDROID_API__=$ANDROID_API shared threads no-asm no-sse2 no-ssl2 no-ssl3 no-comp no-hw no-engine
 
                 make build_libs -j8
             sudo mkdir -p ../$OUTPUT_DIR/${ARCHITECTURE}/
@@ -126,7 +124,8 @@ jobs:
 
           # Build libcrypto for armeabi-v7a 
           build_android_clang  "21"    	"android-arm" #32 bit arm
-     
+          #build_android_clang  "21"    	"android-x86"
+          #build_android_clang  "21"    	"android-arm64"
 
           exit 0
 
@@ -140,10 +139,18 @@ jobs:
           
       - name: "Check workspace"
         run: |
+         #copy openssl shared libraries and headers to compiler working directory
+         #sudo cp -a ${{ github.workspace }}/openssl_android/openssl-1.1.1l/include ${{ github.workspace }}/openssl_android
+         
          #verify all files
          cd ${{ github.workspace }}/openssl_android && ls -al
       
-
+      
+      - name: Upload Artifact openssl 32 bit
+        uses: actions/upload-artifact@v1
+        with:
+          name: "Openssl dependencies arm-v7a"
+          path: openssl_android
       
       - name: "Build Rust for targets: armv7-linux-androideabi" # aarch64-linux-android
         run: |
@@ -154,18 +161,18 @@ jobs:
           export CARGO_TARGET_ARMV7_LINUX_ANDROIDEABI_LINKER=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi21-clang++
           
           
+          #export ARMV7_LINUX_ANDROIDEABI_OPENSSL_LIB_DIR="openssl_android/libs/android/clang/android-arm/ssl" #buggy
+          
           export OPENSSL=${{ github.workspace }}/openssl_android #arm
-          export OPENSSL_DIR=${{ github.workspace }}/openssl_android
-          export OPENSSL_INCLUDE_DIR=${{ github.workspace }}/openssl_android/include
+          
           export OPENSSL_LIB_DIR=${{ github.workspace }}/openssl_android
           export PKG_CONFIG_PATH=${{ github.workspace }}/openssl_android
           
-          export ARMV7_UNKNOWN_LINUX_GNUEABIHF_OPENSSL_INCLUDE_DIR=${{ github.workspace }}/openssl_android/include
+          export ARMV7_LINUX_ANDROIDEABI_OPENSSL_DIR=${{ github.workspace }}/openssl_android
           
-          export ARMV7_UNKNOWN_LINUX_GNUEABIHF_OPENSSL_LIB_DIR=${{ github.workspace }}/openssl_android
           
-          export PKG_CONFIG_ALLOW_CROSS_armv7_linux_androideabi=1
-      
+          PKG_CONFIG_ALLOW_CROSS_armv7_linux_androideabi=1
+          
          
           export ANDROID_NDK_VERSION=25.1.8937393
 
@@ -173,31 +180,155 @@ jobs:
           export TOOLCHAIN=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64
 
           export TARGET=armeabi-v7a
-          export API=21
+
+
           export DEBUG= true
 
           
           cargo ndk -t armeabi-v7a  -o ./jniLibs build --release
           
-      - name: Build for Armv7
-        uses: actions-rs/cargo@v1.0.1
-        with:
-          command: build
-          args: --target armv7-unknown-linux-gnueabihf
-          env: |
-              OPENSSL: ${{ github.workspace }}/openssl_android #arm
-              OPENSSL_DIR: ${{ github.workspace }}/openssl_android
-              OPENSSL_INCLUDE_DIR: ${{ github.workspace }}/openssl_android/include
-              OPENSSL_LIB_DIR: ${{ github.workspace }}/openssl_android
-              PKG_CONFIG_PATH: ${{ github.workspace }}/openssl_android
-
-              ARMV7_UNKNOWN_LINUX_GNUEABIHF_OPENSSL_INCLUDE_DIR: ${{ github.workspace }}/openssl_android/include        
-              ARMV7_UNKNOWN_LINUX_GNUEABIHF_OPENSSL_LIB_DIR: ${{ github.workspace }}/openssl_android          
-              PKG_CONFIG_ALLOW_CROSS_armv7_linux_androideabi: 1
-
+          #cargo build --target aarch64-linux-android --release
+          #cargo build --target armv7-linux-androideabi --release 
+          
       - name: Upload Artifact 1
         uses: actions/upload-artifact@v1
         with:
           name: "android armabi-v7a"
           path: target/armv7-linux-androideabi/release/libalgodot.so
         
+      - name: "Build OpenSSL for arm64"
+        run: |
+        
+          if [[ -z "${ANDROID_NDK_HOME}" ]]; then
+            # need change
+            export ANDROID_NDK_HOME=~/Android/Sdk/ndk/25.1.8937393
+          else
+            echo "Use environment variable ANDROID_NDK_HOME is: $ANDROID_NDK_HOME"
+          fi
+          sleep 3
+          # need change
+          export OPENSSL_VERSION="openssl-1.1.1l"
+          curl -O "https://www.openssl.org/source/${OPENSSL_VERSION}.tar.gz"
+
+
+          PROJECT_HOME=`pwd`
+          PATH_ORG=$PATH
+          export OUTPUT_DIR=${{ github.workspace }}/openssl_android
+
+          # Clean output:
+          sudo rm -rf $OUTPUT_DIR
+          sudo mkdir $OUTPUT_DIR
+
+          build_android_clang() {
+            rm -rf ${OPENSSL_VERSION}
+            tar xfz "${OPENSSL_VERSION}.tar.gz"
+
+            echo ""
+            echo "----- B
+          # Clean output:uild libcrypto & libssl.so for "$2" -----"
+            echo ""
+
+            ANDROID_API=$1
+            CONFIGURE_PLATFORM=$2
+            ARCHITECTURE=$CONFIGURE_PLATFORM
+
+            # Clean openssl:
+            cd "${OPENSSL_VERSION}"
+            #make clean
+
+            # Build openssl libraries
+            #perl -pi -w -e 's/\-mandroid//g;' ./Configure
+            PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
+            #turn off warning  macro-redefined
+            # export CFLAGS="-Wno-macro-redefined -O3"
+            ./Configure  $CONFIGURE_PLATFORM -D__ANDROID_API__=$ANDROID_API shared threads no-asm no-sse2 no-ssl2 no-ssl3 no-comp no-hw no-engine
+
+                make build_libs -j8
+            sudo mkdir -p ../$OUTPUT_DIR/${ARCHITECTURE}/
+
+                file libcrypto.so
+                file libssl.so
+
+                sudo cp libcrypto.a $OUTPUT_DIR/libcrypto.a
+            sudo cp libssl.a $OUTPUT_DIR/libssl.a
+            sudo cp libcrypto.so $OUTPUT_DIR/libcrypto.so
+            sudo cp libssl.so $OUTPUT_DIR/libssl.so
+            
+            sudo cp -a include $OUTPUT_DIR
+            
+            ls -al
+            
+            cd ..
+            echo "Parent Dir"
+            ls -al
+            
+            echo "openssl_android Dir"
+            cd openssl_android && ls -al
+          }
+
+          # Build libcrypto for armeabi-v7a 
+          #build_android_clang  "21"    	"android-arm" #32 bit arm
+          #build_android_clang  "21"    	"android-x86"
+          build_android_clang  "21"    	"android-arm64"
+
+          exit 0
+         
+      - name: "Check workspace"
+        run: |
+         #copy openssl shared libraries and headers to compiler working directory
+         #sudo cp -a ${{ github.workspace }}/openssl_android/openssl-1.1.1l/include ${{ github.workspace }}/openssl_android
+         
+         #verify all files
+         cd ${{ github.workspace }}/openssl_android && ls -al
+         
+      
+      - name: Upload Artifact openssl 64 bit
+        uses: actions/upload-artifact@v1
+        with:
+          name: "Openssl dependencies arm64-v8a"
+          path: openssl_android
+         
+      
+      
+      
+      - name: "Build Rust for targets: armv8-linux-androideabi" # aarch64-linux-android
+        run: |
+          
+        
+          #link external libraries
+          export CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang++
+          export CARGO_TARGET_ARMV7_LINUX_ANDROIDEABI_LINKER=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi21-clang++
+          
+          
+          
+          export OPENSSL=${{ github.workspace }}/openssl_android #arm64
+          
+          export OPENSSL_LIB_DIR=${{ github.workspace }}/openssl_android
+          export PKG_CONFIG_PATH=${{ github.workspace }}/openssl_android
+          
+          export AARCH64_LINUX_ANDROID_OPENSSL_LIB_DIR=${{ github.workspace }}/openssl_android
+            
+         
+          export ANDROID_NDK_VERSION=25.1.8937393
+
+          export OPENSSL_DIR=${{ github.workspace }}/openssl_android
+          export TOOLCHAIN=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64
+
+          export TARGET=arm64-v8a
+
+
+          export DEBUG= true
+
+          
+          cargo ndk -t arm64-v8a  -o ./jniLibs build --release
+         
+          
+      - name: Upload Artifact 2
+        uses: actions/upload-artifact@v1
+        with:
+          name: "android arm64-v8a"
+          path: target/aarch64-linux-android/release/libalgodot.so
+
+      
+
+      
