@@ -60,6 +60,7 @@ impl From<ServiceError> for AlgodotError {
     }
 }
 
+
 #[derive(Debug, Deref, DerefMut, From)]
 pub struct MyAddress(Address);
  
@@ -200,8 +201,7 @@ impl ToVariant for MyTransaction {
                         }
                     }
                     dict.insert("apar", apar);
-                    "acfg"
-                
+                    "acfg"             
                 }             
                 //https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.AssetTransferTransaction.html
                 TransactionType::AssetTransferTransaction(axfer) => {
@@ -212,37 +212,34 @@ impl ToVariant for MyTransaction {
                     if let Some(close_to) = axfer.close_to {
                         dict.insert("aclose", MyAddress::from(close_to));
                     }
-                    "axfer"
-               
+                    "axfer"               
                 }
                 TransactionType::AssetAcceptTransaction(axfer) => {
                     dict.insert("snd", MyAddress::from(axfer.sender));
                     dict.insert("xaid", axfer.xfer);
                     "axfer"
                 }             
-                //https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.ApplicationCallTransaction.html
-                //defaults to a noOp on transaction complete
-                //should be further customized to include ClearState,CloseOut,DeleteApplication
-                
+                ///https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.ApplicationCallTransaction.html
+                ///defaults to a noOp on transaction complete
+                ///should be further customized to include ClearState,CloseOut,DeleteApplication 
                 TransactionType::ApplicationCallTransaction(appl) => { 
-                    //Creates a Txn Dictionary for Signing the App Call Txn
-                    
+                    //Creates a Txn Dictionary for Signing the App Call Txn             
                     let w = Dictionary::new(); 
 
                     //creates a Byte Array from app_arg
                     let q: ByteArray = get_byte_array(appl.app_arguments.as_ref().unwrap().clone())
                         .unwrap_or_default();
                    
-                    dict.insert( "app_id", appl.app_id);
+                    dict.insert("app_id", appl.app_id);
                     dict.insert("app_arg", q); 
-                    dict.insert( "txn", w);
-                    dict.insert( "snd", MyAddress::from(appl.sender));
+                    dict.insert("txn", w);
+                    dict.insert("snd", MyAddress::from(appl.sender));
                     "appl"
                 }
                 TransactionType::AssetClawbackTransaction(_) => todo!(),
                 TransactionType::AssetFreezeTransaction(_) => todo!(), 
-            },
-        );
+              },
+          );
         if let Some(gen) = &self.genesis_id {
             dict.insert("gen", gen);
         }
@@ -339,17 +336,16 @@ impl FromVariant for MySignedTransaction {
     }
 }
 
-//Convert's appl call txn to Godot Variants
-//#[derive(Deref, DerefMut, From, Debug)]
+///Convert's appl call txn to Godot Variants
+///#[derive(Deref, DerefMut, From, Debug)]
 //pub struct MyApplCallTransaction(pub ApplicationCallTransaction);
-
-//impl FromVariant for MyApplCallTransaction {
-//    fn from_variant(&self) -> Variant {
-//     to_json_dict(&self)
-//    }
-
-//}    
-
+///
+///impl FromVariant for MyApplCallTransaction {
+///    fn from_variant(&self) -> Variant {
+///     to_json_dict(&self)
+///   }
+///
+///}    
 
 // Helper functions //
 
