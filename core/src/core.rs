@@ -198,9 +198,10 @@ impl ToVariant for MyTransaction {
                         if let Some(reserve) = &params.reserve {
                             apar.insert("r", MyAddress::from(*reserve))
                         }
-                   }
+                    }
                     dict.insert("apar", apar);
                     "acfg"
+ 
                 }             
                 //https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.AssetTransferTransaction.html
                 TransactionType::AssetTransferTransaction(axfer) => {
@@ -211,13 +212,13 @@ impl ToVariant for MyTransaction {
                     if let Some(close_to) = axfer.close_to {
                         dict.insert("aclose", MyAddress::from(close_to));
                     }
-                    "axfer"              
+                     "axfer"             
                 }
                 TransactionType::AssetAcceptTransaction(axfer) => {
                     dict.insert("snd", MyAddress::from(axfer.sender));
                     dict.insert("xaid", axfer.xfer);
                     "axfer"
-                }             
+                 }             
                 ///https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.ApplicationCallTransaction.html
                 ///defaults to a noOp on transaction complete
                 ///should be further customized to include ClearState,CloseOut,DeleteApplication
@@ -228,11 +229,11 @@ impl ToVariant for MyTransaction {
                     //creates a Byte Array from app_arg
                     let q: ByteArray = get_byte_array(appl.app_arguments.as_ref().unwrap().clone())
                         .unwrap_or_default();
-                    
-                    dict.insert("app_id", appl.app_id);
-                    dict.insert("app_arg", q); 
-                    dict.insert("txn", w);
-                    dict.insert("snd", MyAddress::from(appl.sender));
+                     
+                     dict.insert("app_id", appl.app_id);
+                     dict.insert("app_arg", q); 
+                     dict.insert("txn", w);
+                     dict.insert("snd", MyAddress::from(appl.sender));
                     "appl"
                 }
                 TransactionType::AssetClawbackTransaction(_) => todo!(),
