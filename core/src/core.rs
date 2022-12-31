@@ -198,10 +198,10 @@ impl ToVariant for MyTransaction {
                         if let Some(reserve) = &params.reserve {
                             apar.insert("r", MyAddress::from(*reserve))
                         }
-                    }
+                   }
                     dict.insert("apar", apar);
                     "acfg"
-                 }             
+                }             
                 //https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.AssetTransferTransaction.html
                 TransactionType::AssetTransferTransaction(axfer) => {
                     dict.insert("snd", MyAddress::from(axfer.sender));
