@@ -1,6 +1,7 @@
 # Algodot Node
 
-An instance of the Algorand blockchain's node in Godot engine written in rust.
+An instance of the Algorand blockchain's node in Godot engine written in rust using Algonaut Crates
+and compiled as a dynamic library.
 
 # Methods
 
@@ -15,7 +16,10 @@ An instance of the Algorand blockchain's node in Godot engine written in rust.
 (3) compile_teal(String: "res//path_to_script")
     compiles teal 
 
-(4) construct_app_call()
+
+(4) construct_app_call(params, address: String,app_ id: Int, app argument: String)
+     constructs an app call to a hosted smart contract. Which itself returns a
+     trasaction for signing and broadcasting.
 
 (5) construct_asset_create()
     creates algorand assets
@@ -31,6 +35,7 @@ An instance of the Algorand blockchain's node in Godot engine written in rust.
     generates a new account with mnemonic stored to a dictionary
 
 (10) get_address()
+     Generates a Wallet Address from a mnemonic string.
 
 (11) group_transactions()
      constructs a group tx that can be signed by both wallet addresses
@@ -39,7 +44,7 @@ An instance of the Algorand blockchain's node in Godot engine written in rust.
      checks the health of connection of the plugin to the algorand node
 
 (13) headers 
-     a rust parameter
+     The algod node header parameters
 
 (14) send_transactions()
      sends a tx between a receiver and funder wallet
@@ -48,13 +53,16 @@ An instance of the Algorand blockchain's node in Godot engine written in rust.
      sends a grouped tx between wallets
 
 (16) sets_headers()
-     a rust related function
+     Sets the algod node headers which is a (String, String) Parameter for intitalizing
+     the algod node.
 
 (17) set_url()
      sets the algod node url 
 
 (18) sign_transaction()
-     signs a transaction between two wallets
+     signs a transaction using a senders mnemonic (Secret Key), adds a sig: ByteArray() 
+     parameter to the existing transacton's parameters using a MyTransaction::ToVariant 
+     in Algodot's Core.rs, after which the signed transaction can be sent to the Algorand blockchain
 
 (19) status()
      checks the status of a transaction
@@ -70,7 +78,8 @@ An instance of the Algorand blockchain's node in Godot engine written in rust.
      gets the transaction information from a transaction id
 
 (23) Url (path)
-     A path to the url that te algorand node uses
+     A path to the url that te algorand node uses. Can be set to local host sandbox,
+     testnet, betanet, or mainnet
 
 (24) wait_for_transaction( tx_id )
      waits for a transaction to finish processing, usually 4-5 seconds. 

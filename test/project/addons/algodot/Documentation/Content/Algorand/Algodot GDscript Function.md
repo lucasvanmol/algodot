@@ -1,5 +1,10 @@
 # Algodot GDscript Functions
 
+Algorand GDscript functions abstract away the transaction logic for Algorand and
+gives the user tested template methods for constructing all basic L1 transactions
+on the Algorand blockchain. Users still have the option to reference the
+transaction logic as examples for implementing their own custom transaction logic
+
 (1) create_algot_node()
     creates an algod node, tokens, url and other parameters can be specified.
     It must be run before any transaction logic is done, else the script would

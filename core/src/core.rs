@@ -1,12 +1,16 @@
-use algonaut::core::{MicroAlgos, Round, SuggestedTransactionParams};
+//Interracts with the godot debugger. Handles transaction types and prints out Algod node errors
+// It uses Transaction Types to trigger a state machine in Algodot core.rs
+
+use algonaut::core::{MicroAlgos, Round, SuggestedTransactionParams };
 use algonaut::crypto::{HashDigest, Signature};
 use algonaut::model::algod::v2::PendingTransaction;
 use algonaut::transaction::account::Account;
 use algonaut::transaction::transaction::{
-    AssetAcceptTransaction, AssetConfigurationTransaction, AssetParams, AssetTransferTransaction,
-    Payment, TransactionSignature,
+    AssetAcceptTransaction, AssetConfigurationTransaction, AssetParams, AssetTransferTransaction, 
+    Payment, TransactionSignature, ApplicationCallTransaction, ApplicationCallOnComplete,
 };
-use algonaut::transaction::{SignedTransaction, Transaction, TransactionType};
+
+use algonaut::transaction::{SignedTransaction, Transaction, TransactionType };
 use algonaut::{core::Address, error::ServiceError};
 use derive_more::{Deref, DerefMut, From, Into};
 use gdnative::api::JSON;
@@ -55,9 +59,13 @@ impl From<ServiceError> for AlgodotError {
     }
 }
 
+
+
+
 #[derive(Debug, Deref, DerefMut, From)]
 pub struct MyAddress(Address);
 
+//used when constructing a variant 
 impl FromVariant for MyAddress {
     fn from_variant(variant: &Variant) -> Result<Self, FromVariantError> {
         Address::from_str(&variant.to_string())
@@ -92,6 +100,7 @@ impl MyAccount {
 #[derive(Deref, DerefMut, From)]
 pub struct MySuggestedTransactionParams(SuggestedTransactionParams);
 
+//used when constructing To a variant
 impl ToVariant for MySuggestedTransactionParams {
     fn to_variant(&self) -> Variant {
         let dict = Dictionary::new();
@@ -140,7 +149,7 @@ impl ToVariant for MyTransaction {
         dict.insert("lv", self.last_valid.0);
         dict.insert(
             "type",
-            match &self.txn_type {
+            match &self.txn_type { //state machine prints to debug log : https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/enum.TransactionType.html
                 TransactionType::Payment(payment) => {
                     dict.insert("snd", MyAddress::from(payment.sender));
                     dict.insert("rcv", MyAddress::from(payment.receiver));
@@ -195,6 +204,8 @@ impl ToVariant for MyTransaction {
                     dict.insert("apar", apar);
                     "acfg"
                 }
+                
+                //https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.AssetTransferTransaction.html
                 TransactionType::AssetTransferTransaction(axfer) => {
                     dict.insert("snd", MyAddress::from(axfer.sender));
                     dict.insert("xaid", axfer.xfer);
@@ -210,9 +221,25 @@ impl ToVariant for MyTransaction {
                     dict.insert("xaid", axfer.xfer);
                     "axfer"
                 }
+                
+                //https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.ApplicationCallTransaction.html
+                //defaults to a noOp on transaction complete
+                //should be further customized to include ClearState,CloseOut,DeleteApplication
+                TransactionType::ApplicationCallTransaction(appl) => { 
+                    //Creates a Txn Dictionary for Signing the App Call Txn
+                    let w = Dictionary::new(); 
+                    
+                    //creates a Byte Array from app_arg
+                    let q: ByteArray = get_byte_array(appl.app_arguments.as_ref().unwrap().clone())
+                        .unwrap_or_default();
+                    dict.insert( "app_id", appl.app_id);
+                    dict.insert("app_arg", q); 
+                    dict.insert( "txn", w);
+                    dict.insert( "snd", MyAddress::from(appl.sender));
+                    "appl"
+                }
                 TransactionType::AssetClawbackTransaction(_) => todo!(),
-                TransactionType::AssetFreezeTransaction(_) => todo!(),
-                TransactionType::ApplicationCallTransaction(_) => todo!(),
+                TransactionType::AssetFreezeTransaction(_) => todo!(), 
             },
         );
         if let Some(gen) = &self.genesis_id {
@@ -310,6 +337,19 @@ impl FromVariant for MySignedTransaction {
         Ok(MySignedTransaction(st))
     }
 }
+
+//Convert's appl call txn to Godot Variants
+//#[derive(Deref, DerefMut, From, Debug)]
+//pub struct MyApplCallTransaction(pub ApplicationCallTransaction);
+
+//impl FromVariant for MyApplCallTransaction {
+//    fn from_variant(&self) -> Variant {
+//     to_json_dict(&self)
+//    }
+//}    
+ 
+
+
 
 // Helper functions //
 
@@ -476,6 +516,13 @@ fn get_vec_u8(dict: &Dictionary, field_name: &'static str) -> Result<Vec<u8>, Fr
     Ok(byte_array)
 }
 
+//converts a <Vec<Vec<u8>>> to u8
+#[allow(dead_code)]
+fn get_byte_array(vector: Vec<Vec<u8>>) -> Result<ByteArray, FromVariantError> {
+    let byte_array = ByteArray::from_vec(vector.into_iter().next().unwrap_or_default());
+    Ok(byte_array)
+}
+
 // https://developer.algorand.org/docs/get-details/transactions/
 fn get_transaction_type(
     dict: &Dictionary,
@@ -544,7 +591,24 @@ fn get_transaction_type(
             }
         }
         "afrz" => todo!(),
-        "appl" => todo!(),
+        "appl" => { //checks that the app call is valid
+            let appl = ApplicationCallTransaction {
+                sender: get_address(dict, "snd")?,
+                app_id: Some(get_u64(dict, "app_id")?),
+                on_complete: ApplicationCallOnComplete::NoOp,
+                accounts: None,
+                approval_program: None,
+                app_arguments: Some(vec![get_vec_u8(dict, "app_arg")?]),
+                clear_state_program: None,
+                foreign_apps: None,
+                foreign_assets: None,
+                global_state_schema: None,
+                local_state_schema: None,
+                extra_pages: 0u32,
+            };
+            Ok(TransactionType::ApplicationCallTransaction(appl))
+        }
+
         _ => Err(FromVariantError::InvalidField {
             field_name,
             error: Box::new(FromVariantError::Custom("invalid txn type".to_string())),

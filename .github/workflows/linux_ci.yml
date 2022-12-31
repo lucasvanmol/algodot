@@ -2,19 +2,20 @@ name: Linux CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ TESTNET ]
   pull_request:
-    branches: [ master ]
+    branches: [ TESTNET ]
     
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
   CARGO_INCREMENTAL: 0
+  OPENSSL_VERSION: openssl-1.1.1l
   
   
 jobs:
         
-  build-android:
+  build-linux:
     # Note: even though Android builds for another architecture than Linux, it can reuse downloaded crates (source code, maybe 'cargo check').
     
     #continue-on-error: ${{ matrix.rust == 'nightly' }}
@@ -34,7 +35,8 @@ jobs:
             toolchain: nightly
             override: true
             components: rustfmt, clippy
-            
+
+
        # `cargo check` command here will use installed `nightly`
       # as it is set as an "override" for current directory
 
@@ -42,11 +44,30 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: check
+
+      - name: "Compile & install Openssl 1.1l"
+        run: |
+          sudo apt install make gcc -y
+          wget  "https://www.openssl.org/source/${OPENSSL_VERSION}.tar.gz"
+          tar -xzvf ${OPENSSL_VERSION}.tar.gz
           
+          cd ${OPENSSL_VERSION}
+          ./config --prefix=/opt/openssl --openssldir=/usr/local/ssl
+          make
+          sudo make install
+             
       - name: "Linux compile"
         run: |
           # Linux
-          RUST_BACKTRSCE=full cargo build --target x86_64-unknown-linux-gnu  --release
+          
+           export OPENSSL=${{ github.workspace }}/${OPENSSL_VERSION}
+           export OPENSSL_DIR=${{ github.workspace }}/${OPENSSL_VERSION}
+           export OPENSSL_LIB_DIR=${{ github.workspace }}/${OPENSSL_VERSION}
+           
+           export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_LIB_DIR=${{ github.workspace }}/${OPENSSL_VERSION}
+           
+          
+           RUST_BACKTRSCE=full cargo build --target x86_64-unknown-linux-gnu  --release
    
           
       - name: Upload Artifact
@@ -54,3 +75,9 @@ jobs:
         with:
           name: linux
           path: target/x86_64-unknown-linux-gnu/release/libalgodot.so
+      - name: Download-content
+        uses: actions/download-artifact@v2
+        with: 
+          name: linux
+          
+    

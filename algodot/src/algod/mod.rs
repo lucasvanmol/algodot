@@ -1,18 +1,18 @@
 use algodot_core::*;
 use algodot_macros::*;
 use algonaut::algod::v2::Algod;
-use algonaut::core::{CompiledTeal, MicroAlgos, Round};
+use algonaut::core::{MicroAlgos, Round};
 use algonaut::model::algod::v2::{PendingTransaction, TransactionResponse};
 use algonaut::transaction::transaction::{
-    ApplicationCallOnComplete, ApplicationCallTransaction, AssetAcceptTransaction,
-    AssetConfigurationTransaction, AssetParams, AssetTransferTransaction, StateSchema,
+    AssetAcceptTransaction,    AssetConfigurationTransaction, AssetParams, AssetTransferTransaction,
 };
 use algonaut::transaction::tx_group::TxGroup;
-use algonaut::transaction::{Pay, TransactionType, TxnBuilder};
+use algonaut::transaction::{Pay, TransactionType, TxnBuilder, builder::CallApplication, };
 use gdnative::api::Engine;
 use gdnative::prelude::*;
 use gdnative::tasks::{Async, AsyncMethod, Spawner};
 use std::rc::Rc;
+
 
 #[derive(NativeClass)]
 #[inherit(Node)]
@@ -41,7 +41,7 @@ impl Algodot {
             // leave these default values here for now
             algod: Rc::new(
                 Algod::new(
-                    "http://localhost:4001",
+                   "http://localhost:4001",
                     "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                 )
                 .unwrap(),
@@ -277,67 +277,21 @@ impl Algodot {
         #[base] _base: &Node,
         params: SuggestedTransactionParams,
         sender: Address,
-        #[opt] app_id: Option<u64>,
-        #[opt] accounts: Option<Vec<Address>>,
-        #[opt] app_arguments: Option<VariantArray>, // array of PoolByteArrays. Could perhaps be changed directily to Option<Vec<Vec<u8>>> | was previously Option<VariantArray>
-        #[opt] foreign_apps: Option<Int32Array>,
-        #[opt] foreign_assets: Option<Int32Array>,
-        #[opt] approval_program: Option<Vec<u8>>,
-        #[opt] clear_state_program: Option<Vec<u8>>,
-        #[opt] global_state_schema: Option<(u64, u64)>,
-        #[opt] local_state_schema: Option<(u64, u64)>,
-        #[opt] extra_pages: Option<u32>,
-    ) -> Transaction {
-        let accounts: Option<Vec<algonaut::core::Address>> =
-            accounts.map(|acc| acc.iter().map(|acc| **acc).collect());
-
-        let app_arguments: Option<Vec<Vec<u8>>> = app_arguments.map(|args| {
-            args.iter()
-                .map(|var| var.to::<Vec<u8>>().unwrap())
-                .collect()
-        });
-
-        let foreign_apps = foreign_apps.map(|fa| fa.read().iter().map(|num| *num as u64).collect());
-
-        let foreign_assets =
-            foreign_assets.map(|fa| fa.read().iter().map(|num| *num as u64).collect());
-
-        let approval_program = approval_program.map(CompiledTeal);
-
-        let clear_state_program = clear_state_program.map(CompiledTeal);
-
-        let global_state_schema =
-            global_state_schema.map(|(number_ints, number_byteslices)| StateSchema {
-                number_ints,
-                number_byteslices,
-            });
-
-        let local_state_schema =
-            local_state_schema.map(|(number_ints, number_byteslices)| StateSchema {
-                number_ints,
-                number_byteslices,
-            });
+        app_id: u64,
+        #[opt] app_arguments: Option<String>, 
+        
+   
+    ) -> Transaction { 
 
         TxnBuilder::with(
             &params,
-            TransactionType::ApplicationCallTransaction(ApplicationCallTransaction {
-                sender: *sender,
-                app_id,
-                on_complete: ApplicationCallOnComplete::NoOp,
-                accounts,
-                approval_program,
-                app_arguments,
-                clear_state_program,
-                foreign_apps,
-                foreign_assets,
-                global_state_schema,
-                local_state_schema,
-                extra_pages: extra_pages.unwrap_or(0),
-            }),
-        )
-        .build()
-        .unwrap()
-        .into()
+            CallApplication::new(*sender, app_id)
+                .app_arguments( vec![app_arguments.expect("REASON").into_bytes()])
+                .build(),
+            )
+            .build()
+            .unwrap()
+            .into()
     }
 
     #[method]
