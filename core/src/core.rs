@@ -211,7 +211,7 @@ impl ToVariant for MyTransaction {
                     if let Some(close_to) = axfer.close_to {
                         dict.insert("aclose", MyAddress::from(close_to));
                     }
-                     "axfer"              
+                    "axfer"              
                 }
                 TransactionType::AssetAcceptTransaction(axfer) => {
                     dict.insert("snd", MyAddress::from(axfer.sender));
@@ -230,7 +230,7 @@ impl ToVariant for MyTransaction {
                         .unwrap_or_default();
                     
                     dict.insert("app_id", appl.app_id);
-                     dict.insert("app_arg", q); 
+                    dict.insert("app_arg", q); 
                     dict.insert("txn", w);
                     dict.insert("snd", MyAddress::from(appl.sender));
                     "appl"
@@ -585,8 +585,7 @@ fn get_transaction_type(
                 Ok(TransactionType::AssetAcceptTransaction(axfer))
             }
         }
-        "afrz" => todo!(),
-        
+        "afrz" => todo!(),       
         "appl" => {
             //checks that the app call is valid
             let appl = ApplicationCallTransaction {
