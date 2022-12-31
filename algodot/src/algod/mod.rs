@@ -4,15 +4,14 @@ use algonaut::algod::v2::Algod;
 use algonaut::core::{MicroAlgos, Round};
 use algonaut::model::algod::v2::{PendingTransaction, TransactionResponse};
 use algonaut::transaction::transaction::{
-    AssetAcceptTransaction,    AssetConfigurationTransaction, AssetParams, AssetTransferTransaction,
+AssetAcceptTransaction, AssetConfigurationTransaction, AssetParams, AssetTransferTransaction,
 };
 use algonaut::transaction::tx_group::TxGroup;
-use algonaut::transaction::{Pay, TransactionType, TxnBuilder, builder::CallApplication, };
+use algonaut::transaction::{builder::CallApplication, Pay, TransactionType, TxnBuilder};
 use gdnative::api::Engine;
 use gdnative::prelude::*;
 use gdnative::tasks::{Async, AsyncMethod, Spawner};
 use std::rc::Rc;
-
 
 #[derive(NativeClass)]
 #[inherit(Node)]
@@ -41,7 +40,7 @@ impl Algodot {
             // leave these default values here for now
             algod: Rc::new(
                 Algod::new(
-                   "http://localhost:4001",
+                    "http://localhost:4001",
                     "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                 )
                 .unwrap(),
@@ -279,20 +278,17 @@ impl Algodot {
         sender: Address,
         app_id: u64,
         #[opt] app_arguments: Option<String>, 
-        
-   
     ) -> Transaction { 
-
         TxnBuilder::with(
             &params,
             CallApplication::new(*sender, app_id)
-                .app_arguments( vec![app_arguments.expect("REASON").into_bytes()])
+                .app_arguments(vec![app_arguments.expect("REASON").into_bytes()])
                 .build(),
             )
             .build()
             .unwrap()
             .into()
-    }
+          }
 
     #[method]
     fn construct_asset_opt_in(
