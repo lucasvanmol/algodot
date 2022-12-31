@@ -227,21 +227,15 @@ impl ToVariant for MyTransaction {
                 ///should be further customized to include ClearState,CloseOut,DeleteApplication
                 TransactionType::ApplicationCallTransaction(appl) => {
                     //Creates a Txn Dictionary for Signing the App Call Txn
-                    
-                    
-                    
-                    
-                    let w = Dictionary::new();  
-                    
+
                     //creates a Byte Array from app_arg
                     let q: ByteArray = get_byte_array(appl.app_arguments.as_ref().unwrap().clone())
                         .unwrap_or_default();
                    
                     dict.insert("app_id", appl.app_id);
-                    
-                    
+                                      
                     dict.insert("app_arg", q);
-                    dict.insert("txn", w);
+                    dict.insert("txn", Dictionary::new());
                     dict.insert("snd", MyAddress::from(appl.sender));
                     "appl"
                 }
@@ -595,8 +589,7 @@ fn get_transaction_type(
                 Ok(TransactionType::AssetAcceptTransaction(axfer))
             }
         }
-
-        
+    
         "afrz" => todo!(),       
         "appl" => {
             //checks that the app call is valid
