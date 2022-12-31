@@ -1,16 +1,17 @@
 //Interracts with the godot debugger. Handles transaction types and prints out Algod node errors
 // It uses Transaction Types to trigger a state machine in Algodot core.rs
 
-use algonaut::core::{MicroAlgos, Round, SuggestedTransactionParams };
+use algonaut::core::{MicroAlgos, Round, SuggestedTransactionParams};
 use algonaut::crypto::{HashDigest, Signature};
 use algonaut::model::algod::v2::PendingTransaction;
 use algonaut::transaction::account::Account;
 use algonaut::transaction::transaction::{
-    AssetAcceptTransaction, AssetConfigurationTransaction, AssetParams, AssetTransferTransaction, 
-    Payment, TransactionSignature, ApplicationCallTransaction, ApplicationCallOnComplete,
+    ApplicationCallOnComplete, ApplicationCallTransaction, AssetAcceptTransaction,
+    AssetConfigurationTransaction, AssetParams, AssetTransferTransaction, Payment,
+    TransactionSignature,
 };
 
-use algonaut::transaction::{SignedTransaction, Transaction, TransactionType };
+use algonaut::transaction::{SignedTransaction, Transaction, TransactionType};
 use algonaut::{core::Address, error::ServiceError};
 use derive_more::{Deref, DerefMut, From, Into};
 use gdnative::api::JSON;
@@ -58,9 +59,6 @@ impl From<ServiceError> for AlgodotError {
         AlgodotError::ServiceError(err)
     }
 }
-
-
-
 
 #[derive(Debug, Deref, DerefMut, From)]
 pub struct MyAddress(Address);
@@ -149,7 +147,8 @@ impl ToVariant for MyTransaction {
         dict.insert("lv", self.last_valid.0);
         dict.insert(
             "type",
-            match &self.txn_type { //state machine prints to debug log : https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/enum.TransactionType.html
+            match &self.txn_type {
+                //state machine prints to debug log : https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/enum.TransactionType.html
                 TransactionType::Payment(payment) => {
                     dict.insert("snd", MyAddress::from(payment.sender));
                     dict.insert("rcv", MyAddress::from(payment.receiver));
@@ -203,8 +202,7 @@ impl ToVariant for MyTransaction {
                     }
                     dict.insert("apar", apar);
                     "acfg"
-                }
-                
+                }              
                 //https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.AssetTransferTransaction.html
                 TransactionType::AssetTransferTransaction(axfer) => {
                     dict.insert("snd", MyAddress::from(axfer.sender));
@@ -220,8 +218,7 @@ impl ToVariant for MyTransaction {
                     dict.insert("snd", MyAddress::from(axfer.sender));
                     dict.insert("xaid", axfer.xfer);
                     "axfer"
-                }
-                
+                }             
                 //https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.ApplicationCallTransaction.html
                 //defaults to a noOp on transaction complete
                 //should be further customized to include ClearState,CloseOut,DeleteApplication
