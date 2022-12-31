@@ -60,6 +60,9 @@ var _info : Dictionary
 var wait # waits until txn is completed
 var status: bool
 
+#***********Node State Parameters************#
+
+var algod_node_count: int = 0 #stops multiple instance bug
 
 
 func _ready():
@@ -68,19 +71,34 @@ func _ready():
 	if  debug_txn:
 		_run_debug_test()
 
-func create_algod_node(): 
-	print(" -- Initialize Algod")
-	algod = Algod.new() 
+func create_algod_node(network_type: String):
+	if algod_node_count == 0: 
+		print(" -- Initialize Algod", network_type)
 
-	
-	algod.url = "http://localhost:4001"  #Used in sandbox environment. Used Change this variable for testnet/ mainnet
-	algod.token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" #Used in sandbox environment. Used Change this variable for testnet
-	
+		if network_type == "localhost":
+			algod = Algod.new() 
+			algod.url = "http://localhost:4001"  #Used in sandbox environment. Used Change this variable for testnet/ mainnet
+			algod.token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" #Used in sandbox environment. Used Change this variable for testnet
+			algod_node_count += 1
+		elif network_type == "TESTNET":
+			algod = Algod.new() 
+			var url = "https://node.testnet.algoexplorerapi.io"
+			var token = ""
+			
+			var headers_ : PoolStringArray = ["User-Agent","DoYouLoveMe?"]
+			
+			algod.set_url(url)
+			algod.set_token(token)
+			algod.set_headers(headers_)
+			algod_node_count += 1
+		elif network_type == "MAINNET":
+			algod_node_count += 1
+			return
 	
 
 
 func _run_debug_test():
-	create_algod_node()
+	create_algod_node('localhost')
 
 	print(" -- Get funder account")
 
@@ -329,4 +347,18 @@ func opt_in_asset_transaction( from_address: String, _asset_index):
 		)
 	return optin_tx
 
+func transferAssets(params,_funder_mnemonic: String ,  _receiver_address : String,_asset_id, _amount: int):
+	var _funder_address=algod.get_address(_funder_mnemonic)
+	
+	# Construct Aset tx
+	construct_asset_transfer(params,_funder_address, _receiver_address, _amount, _asset_id)
+	
+	# Raw Sign Asset tx
+	stx = algod.sign_transaction(asset_tx, _funder_mnemonic)
+	
+	#Generating transaction Id from signed transaction
+	txid = yield(algod.send_transaction(stx), "completed") 
+	
+	print (txid)
+	
 
