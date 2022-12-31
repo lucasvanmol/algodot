@@ -198,8 +198,7 @@ impl ToVariant for MyTransaction {
                             apar.insert("r", MyAddress::from(*reserve))
                         }
                     }
-                    dict.insert("apar", apar);
-                 
+                    dict.insert("apar", apar);              
                     "acfg"                    
                 }
                 //https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.AssetTransferTransaction.html.
