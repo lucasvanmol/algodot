@@ -4,7 +4,7 @@ use algonaut::algod::v2::Algod;
 use algonaut::core::{MicroAlgos, Round};
 use algonaut::model::algod::v2::{PendingTransaction, TransactionResponse};
 use algonaut::transaction::transaction::{
-AssetAcceptTransaction, AssetConfigurationTransaction, AssetParams, AssetTransferTransaction,
+    AssetAcceptTransaction, AssetConfigurationTransaction, AssetParams, AssetTransferTransaction,
 };
 use algonaut::transaction::tx_group::TxGroup;
 use algonaut::transaction::{builder::CallApplication, Pay, TransactionType, TxnBuilder};
@@ -284,11 +284,11 @@ impl Algodot {
             CallApplication::new(*sender, app_id)
                 .app_arguments(vec![app_arguments.expect("REASON").into_bytes()])
                 .build(),
-            )
-            .build()
-            .unwrap()
-            .into()
-          }
+          )
+          .build()
+          .unwrap()
+          .into()
+    }
 
     #[method]
     fn construct_asset_opt_in(
