@@ -10,7 +10,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 tokio = { version = "1.10", features = ["rt"] }
-gdnative = { version = "0.11", features = ["async"] }
+gdnative = { version = "0.10", features = ["async"] }
 futures = "0.3"
 algonaut = { git = "https://github.com/manuelmauro/algonaut", rev = "75bce54" }
 algodot_macros = { path = "../macros" }
