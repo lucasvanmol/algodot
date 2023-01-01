@@ -1,7 +1,7 @@
 [package]
 name = "algodot"
 version = "0.2.1"
-edition = "2023"
+edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
