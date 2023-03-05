@@ -312,7 +312,7 @@ impl Algodot {
         )
         .build()
         .unwrap()
-        .into()
+        .into() //uses Core Traits
     }
 
     #[method]
