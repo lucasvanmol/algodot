@@ -270,38 +270,6 @@ impl Algodot {
         .into()
     }
 
-    #[method]
-    #[allow(clippy::too_many_arguments)]
-    
-    fn construct_app_call_method(
-        &self,
-        #[base] _base: &Node,
-        app_id: u64,
-        method: AbiMethod,
-        method_args: Vec<AbiArgValue>,
-        fee: TxnFee,
-        sender: Address,
-        on_complete: ApplicationCallOnComplete,
-        clear_program: Option<CompiledTeal>,
-        global_schema: Option<StateSchema>,
-        local_schema: Option<StateSchema>,
-        extra_pages: u32,
-        note: Option<Vec<u8>>,
-        lease: Option<HashDigest>,
-        rekey_to: Option<Address>,
-        signer: TransactionSigner,
-    
-    
-    ) -> Transaction {
-        
-        TxnBuilder::with(
-        )
-        .build()
-        .unwrap()
-        .into()
-    
-    
-    }
     
     #[method]
     #[allow(clippy::too_many_arguments)]
