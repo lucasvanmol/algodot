@@ -1,16 +1,288 @@
+
+pub mod escrow {
+
+    /*Atomic Transaction Composer Helper Modules*/
+
+    use algonaut::algod::v2::Algod;
+    use algonaut::abi::abi_type::AbiValue::Int;
+    use algonaut::core::Address;
+    
+    use num_bigint::BigUint;
+
+    use algonaut::{
+        
+        atomic_transaction_composer::{
+            transaction_signer::TransactionSigner, AbiArgValue, //AbiMethodReturnValue,
+            AtomicTransactionComposer, //AbiReturnDecodeError, AddMethodCallParams, 
+            TransactionWithSigner, //AtomicTransactionComposerStatus, 
+        },
+        error::ServiceError,
+    };
+    
+   //;
+         //AbiArgType,AbiReturn,, ReferenceArgType,, AbiReturnType  
+        //abi_type::{AbiType, AbiValue as OtherAbiValue},
+    //};
+    use algonaut::core::{to_app_address, Address as OtherAddress, MicroAlgos, CompiledTeal};
+    use algonaut::abi::abi_interactions::AbiMethod;
+    use algonaut::transaction::{
+        builder::TxnFee, builder::TxnFee::Fixed,
+        transaction::{ApplicationCallOnComplete, StateSchema},
+        Pay, TxnBuilder,
+    };
+
+    use algonaut::core::SuggestedTransactionParams as OtherSuggestedTransactionParams;
+    use algonaut::transaction::{transaction::Payment, account::Account};
+  
+    use algonaut::crypto::HashDigest;
+  
+    use std::convert::TryInto;
+   
+    //use crate::params::params::MySuggestedTransactionParams;
+    
+    #[derive(Debug)]
+    //lifetime Parameter
+    pub struct Foo <'a> {
+        pub withdrw_amt: u32,
+        pub withdrw_to_addr: [u8; 32],
+        pub arg1: AbiArgValue,
+        pub arg2: AbiArgValue,
+        pub _app_id: u64,
+        pub _escrow_address: Address,
+        pub atc: &'a AtomicTransactionComposer,
+    }
+
+    trait MyTrait {
+        type Foo <'a>;
+        type Params;
+        type Parsed;
+        type Payment;
+
+        fn _app_id(&self, x: u64) -> u64;
+        //fn default() -> Option<String>{ None }
+        //fn suggested_tx_params(&self) -> OtherSuggestedTransactionParams { OtherSuggestedTransactionParams::default() }
+        fn arg1(withdrw_amt: u64) -> AbiArgValue { AbiArgValue::AbiValue(Int(withdrw_amt.into())) }
+        fn arg2(withdrw_amt: u64) -> AbiArgValue { AbiArgValue::AbiValue(Int(withdrw_amt.into())) }
+    }
+
+    impl MyTrait for Foo <'_>{
+        type Foo <'a> = Foo<'a>;
+        type Parsed = Option<String>;
+        type Payment = Option<Payment>;
+        type Params = Option<OtherSuggestedTransactionParams>;
+        fn _app_id(&self, x: u64) -> u64 { x }
+    }
+
+    impl Foo <'_> {
+        // Adding method to create application call
+        fn get_call(&self) -> Result<ApplicationCallOnComplete, ServiceError> {
+            //let func_args = vec![self.arg1.clone(), self.arg2.clone()];
+            
+            todo!()
+            
+        }
+
+        // Adding method to create pay transaction
+        fn get_payment(&self) -> Result<Payment, ServiceError> {
+            todo!()
+           // tx
+        }
+
+        fn arg1(&self)-> AbiArgValue{ 
+            todo!()
+            
+        }
+        
+        pub fn note(size : u32) -> Option <Vec<u8>>{
+            Some(vec![size.try_into().unwrap()])
+
+        }
+    
+
+
+        pub fn withdraw_amount(amount : u32) -> AbiArgValue {
+            /*
+            Converts a U64 int to Big Uint and returns an AbiArg Value
+            
+            Temporarily Disabling
+            */
+            //let withdrw_amt : BigUint = BigUint::new(vec![amount]); //in MicroAlgos
+            
+
+            //let arg1 : AbiArgValue = AbiArgValue::AbiValue( Int(withdrw_amt));
+            //arg1
+
+
+            todo!()
+
+        }
+            
+    
+        
+        pub fn withdraw(_acct1: Account ){
+             /* 
+            Withdraw Method Parameters for Escrow SmartContract
+            
+                Docs: https://docs.rs/num-bigint/0.4.3/num_bigint/struct.BigUint.html
+
+                Does nothing
+            */
+
+        }
+        
+
+        //use algonaut_core::Address;
+        pub fn pay(to_address : algonaut::core::Address , acct1 : Account, _params : algonaut::core::SuggestedTransactionParams) -> algonaut::transaction::transaction::Transaction{
+            /*
+                Constructs a Payment Transaction to an Address
+            */
+
+             let _t = TxnBuilder::with(
+
+                    &_params,
+
+                    Pay::new(acct1.address(), to_address, MicroAlgos(123_456)).build(),
+
+                )
+
+                .build()
+                .unwrap();
+            
+            return _t;
+        }
+
+        pub fn app_address (app_id : &u64) -> Address{
+            to_app_address(*app_id)
+        }
+        
+        pub fn deposit(_algod : Algod , acct1_3 : Account ,  params : algonaut::core::SuggestedTransactionParams) -> algonaut::core::SuggestedTransactionParams {
+            /*
+            Deposit Method Parameters for Escrow SmartContract
+            Unused and Depreciated
+           
+            Does
+            */
+
+            //Params
+            //
+            //App ID
+            let _app_id = 161737986;
+
+            
+            //Get Escrow Address From App ID
+
+            let _escrow_address = Foo::app_address(&_app_id); //to_app_address(_app_id.clone());
+           
+            println!(" building Pay transaction to Escrow Address: {}", &_escrow_address);
+
+            let _t = Foo::pay(_escrow_address, acct1_3.clone(), params.clone());                
+
+            // create a transaction with signer with the current transaction
+
+            let _signer = TransactionSigner::BasicAccount(acct1_3);
+
+
+            let tx_with_signer = TransactionWithSigner { tx: _t, signer: _signer };
+
+
+            let mut atc = AtomicTransactionComposer::default();  
+
+            // Deposit
+            // Add Payment Txn to 
+            // Should Ideally Match To A Statemachine Behaviour Bloc
+            atc.add_transaction(tx_with_signer).unwrap();
+
+            params
+
+ 
+        }
+
+        pub fn new() -> AtomicTransactionComposer{
+        /*
+        Constructs a Default Atomic Transation Composer
+        */
+            AtomicTransactionComposer::default()
+        
+        }
+     
+        pub fn address_to_bytes(addr: String) -> [u8; 32]{ 
+        /*
+        Constructs a 32 Bit Byte Slice froma Given Address String
+        */   
+            let mut _to_addr: [u8; 32] = [0; 32];
+            //_to_addr.copy_from_slice(&acct1.address().to_string().as_bytes()[..32]);
+            _to_addr.copy_from_slice(&addr.as_bytes()[..32]);
+
+            _to_addr
+            
+        }
+
+        //let arg2: AbiArgValue = AbiArgValue::AbiValue(algonaut_abi::abi_type::AbiValue::Address(OtherAddress::new(withdrw_to_addr)));
+      
+        pub fn address(addr : [u8; 32]) -> AbiArgValue {
+            /* Returns an Address abi value from an Address as [u8,32]*/
+            AbiArgValue::AbiValue(algonaut::abi::abi_type::AbiValue::Address(OtherAddress::new(addr)))
+
+        } 
+
+        
+
+        pub fn fee(amount : u64) -> TxnFee{Fixed(MicroAlgos(amount))}
+
+        pub fn construct_app_call_method(
+        /*
+        Constructs an App Call Method as a Rust Module
+        
+        */
+        
+        //&AtomicTransactionComposer
+        &self,
+        //#[base] _base: &Node,
+        _app_id: u64,
+        _method: AbiMethod,
+        _method_args: Vec<AbiArgValue>,
+        _fee: TxnFee,//Fixed(MicroAlgos(2500u64)), //make customizable
+        _sender: Address,
+        _on_complete: ApplicationCallOnComplete,
+        _clear_program: Option<CompiledTeal>,
+        _global_schema: Option<StateSchema>,
+        _local_schema: Option<StateSchema>,
+        _extra_pages: u32,
+        _note: Option<Vec<u8>>,
+        _lease: Option<HashDigest>,
+        _rekey_to: Option<Address>,
+        _signer: TransactionSigner,
+    
+    
+    ) -> Result<Foo<'_>, ServiceError> {
+            todo!()
+            
+        }
+        
+
+    } 
+
+}
+
+
+
+
+
+
 //Interracts with the godot debugger. Handles transaction types and prints out Algod node errors
 // It uses Transaction Types to trigger a state machine in Algodot core.rs
 
-use algonaut::core::{MicroAlgos, Round, SuggestedTransactionParams };
+use algonaut::core::{MicroAlgos, Round, SuggestedTransactionParams};
 use algonaut::crypto::{HashDigest, Signature};
 use algonaut::model::algod::v2::PendingTransaction;
 use algonaut::transaction::account::Account;
 use algonaut::transaction::transaction::{
-    AssetAcceptTransaction, AssetConfigurationTransaction, AssetParams, AssetTransferTransaction, 
-    Payment, TransactionSignature, ApplicationCallTransaction, ApplicationCallOnComplete,
+    ApplicationCallOnComplete, ApplicationCallTransaction, AssetAcceptTransaction,
+    AssetConfigurationTransaction, AssetParams, AssetTransferTransaction, Payment,
+    TransactionSignature,
 };
 
-use algonaut::transaction::{SignedTransaction, Transaction, TransactionType };
+use algonaut::transaction::{SignedTransaction, Transaction, TransactionType};
 use algonaut::{core::Address, error::ServiceError};
 use derive_more::{Deref, DerefMut, From, Into};
 use gdnative::api::JSON;
@@ -18,6 +290,9 @@ use gdnative::prelude::*;
 use serde::Serialize;
 use std::str::FromStr;
 use thiserror::Error;
+
+
+
 
 /// This file contains implementations of ToVariant and FromVariant for algonaut types.
 ///
@@ -59,13 +334,9 @@ impl From<ServiceError> for AlgodotError {
     }
 }
 
-
-
-
 #[derive(Debug, Deref, DerefMut, From)]
 pub struct MyAddress(Address);
 
-//used when constructing a variant 
 impl FromVariant for MyAddress {
     fn from_variant(variant: &Variant) -> Result<Self, FromVariantError> {
         Address::from_str(&variant.to_string())
@@ -141,6 +412,10 @@ impl FromVariant for MySuggestedTransactionParams {
 pub struct MyTransaction(pub Transaction);
 
 impl ToVariant for MyTransaction {
+
+    //Implements into() method for algodot::core mod rs.
+    //bugs out on gdnative 11
+
     fn to_variant(&self) -> Variant {
         let dict = Dictionary::new();
         dict.insert("fee", self.fee.0);
@@ -149,7 +424,8 @@ impl ToVariant for MyTransaction {
         dict.insert("lv", self.last_valid.0);
         dict.insert(
             "type",
-            match &self.txn_type { //state machine prints to debug log : https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/enum.TransactionType.html
+            match &self.txn_type {
+                //state machine prints to debug log : https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/enum.TransactionType.html
                 TransactionType::Payment(payment) => {
                     dict.insert("snd", MyAddress::from(payment.sender));
                     dict.insert("rcv", MyAddress::from(payment.receiver));
@@ -159,7 +435,6 @@ impl ToVariant for MyTransaction {
                     };
                     "pay"
                 }
-                TransactionType::KeyRegistration(_) => todo!(),
                 TransactionType::AssetConfigurationTransaction(cfg) => {
                     dict.insert("snd", MyAddress(cfg.sender));
                     let apar = Dictionary::new();
@@ -204,7 +479,6 @@ impl ToVariant for MyTransaction {
                     dict.insert("apar", apar);
                     "acfg"
                 }
-                
                 //https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.AssetTransferTransaction.html
                 TransactionType::AssetTransferTransaction(axfer) => {
                     dict.insert("snd", MyAddress::from(axfer.sender));
@@ -221,25 +495,24 @@ impl ToVariant for MyTransaction {
                     dict.insert("xaid", axfer.xfer);
                     "axfer"
                 }
-                
                 //https://docs.rs/algonaut_transaction/0.4.2/algonaut_transaction/transaction/struct.ApplicationCallTransaction.html
                 //defaults to a noOp on transaction complete
                 //should be further customized to include ClearState,CloseOut,DeleteApplication
-                TransactionType::ApplicationCallTransaction(appl) => { 
+                TransactionType::ApplicationCallTransaction(appl) => {
                     //Creates a Txn Dictionary for Signing the App Call Txn
-                    let w = Dictionary::new(); 
-                    
+
                     //creates a Byte Array from app_arg
                     let q: ByteArray = get_byte_array(appl.app_arguments.as_ref().unwrap().clone())
                         .unwrap_or_default();
-                    dict.insert( "app_id", appl.app_id);
-                    dict.insert("app_arg", q); 
-                    dict.insert( "txn", w);
-                    dict.insert( "snd", MyAddress::from(appl.sender));
+                    dict.insert("app_id", appl.app_id);
+                    dict.insert("app_arg", q);
+                    dict.insert("txn", Dictionary::new());
+                    dict.insert("snd", MyAddress::from(appl.sender));
                     "appl"
                 }
                 TransactionType::AssetClawbackTransaction(_) => todo!(),
-                TransactionType::AssetFreezeTransaction(_) => todo!(), 
+                TransactionType::AssetFreezeTransaction(_) => todo!(),
+                TransactionType::KeyRegistration(_) => todo!(),
             },
         );
         if let Some(gen) = &self.genesis_id {
@@ -338,18 +611,16 @@ impl FromVariant for MySignedTransaction {
     }
 }
 
-//Convert's appl call txn to Godot Variants
-//#[derive(Deref, DerefMut, From, Debug)]
+///Convert's appl call txn to Godot Variants.
+///#[derive(Deref, DerefMut, From, Debug)]
 //pub struct MyApplCallTransaction(pub ApplicationCallTransaction);
-
-//impl FromVariant for MyApplCallTransaction {
-//    fn from_variant(&self) -> Variant {
-//     to_json_dict(&self)
-//    }
-//}    
- 
-
-
+///
+///impl FromVariant for MyApplCallTransaction {
+///    fn from_variant(&self) -> Variant {
+///     to_json_dict(&self)
+///   }
+///
+///}    
 
 // Helper functions //
 
@@ -572,6 +843,7 @@ fn get_transaction_type(
             Ok(TransactionType::AssetConfigurationTransaction(acfg))
         }
         "keyreg" => todo!(),
+        "afrz" => todo!(),
         "axfer" => {
             if let Ok(amount) = get_u64(dict, "aamt") {
                 let axfer = AssetTransferTransaction {
@@ -590,8 +862,8 @@ fn get_transaction_type(
                 Ok(TransactionType::AssetAcceptTransaction(axfer))
             }
         }
-        "afrz" => todo!(),
-        "appl" => { //checks that the app call is valid
+        "appl" => {
+            //checks that the app call is valid
             let appl = ApplicationCallTransaction {
                 sender: get_address(dict, "snd")?,
                 app_id: Some(get_u64(dict, "app_id")?),
