@@ -90,7 +90,7 @@ pub mod bar {
 }
 
 #[macro_export]
-pub mod escrow {
+mod escrow {
 
     /*Atomic Transaction Composer Helper Modules*/
     use algonaut::atomic_transaction_composer::transaction_signer::TransactionSigner::BasicAccount;
@@ -98,12 +98,12 @@ pub mod escrow {
     use algonaut::transaction::account::Account;
     //use crate::algod::Account;
     
-    use algonaut::algod::v2::Algod;
+    //use algonaut::algod::v2::Algod;
     use algonaut::abi::abi_type::AbiValue::Int;
     use algonaut::core::Address;
     
     //use num_bigint::BigUint;
-    use crate::algod::bar::Foo;
+   // use crate::algod::bar::Foo;
     use algonaut::{
         
         atomic_transaction_composer::{
@@ -125,23 +125,34 @@ pub mod escrow {
     use algonaut::core::SuggestedTransactionParams as OtherSuggestedTransactionParams;
     use algonaut::transaction::{transaction::Payment}; //account::Account
   
-    use algonaut::crypto::HashDigest;
+    //use algonaut::crypto::HashDigest;
     use std::convert::TryInto;   
     use gdnative::prelude::*;
 
-    use std::marker::Sized;
+   // use std::marker::Sized;
     use std::fmt::Display;
-    
+    use algonaut::atomic_transaction_composer::AtomicTransactionComposerStatus as OtherAtomicTransactionComposerStatus;
+
     use crate::algod::bar::Foo as OtherFoo;
     //#[derive(Clone, Debug, escrow::ToVariant::to_variant(&atc))] //PartialEq,
     
     //#[derive(Clone, Debug, escrow::MyTrait::to_variant(&atc))] //PartialEq,
             
-    #[derive(Clone, Debug, gdnative::prelude::ToVariant::to_variant(&atc))] //PartialEq,
+    #[derive(Clone<'_>, Debug<'_>, gdnative::prelude::ToVariant::to_variant(atc))] //PartialEq,
     
     //#[derive(Clone, Debug, escrow::OwnedToVariant::to_variant(&atc))] //PartialEq,
 
     //#[derive(Clone, Debug, ToVariant)] //PartialEq,
+     pub struct Foo {
+        pub withdrw_amt: u32,
+        pub withdrw_to_addr: [u8; 32],
+        pub arg1: AbiArgValue,
+        pub arg2: AbiArgValue,
+        pub _app_id: u64,
+        pub _escrow_address: Address,
+        pub atc: &'a AtomicTransactionComposer,
+        
+    }
 
     //lifetime Parameter
     pub struct Foo <'a> {
@@ -206,9 +217,12 @@ pub mod escrow {
         fn to_variant(&self) -> &AtomicTransactionComposer ;//{ todo!()}
     }
 
+    pub trait AtomicTransactionComposerStatus{
+        fn status(&self) -> dyn AtomicTransactionComposerStatus ;
+    }
     /*Implements all traits for Foo Crate*/
-    impl <'a> MyTrait <'_> for Foo{//Foo <'a>{
-        type Foo = Foo;//<'a>;
+    impl <'a, 'c> MyTrait <'a> for Foo<'a>{//Foo <'a>{
+        type Foo <'a> = Foo<'a>;
         type Parsed = Option<String>;
         type Payment = Option<Payment>;
         type Params = Option<OtherSuggestedTransactionParams>;
@@ -220,18 +234,24 @@ pub mod escrow {
         fn _app_id(&self, x: u64) -> u64 { x }
         
     }
-    impl AtomicTransactionComposerStatus for dyn ToString {}
+    impl AtomicTransactionComposerStatus for dyn ToString { 
+        fn status(&self ) -> dyn ToString {
+            <dyn AtomicTransactionComposerStatus>::to_string()
+            //"dfadfsdf".to_string()
+        }
+        
+    }
     impl OwnedToVariant for AtomicTransactionComposer {
         type Sized = i32;
         
-        fn to_variant(&self) -> &AtomicTransactionComposer { AtomicTransactionComposer.status().to_string()}
+        fn to_variant(&self) -> &AtomicTransactionComposer { AtomicTransactionComposer::status().to_string()}
     
 
     }
     impl ToVariant for AtomicTransactionComposer {
         type Sized = i32;
         
-        fn to_variant(&self) -> &AtomicTransactionComposer { AtomicTransactionComposer.status().to_string()}
+        fn to_variant(&self) -> &AtomicTransactionComposer { AtomicTransactionComposer::status().to_string()}
     
       
     }
@@ -252,7 +272,7 @@ pub mod escrow {
     }
       
         impl <'a> MyTrait <'_> for &'a AtomicTransactionComposer {
-            type Foo = Foo;//Foo<'a>;
+            type Foo = Foo<'a>;//Self::Foo;//Foo<'a>;
             type Parsed = Option<String>;
             type Payment= Option<Payment>;
             type Params = Option<OtherSuggestedTransactionParams>;
@@ -282,7 +302,7 @@ pub mod escrow {
         }
 
 
-    impl Foo{//Foo <'_> {
+    impl Foo<'_>{
         // Adding method to create application call
         fn get_call(&self) -> Result<ApplicationCallOnComplete, ServiceError> {
             //let func_args = vec![self.arg1.clone(), self.arg2.clone()];
@@ -434,31 +454,32 @@ pub mod escrow {
 
         pub fn fee(amount : u64) -> TxnFee{Fixed(MicroAlgos(amount))}
 
-        pub fn construct_app_call_method(
+        //pub fn construct_app_call_method(
         /*
         Constructs an App Call Method as a Rust Module
         
+        Depreciated
         */
         
  
-        &self,
-        _app_id: u64,
-        _method: AbiMethod,
-        _method_args: Vec<AbiArgValue>,
-        _fee: TxnFee,//Fixed(MicroAlgos(2500u64)), //make customizable
-        _sender: Address,
-        _on_complete: ApplicationCallOnComplete,
-        _clear_program: Option<CompiledTeal>,
-        _global_schema: Option<StateSchema>,
-        _local_schema: Option<StateSchema>,
-        _extra_pages: u32,
-        _note: Option<Vec<u8>>,
-        _lease: Option<HashDigest>,
-        _rekey_to: Option<Address>,
-        _signer: TransactionSigner,
+        //&self,
+        //_app_id: u64,
+        //_method: AbiMethod,
+        //_method_args: Vec<AbiArgValue>,
+        //_fee: TxnFee,//Fixed(MicroAlgos(2500u64)), //make customizable
+        //_sender: Address,
+        //_on_complete: ApplicationCallOnComplete,
+        //_clear_program: Option<CompiledTeal>,
+        //_global_schema: Option<StateSchema>,
+        //_local_schema: Option<StateSchema>,
+        //_extra_pages: u32,
+        //_note: Option<Vec<u8>>,
+        //_lease: Option<HashDigest>,
+        //_rekey_to: Option<Address>,
+        //_signer: TransactionSigner,
+      //  )
     
-    
-    ) -> Result<<'_>, ServiceError> {todo!()}
+        // -> Result<Foo<'_>, ServiceError> {todo!()}
         
 
     } 
@@ -809,7 +830,7 @@ impl Algodot {
     godot_dbg!("retrieving suggested params");
     let params = self.algod.suggested_transaction_params().await.unwrap();
     //Txn Details As a Struct
-    let details = escrow::Foo { 
+    let details = OtherFoo::Foo { 
             withdrw_amt : 0u32,//Foo::withdraw_amount(0u32),//BigUint::new(vec![0]),//BigUint { data: vec![0u64] },//BigUint = BigUint::new(vec![0]), 
             withdrw_to_addr: _to_addr.clone(), 
             arg1: Foo::withdraw_amount(0u32), 
