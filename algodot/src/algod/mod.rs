@@ -130,6 +130,7 @@ pub mod escrow {
     use gdnative::prelude::*;
 
     use std::marker::Sized;
+    use std::fmt::Display;
     
     use crate::algod::bar::Foo as OtherFoo;
     //#[derive(Clone, Debug, escrow::ToVariant::to_variant(&atc))] //PartialEq,
@@ -219,6 +220,7 @@ pub mod escrow {
         fn _app_id(&self, x: u64) -> u64 { x }
         
     }
+    impl AtomicTransactionComposerStatus for dyn ToString {}
     impl OwnedToVariant for AtomicTransactionComposer {
         type Sized = i32;
         
@@ -781,7 +783,7 @@ impl Algodot {
 
     #[method]
     #[allow(clippy::too_many_arguments)]
-    async fn construct_atc: _(
+    async fn construct_atc (
         /* Atomic Transaction Composer*/
         &self,
         #[base] _base: &Node,
