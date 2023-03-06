@@ -222,7 +222,7 @@ mod escrow {
     }
     /*Implements all traits for Foo Crate*/
     impl <'a, 'c> MyTrait <'a> for Foo<'a>{//Foo <'a>{
-        type Foo <'a> = Foo<'a>;
+        type Foo  = Foo<'a>;
         type Parsed = Option<String>;
         type Payment = Option<Payment>;
         type Params = Option<OtherSuggestedTransactionParams>;
@@ -244,14 +244,14 @@ mod escrow {
     impl OwnedToVariant for AtomicTransactionComposer {
         type Sized = i32;
         
-        fn to_variant(&self) -> &AtomicTransactionComposer { AtomicTransactionComposer::status().to_string()}
+        fn to_variant(&self, _T:AtomicTransactionComposer) -> AtomicTransactionComposer { _T::status().to_string()}
     
 
     }
     impl ToVariant for AtomicTransactionComposer {
         type Sized = i32;
         
-        fn to_variant(&self) -> &AtomicTransactionComposer { AtomicTransactionComposer::status().to_string()}
+        fn to_variant(&self, _T:AtomicTransactionComposer) -> &AtomicTransactionComposer { _T::status().to_string()}
     
       
     }
@@ -830,7 +830,7 @@ impl Algodot {
     godot_dbg!("retrieving suggested params");
     let params = self.algod.suggested_transaction_params().await.unwrap();
     //Txn Details As a Struct
-    let details = OtherFoo::Foo { 
+    let details = <bar::Foo as Trait>::Foo{ //OtherFoo::Foo { 
             withdrw_amt : 0u32,//Foo::withdraw_amount(0u32),//BigUint::new(vec![0]),//BigUint { data: vec![0u64] },//BigUint = BigUint::new(vec![0]), 
             withdrw_to_addr: _to_addr.clone(), 
             arg1: Foo::withdraw_amount(0u32), 
