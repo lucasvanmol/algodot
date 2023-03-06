@@ -156,7 +156,7 @@ pub mod escrow {
     
 
     //All lifetime traits
-    trait MyTrait<'a> {
+    pub trait MyTrait<'a> {
         type Foo ;
         type Params;
         type Parsed;
@@ -237,7 +237,7 @@ pub mod escrow {
     impl ToVariant for &&AtomicTransactionComposer {
         type Sized = i32;
         
-        fn to_variant(&self) -> &AtomicTransactionComposer { &AtomicTransactionComposer.status().to_string()}
+        fn to_variant(&self) -> &AtomicTransactionComposer { &AtomicTransactionComposer::default().status().to_string()}
     
       
     }
