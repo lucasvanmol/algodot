@@ -5,12 +5,15 @@ pub mod bar {
 
 
     use algonaut::abi::abi_interactions::AbiMethod;
-
+    use algonaut::atomic_transaction_composer::AtomicTransactionComposer;
+    use gdnative::core_types::{Variant, ToVariant};
+    
     pub struct Foo {
         pub name: String,
         pub description: String,
         pub type_: String, 
         pub parsed: Option<String>,
+        
     }
 
     impl MyTrait for Foo {
@@ -40,6 +43,8 @@ pub mod bar {
         fn r#type() -> String;
         fn parsed() -> Option<AbiType>;
     }
+
+
 
     impl Foo {
         //Doc : https://developer.algorand.org/docs/get-details/transactions/signatures/#single-signatures
@@ -84,7 +89,7 @@ pub mod bar {
     }
 }
 
-
+#[macro_export]
 pub mod escrow {
 
     /*Atomic Transaction Composer Helper Modules*/
@@ -98,23 +103,19 @@ pub mod escrow {
     use algonaut::core::Address;
     
     //use num_bigint::BigUint;
-
+    use crate::algod::bar::Foo;
     use algonaut::{
         
         atomic_transaction_composer::{
-            transaction_signer::TransactionSigner, AbiArgValue, //AbiMethodReturnValue,
+            transaction_signer::TransactionSigner, AbiArgValue, 
             AtomicTransactionComposer, //AbiReturnDecodeError, AddMethodCallParams, 
             TransactionWithSigner, //AtomicTransactionComposerStatus, 
         },
         error::ServiceError,
     };
     
-   //;
-         //AbiArgType,AbiReturn,, ReferenceArgType,, AbiReturnType  
-        //abi_type::{AbiType, AbiValue as OtherAbiValue},
-    //};
     use algonaut::core::{to_app_address, Address as OtherAddress, MicroAlgos, CompiledTeal};
-    use algonaut::abi::abi_interactions::AbiMethod;
+    //use algonaut::abi::abi_interactions::AbiMethod;
     use algonaut::transaction::{
         builder::TxnFee, builder::TxnFee::Fixed,
         transaction::{ApplicationCallOnComplete, StateSchema},
@@ -125,15 +126,22 @@ pub mod escrow {
     use algonaut::transaction::{transaction::Payment}; //account::Account
   
     use algonaut::crypto::HashDigest;
-  
-    use std::convert::TryInto;
-   
-    //use crate::params::params::MySuggestedTransactionParams;
-    use gdnative::prelude::*;//::ToVariant;
+    use std::convert::TryInto;   
+    use gdnative::prelude::*;
 
+    use std::marker::Sized;
+    
+    use crate::algod::bar::Foo as OtherFoo;
+    //#[derive(Clone, Debug, escrow::ToVariant::to_variant(&atc))] //PartialEq,
+    
+    //#[derive(Clone, Debug, escrow::MyTrait::to_variant(&atc))] //PartialEq,
+            
+    #[derive(Clone, Debug, gdnative::prelude::ToVariant::to_variant(&atc))] //PartialEq,
+    
+    //#[derive(Clone, Debug, escrow::OwnedToVariant::to_variant(&atc))] //PartialEq,
 
+    //#[derive(Clone, Debug, ToVariant)] //PartialEq,
 
-    #[derive(Clone, Debug, ToVariant)] //PartialEq,
     //lifetime Parameter
     pub struct Foo <'a> {
         pub withdrw_amt: u32,
@@ -143,49 +151,136 @@ pub mod escrow {
         pub _app_id: u64,
         pub _escrow_address: Address,
         pub atc: &'a AtomicTransactionComposer,
+        
     }
+    
 
-    trait MyTrait {
-        type Foo <'a>;
+    //All lifetime traits
+    trait MyTrait<'a> {
+        type Foo ;
         type Params;
         type Parsed;
         type Payment;
+        type AtomicTransactionComposer ;
+        //type ToVariant;
+        type Sized ;//: u64; //= 7u64;
+        type ToVariant = dyn ToVariant<Sized = usize>;
+        type OwnedToVariant;
+        //type NewTrait;
+        
 
         fn _app_id(&self, x: u64) -> u64;
         //fn default() -> Option<String>{ None }
         //fn suggested_tx_params(&self) -> OtherSuggestedTransactionParams { OtherSuggestedTransactionParams::default() }
         fn arg1(withdrw_amt: u64) -> AbiArgValue { AbiArgValue::AbiValue(Int(withdrw_amt.into())) }
         fn arg2(withdrw_amt: u64) -> AbiArgValue { AbiArgValue::AbiValue(Int(withdrw_amt.into())) }
+
+        fn get(&self) -> &'a AtomicTransactionComposer { todo!()}
+        
+        //fn to_variant(&self) -> dyn NewTrait <Sized = u64>{
+        //    (**self).clone().into_shared().to_variant()
+        //}
+        fn to_variant(&'a self) -> &'a AtomicTransactionComposer {&AtomicTransactionComposer::default()}
+  
     }
+
+    //trait NewTrait: ToVariant + Sized  {
+       
+    // fn static_foo<T:NewTrait + ?Sized>(b: &T) {todo!()}
+        
+    //}
+
     //Docs: https://godot-rust.github.io/docs/gdnative/prelude/struct.Variant.html
-    impl ToVariant for  withdrw_to_addr { //[u8; 32]
-    fn to_variant(&self) -> PoolArray<u8> {
-        PoolArray::from_variant_array(self)
-       }
+
+    //trait NewTrait: escrow::ToVariant + Sized {}
+    pub trait OwnedToVariant{
+        type Sized ;
+        
+        fn to_variant(&self) -> &AtomicTransactionComposer ;//{ todo!()}
     }
 
-    impl ToVariant for atc {
-    fn to_variant(&self) -> Variant {
-        Variant::new(self)
+    pub trait ToVariant{
+        type Sized ;
+        
+        fn to_variant(&self) -> &AtomicTransactionComposer ;//{ todo!()}
     }
 
-    impl ToVariant for &&AtomicTransactionComposer {//: [u8; 32] {
-    fn to_variant(&self) -> Variant {
-        Variant::new(self)
-        }
-
-    }
-}
-
-    impl MyTrait for Foo <'_>{
-        type Foo <'a> = Foo<'a>;
+    /*Implements all traits for Foo Crate*/
+    impl <'a> MyTrait <'_> for Foo{//Foo <'a>{
+        type Foo = Foo;//<'a>;
         type Parsed = Option<String>;
         type Payment = Option<Payment>;
         type Params = Option<OtherSuggestedTransactionParams>;
+        type AtomicTransactionComposer =  AtomicTransactionComposer;
+        
+        type Sized = u32;//: u64; //= 7u64;
+        type ToVariant = dyn ToVariant<Sized = usize>;
+        type OwnedToVariant = dyn ToVariant<Sized = u32>; // = dyn OwnedToVariant<Sized = usize>;
         fn _app_id(&self, x: u64) -> u64 { x }
+        
+    }
+    impl OwnedToVariant for AtomicTransactionComposer {
+        type Sized = i32;
+        
+        fn to_variant(&self) -> &AtomicTransactionComposer { AtomicTransactionComposer.status().to_string()}
+    
+
+    }
+    impl ToVariant for AtomicTransactionComposer {
+        type Sized = i32;
+        
+        fn to_variant(&self) -> &AtomicTransactionComposer { AtomicTransactionComposer.status().to_string()}
+    
+      
     }
 
-    impl Foo <'_> {
+    impl ToVariant for &&AtomicTransactionComposer {
+        type Sized = i32;
+        
+        fn to_variant(&self) -> &AtomicTransactionComposer { &AtomicTransactionComposer.status().to_string()}
+    
+      
+    }
+    impl<'a> ToVariant for &AtomicTransactionComposer {
+        type Sized = i32;
+        
+        fn to_variant(&self) -> &AtomicTransactionComposer { todo!()}
+    
+      
+    }
+      
+        impl <'a> MyTrait <'_> for &'a AtomicTransactionComposer {
+            type Foo = Foo;//Foo<'a>;
+            type Parsed = Option<String>;
+            type Payment= Option<Payment>;
+            type Params = Option<OtherSuggestedTransactionParams>;
+            type AtomicTransactionComposer = AtomicTransactionComposer;
+            
+            type Sized = u32;
+            type ToVariant= dyn ToVariant<Sized = u32>;
+            type OwnedToVariant = dyn ToVariant <Sized = u32>;
+            
+            //type NewTrait = dyn NewTrait<Sized = i32>;
+         fn _app_id(&self, x: u64) -> u64{todo!()}
+   
+            
+            //type ToVariant = dyn ToVariant<Sized = ?Sized>;//T: ?Sized
+            //type Sized;
+         //fn to_variant(&self) -> &'a AtomicTransactionComposer {todo!()}
+  
+         //fn to_variant(&self) -> dyn NewTrait {
+         //   (**self).clone().into_shared().to_variant()
+         //}
+
+         fn to_variant(&self) -> &AtomicTransactionComposer {
+            //(**self).len()
+            //todo!()\
+            &AtomicTransactionComposer::default()
+         }
+        }
+
+
+    impl Foo{//Foo <'_> {
         // Adding method to create application call
         fn get_call(&self) -> Result<ApplicationCallOnComplete, ServiceError> {
             //let func_args = vec![self.arg1.clone(), self.arg2.clone()];
@@ -218,12 +313,7 @@ pub mod escrow {
             
             Temporarily Disabling
             */
-            //let withdrw_amt : BigUint = BigUint::new(vec![amount]); //in MicroAlgos
-            
-
-            //let arg1 : AbiArgValue = AbiArgValue::AbiValue( Int(withdrw_amt));
-            //arg1
-
+ 
 
             todo!()
 
@@ -231,7 +321,7 @@ pub mod escrow {
             
     
         
-        pub fn withdraw(_acct1: Account ){
+        //pub fn withdraw(_acct1: Account ){
              /* 
             Withdraw Method Parameters for Escrow SmartContract
             
@@ -240,7 +330,7 @@ pub mod escrow {
                 Does nothing
             */
 
-        }
+        //}
         
 
         //use algonaut_core::Address;
@@ -267,7 +357,7 @@ pub mod escrow {
             to_app_address(*app_id)
         }
         
-        pub fn deposit(_algod : Algod , acct1_3 : Account ,  params : algonaut::core::SuggestedTransactionParams) -> algonaut::core::SuggestedTransactionParams {
+        //pub fn deposit(_algod : Algod , acct1_3 : Account ,  params : algonaut::core::SuggestedTransactionParams) -> algonaut::core::SuggestedTransactionParams {
             /*
             Deposit Method Parameters for Escrow SmartContract
             Unused and Depreciated
@@ -275,39 +365,37 @@ pub mod escrow {
             Does
             */
 
-            //Params
-            //
-            //App ID
-            let _app_id = 161737986;
+        //    let _app_id = 161737986;
 
             
             //Get Escrow Address From App ID
 
-            let _escrow_address = Foo::app_address(&_app_id); //to_app_address(_app_id.clone());
+        //    let _escrow_address = escrow::Foo::app_address(&_app_id); //to_app_address(_app_id.clone());
            
-            println!(" building Pay transaction to Escrow Address: {}", &_escrow_address);
+        //    println!(" building Pay transaction to Escrow Address: {}", &_escrow_address);
 
-            let _t = Foo::pay(_escrow_address, acct1_3.clone().into(), params.clone());                
+            //let _t = Foo::pay(_escrow_address, acct1_3.clone().into(), params.clone());                
 
             // create a transaction with signer with the current transaction
 
-            let _signer ;//= TransactionSigner::BasicAccount(acct1_3);
+        //    let _signer ;//= TransactionSigner::BasicAccount(acct1_3);
 
 
-            let tx_with_signer = TransactionWithSigner { tx: _t, signer: _signer };
+            //let tx_with_signer = TransactionWithSigner { tx: _t, signer: _signer };
 
 
-            let mut atc = AtomicTransactionComposer::default();  
+        //    let mut atc = AtomicTransactionComposer::default();  
 
             // Deposit
             // Add Payment Txn to 
             // Should Ideally Match To A Statemachine Behaviour Bloc
-            atc.add_transaction(tx_with_signer).unwrap();
+            
+            //atc.add_transaction(tx_with_signer).unwrap();
 
-            params
+        //  params
 
  
-        }
+        //}
 
         pub fn new() -> AtomicTransactionComposer{
         /*
@@ -322,7 +410,6 @@ pub mod escrow {
         Constructs a 32 Bit Byte Slice froma Given Address String
         */   
             let mut _to_addr: [u8; 32] = [0; 32];
-            //_to_addr.copy_from_slice(&acct1.address().to_string().as_bytes()[..32]);
             _to_addr.copy_from_slice(&addr.as_bytes()[..32]);
 
             _to_addr
@@ -351,9 +438,8 @@ pub mod escrow {
         
         */
         
-        //&AtomicTransactionComposer
+ 
         &self,
-        //#[base] _base: &Node,
         _app_id: u64,
         _method: AbiMethod,
         _method_args: Vec<AbiArgValue>,
@@ -370,10 +456,7 @@ pub mod escrow {
         _signer: TransactionSigner,
     
     
-    ) -> Result<Foo<'_>, ServiceError> {
-            todo!()
-            
-        }
+    ) -> Result<<'_>, ServiceError> {todo!()}
         
 
     } 
@@ -409,7 +492,9 @@ AddMethodCallParams //transaction_signer::TransactionSigner::BasicAccount,
 //cant get my mods
 //use super::escrow::Foo;
 use crate::algod::escrow::Foo;
-use bar::Foo as OtherFoo;
+use crate::algod::bar::Foo as OtherFoo;
+
+//use bar::Foo as OtherFoo;
 use algodot_core::Account;
 use algonaut::transaction::transaction::ApplicationCallOnComplete::NoOp;
 
@@ -696,7 +781,7 @@ impl Algodot {
 
     #[method]
     #[allow(clippy::too_many_arguments)]
-    async fn construct_atc(
+    async fn construct_atc: _(
         /* Atomic Transaction Composer*/
         &self,
         #[base] _base: &Node,
