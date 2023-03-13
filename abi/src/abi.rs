@@ -3,7 +3,7 @@
 
   
  
-mod bar {
+pub mod abi_smartcontract {
     //use algonaut_abi::abi_interactions::AbiMethodArg;
     //use algonaut_abi::abi_interactions::AbiReturn;
     use algonaut::abi::abi_type::AbiType;
@@ -312,10 +312,156 @@ pub mod escrow {
             
 
         }
+        pub fn withdraw(_acct1: Account ){
+             /* 
+            Withdraw Method Parameters for Escrow SmartContract
+            
+                Docs: https://docs.rs/num-bigint/0.4.3/num_bigint/struct.BigUint.html
+                Does nothing
+            */
 
-    }
+        }
+        
+
+        //use algonaut_core::Address;
+        pub fn pay(to_address : algonaut::core::Address , acct1 : Account, _params : algonaut::core::SuggestedTransactionParams) -> algonaut::transaction::Transaction{
+            /*
+                Constructs a Payment Transaction to an Address
+            */
+
+             let _t = TxnBuilder::with(
+
+                    &_params,
+
+                    Pay::new(acct1.address(), to_address, MicroAlgos(123_456)).build(),
+
+                )
+
+                .build()
+                .unwrap();
+            
+            return _t;
+        }
+
+        pub fn app_address (app_id : &u64) -> Address{
+            to_app_address(*app_id)
+        }
+        
+        pub fn deposit(_algod : Algod , acct1_3 : Account ,  params : algonaut::core::SuggestedTransactionParams) -> algonaut::core::SuggestedTransactionParams {
+            /*
+            Deposit Method Parameters for Escrow SmartContract
+            Unused and Depreciated
+           
+            Does
+            */
+
+            //Params
+            //
+            //App ID
+            let _app_id = 161737986;
+
+            
+            //Get Escrow Address From App ID
+
+            let _escrow_address = Foo::app_address(&_app_id); //to_app_address(_app_id.clone());
+           
+            println!(" building Pay transaction to Escrow Address: {}", &_escrow_address);
+
+            let _t = Foo::pay(_escrow_address, acct1_3.clone(), params.clone());                
+
+            // create a transaction with signer with the current transaction
+
+            let _signer = TransactionSigner::BasicAccount(acct1_3);
+
+
+            let tx_with_signer = TransactionWithSigner { tx: _t, signer: _signer };
+
+
+            let mut atc = AtomicTransactionComposer::default();  
+
+            // Deposit
+            // Add Payment Txn to 
+            // Should Ideally Match To A Statemachine Behaviour Bloc
+            atc.add_transaction(tx_with_signer).unwrap();
+
+            params
+
+ 
+        }
+
+        pub fn new() -> AtomicTransactionComposer{
+        /*
+        Constructs a Default Atomic Transation Composer
+        */
+            AtomicTransactionComposer::default()
+        
+        }
+     
+        pub fn address_to_bytes(addr: String) -> [u8; 32]{ 
+        /*
+        Constructs a 32 Bit Byte Slice froma Given Address String
+        */   
+            let mut _to_addr: [u8; 32] = [0; 32];
+            //_to_addr.copy_from_slice(&acct1.address().to_string().as_bytes()[..32]);
+            _to_addr.copy_from_slice(&addr.as_bytes()[..32]);
+
+            _to_addr
+            
+        }
+
+        //let arg2: AbiArgValue = AbiArgValue::AbiValue(algonaut_abi::abi_type::AbiValue::Address(OtherAddress::new(withdrw_to_addr)));
+      
+        pub fn address(addr : [u8; 32]) -> AbiArgValue {
+            /* Returns an Address abi value from an Address as [u8,32]*/
+            AbiArgValue::AbiValue(algonaut::abi::abi_type::AbiValue::Address(OtherAddress::new(addr)))
+
+        } 
+
+        pub fn basic_account(mnemonic : &str)  ->  algonaut::atomic_transaction_composer::transaction_signer::TransactionSigner{
+            BasicAccount(algonaut::transaction::account::Account::from_mnemonic(&mnemonic).unwrap())
+        
+        }
+        
+
+        pub fn fee(amount : u64) -> TxnFee{Fixed(MicroAlgos(amount))}
+
+        pub fn construct_app_call_method(
+        /*
+        Constructs an App Call Method as a Rust Module
+        
+        */
+        
+        //&AtomicTransactionComposer
+        &self,
+        //#[base] _base: &Node,
+        _app_id: u64,
+        _method: AbiMethod,
+        _method_args: Vec<AbiArgValue>,
+        _fee: TxnFee,//Fixed(MicroAlgos(2500u64)), //make customizable
+        _sender: Address,
+        _on_complete: ApplicationCallOnComplete,
+        _clear_program: Option<CompiledTeal>,
+        _global_schema: Option<StateSchema>,
+        _local_schema: Option<StateSchema>,
+        _extra_pages: u32,
+        _note: Option<Vec<u8>>,
+        _lease: Option<HashDigest>,
+        _rekey_to: Option<Address>,
+        _signer: TransactionSigner,
+    
+    
+    ) -> Result<Foo<'_>, ServiceError> {
+            todo!()
+            
+        }
+        
+
+    } 
 
 }
+    
+
+
 
 
 

@@ -1,100 +1,10 @@
-pub mod bar {
-    //use algonaut_abi::abi_interactions::AbiMethodArg;
-    //use algonaut_abi::abi_interactions::AbiReturn;
-    use algonaut::abi::abi_type::AbiType;
+use algodot_abi::abi_smartcontract::*;
+use algodot_abi::escrow::Foo as escrowFoo;
+//use algodot_abi::abi_smartcontract::Foo;
+//use algodot_abi::escrow::Foo;
+use algodot_abi::abi_smartcontract::Foo as abiFoo;
 
-
-    use algonaut::abi::abi_interactions::AbiMethod;
-    use algonaut::atomic_transaction_composer::AtomicTransactionComposer;
-    use gdnative::core_types::{Variant, ToVariant};
-    
-    pub struct Foo {
-        pub name: String,
-        pub description: String,
-        pub type_: String, 
-        pub parsed: Option<String>,
-        
-    }
-
-    impl MyTrait for Foo {
-        type Foo = Foo;
-        type Type = String;
-        type Parsed = Option<String>;
-
-        fn new() -> Self::Foo {
-            Foo {
-                name: "".to_string(),
-                description: "".to_string(),
-                type_: "".to_string(),
-                parsed: None,
-            }
-        }
-
-        fn r#type() -> String { "".to_string() }
-        fn parsed() -> Option<AbiType> { None }
-    }
-
-    trait MyTrait {
-        type Foo;
-        type Type: ToString;
-        type Parsed;
-
-        fn new() -> Self::Foo;
-        fn r#type() -> String;
-        fn parsed() -> Option<AbiType>;
-    }
-
-
-
-    impl Foo {
-        //Doc : https://developer.algorand.org/docs/get-details/transactions/signatures/#single-signatures
-        //      https://developer.algorand.org/docs/get-details/dapps/smart-contracts/ABI/?from_query=Method%20Signature#reference-types
-        // Boilerplate
-        //pub fn new() -> AbiMethod {
-        //    let method_sig : String = "withdraw(uint64,account)void".to_string();
-            //let method_sig : String = "add(uint64,uint64)uint128".to_string();
-
-            
-        //    println!("{}",&method_sig);
-
-        //    AbiMethod::from_signature(&method_sig)
-        //    .expect("Error")
-            
-        //}
-        
-        pub fn withdraw() -> AbiMethod {
-            let method_sig : String = "withdraw(uint64,account)void".to_string();
-            //let method_sig : String = "add(uint64,uint64)uint128".to_string();
-
-            
-            println!("Method Signature: {}",&method_sig);
-
-            AbiMethod::from_signature(&method_sig)
-            .expect("Error")
-            
-        }
-
-        pub fn deposit() -> AbiMethod {
-            let method_sig : String = "deposit(PaymentTransaction,account)void".to_string();
-            //let method_sig : String = "add(uint64,uint64)uint128".to_string();
-
-            
-            println!("Method Signature: {}",&method_sig);
-
-            AbiMethod::from_signature(&method_sig)
-            .expect("Error")
-            
-        }
-   
-    }
-}
-
-
-
-
-
-
-use algodot_abi::*;
+//use algodot_abi::*;
 use algodot_core::*;
 use algodot_macros::*;
 use algonaut::algod::v2::Algod;
@@ -115,13 +25,8 @@ use algonaut::atomic_transaction_composer::{AtomicTransactionComposerStatus,
 AddMethodCallParams //transaction_signer::TransactionSigner::BasicAccount, 
 };
 
-//cant get my mods
-//use super::escrow::Foo;
-//use crate::algod::escrow::Foo;
-//use crate::algod::bar::Foo as OtherFoo;
 
-//use bar::Foo as OtherFoo;
-use algodot_core::Account;
+//use algodot_core::Account;
 use algonaut::transaction::transaction::ApplicationCallOnComplete::NoOp;
 
 #[derive(NativeClass)]
@@ -404,6 +309,84 @@ impl Algodot {
             .unwrap()
             .into()
     }
+
+
+    #[methods]
+    #[allow(clippy::too_many_arguments)]
+    fn construct_atc(
+        /* Atomic Transaction Composer*/
+        &self,
+        _base: &Node,
+        params: SuggestedTransactionParams,
+        sender: Address,
+        mnemonic : String,
+        app_id: u64,
+        app_arguments: Option<String>, 
+        
+   
+    ) -> Result<(), Foo> { 
+
+       
+    let mut atc = escrowFoo::new();  
+
+
+
+    let mut _to_addr: [u8; 32] = escrowFoo::address_to_bytes(sender.to_string());//[0; 32];
+
+    let __app_id : u64 = 161737986 ;
+    let pages: u32 = 0;
+    
+    godot_dbg!("retrieving suggested params");
+    //let params = self.algod.suggested_transaction_params().await.unwrap();
+    //let params = self.algod.suggested_transaction_params().await.unwrap();
+
+    //Txn Details As a Struct
+    let details = escrowFoo{ //OtherFoo::Foo { 
+            withdrw_amt : 0u32,//Foo::withdraw_amount(0u32),//BigUint::new(vec![0]),//BigUint { data: vec![0u64] },//BigUint = BigUint::new(vec![0]), 
+            withdrw_to_addr: _to_addr.clone(), 
+            arg1: escrowFoo::withdraw_amount(0u32), 
+            arg2: escrowFoo::address(_to_addr),
+            _app_id: __app_id.clone(), 
+            _escrow_address: escrowFoo::app_address(&__app_id),//to_app_address(__app_id), 
+            atc: &atc };
+
+    //println!("{:?}", &details);
+    godot_dbg!(&details);
+            //Add method Call     
+    atc.add_method_call( &mut AddMethodCallParams {
+                    app_id: details._app_id,
+                    method: abiFoo::withdraw(), //bar::Foo::withdraw() //for deposits //bar::Foo::deposit()
+                    method_args: vec![details.arg1, details.arg2],
+                    fee: escrowFoo::fee(2500),
+                    sender: *sender,
+                    suggested_params: params,
+                    on_complete: NoOp,
+                    approval_program: None,
+                    clear_program: None,
+                    global_schema: None,
+                    local_schema: None,
+                    extra_pages: pages,
+                    note: escrowFoo::note(0u32),//_note,
+                    lease: None,
+                    rekey_to: None,
+                    signer: escrowFoo::basic_account(&mnemonic)
+            
+        }
+    ).unwrap();
+
+
+    atc.build_group().expect("Error");
+
+    //atc.execute(&self.algod).await.expect("Error");
+    
+    //atc.execute(&self.algod);
+    //let status_str : &mut AtomicTransactionComposerStatus = &mut atc.status();
+    //godot_dbg!(status_str);
+
+    Ok(())
+    }
+
+
 
     #[method]
     fn construct_asset_opt_in(
