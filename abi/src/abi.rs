@@ -1,57 +1,56 @@
-#[macro_export]
-mod escrow {
 
-    /*Atomic Transaction Composer Helper Modules*/
-    use algonaut::atomic_transaction_composer::transaction_signer::TransactionSigner::BasicAccount;
-    //use crate::core::Account;
-    use algonaut::transaction::account::Account;
-    //use crate::algod::Account;
+
+/*Atomic Transaction Composer Helper Modules*/
+use algonaut::atomic_transaction_composer::transaction_signer::TransactionSigner::BasicAccount;
+//use crate::core::Account;
+use algonaut::transaction::account::Account;
+//use crate::algod::Account;
     
     //use algonaut::algod::v2::Algod;
-    use algonaut::abi::abi_type::AbiValue::Int;
-    use algonaut::core::Address;
+use algonaut::abi::abi_type::AbiValue::Int;
+use algonaut::core::Address;
     
-    //use num_bigint::BigUint;
-   // use crate::algod::bar::Foo;
-    use algonaut::{
+//use num_bigint::BigUint;
+// use crate::algod::bar::Foo;
+use algonaut::{
         
-        atomic_transaction_composer::{
-            transaction_signer::TransactionSigner, AbiArgValue, 
-            AtomicTransactionComposer, //AbiReturnDecodeError, AddMethodCallParams, 
-            TransactionWithSigner, //AtomicTransactionComposerStatus, 
-        },
-        error::ServiceError,
+    atomic_transaction_composer::{
+        transaction_signer::TransactionSigner, AbiArgValue, 
+        AtomicTransactionComposer, //AbiReturnDecodeError, AddMethodCallParams, 
+        TransactionWithSigner, //AtomicTransactionComposerStatus, 
+    },
+    error::ServiceError,
     };
     
-    use algonaut::core::{to_app_address, Address as OtherAddress, MicroAlgos, CompiledTeal};
-    //use algonaut::abi::abi_interactions::AbiMethod;
-    use algonaut::transaction::{
-        builder::TxnFee, builder::TxnFee::Fixed,
-        transaction::{ApplicationCallOnComplete, StateSchema},
-        Pay, TxnBuilder,
-    };
+use algonaut::core::{to_app_address, Address as OtherAddress, MicroAlgos, CompiledTeal};
+//use algonaut::abi::abi_interactions::AbiMethod;
+use algonaut::transaction::{
+    builder::TxnFee, builder::TxnFee::Fixed,
+    transaction::{ApplicationCallOnComplete, StateSchema},
+    Pay, TxnBuilder,
+};
 
-    use algonaut::core::SuggestedTransactionParams as OtherSuggestedTransactionParams;
-    use algonaut::transaction::{transaction::Payment}; //account::Account
+use algonaut::core::SuggestedTransactionParams as OtherSuggestedTransactionParams;
+use algonaut::transaction::{transaction::Payment}; //account::Account
   
-    //use algonaut::crypto::HashDigest;
-    use std::convert::TryInto;   
-    //use gdnative::prelude::*;
+//use algonaut::crypto::HashDigest;
+use std::convert::TryInto;   
+//use gdnative::prelude::*;
 
-   // use std::marker::Sized;
-    use std::fmt::Display as Display;
-    use algonaut::atomic_transaction_composer::AtomicTransactionComposerStatus as OtherAtomicTransactionComposerStatus;
+// use std::marker::Sized;
+use std::fmt::Display as Display;
+use algonaut::atomic_transaction_composer::AtomicTransactionComposerStatus as OtherAtomicTransactionComposerStatus;
 
-    use crate::algod::bar::Foo as OtherFoo;
-    //#[derive(Clone, Debug, escrow::ToVariant::to_variant(&atc))] //PartialEq,
+use crate::algod::bar::Foo as OtherFoo;
+//#[derive(Clone, Debug, escrow::ToVariant::to_variant(&atc))] //PartialEq,
     
-    //#[derive(Clone, Debug, escrow::MyTrait::to_variant(&atc))] //PartialEq,
+//#[derive(Clone, Debug, escrow::MyTrait::to_variant(&atc))] //PartialEq,
             
-    //#[derive(Clone<'_>, Debug<'_>, gdnative::prelude::ToVariant::to_variant(atc))] //PartialEq,
+//#[derive(Clone<'_>, Debug<'_>, gdnative::prelude::ToVariant::to_variant(atc))] //PartialEq,
     
-    //#[derive(Clone, Debug, escrow::OwnedToVariant::to_variant(&atc))] //PartialEq,
+//#[derive(Clone, Debug, escrow::OwnedToVariant::to_variant(&atc))] //PartialEq,
 
-    #[derive(gdnative::prelude::ToVariant::to_variant(&atc), Debug)] //PartialEq,
+//#[derive(gdnative::prelude::ToVariant::to_variant(&atc), Debug)] //PartialEq,
     //#[derive (gdnative::prelude::ToVariant::to_variant(Foo))]
      
 
@@ -410,5 +409,5 @@ mod escrow {
 
     } 
 
-}
+
 
