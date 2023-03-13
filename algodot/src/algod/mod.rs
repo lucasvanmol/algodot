@@ -117,8 +117,8 @@ AddMethodCallParams //transaction_signer::TransactionSigner::BasicAccount,
 
 //cant get my mods
 //use super::escrow::Foo;
-use crate::algod::escrow::Foo;
-use crate::algod::bar::Foo as OtherFoo;
+//use crate::algod::escrow::Foo;
+//use crate::algod::bar::Foo as OtherFoo;
 
 //use bar::Foo as OtherFoo;
 use algodot_core::Account;
@@ -403,78 +403,6 @@ impl Algodot {
             .build()
             .unwrap()
             .into()
-    }
-
-    #[method]
-    #[allow(clippy::too_many_arguments)]
-    async fn construct_atc : _(
-        /* Atomic Transaction Composer*/
-        &self,
-        #[base] _base: &Node,
-        params: SuggestedTransactionParams,
-        sender: Address,
-        mnemonic : String,
-        app_id: u64,
-        #[opt] app_arguments: Option<String>, 
-        
-   
-    ) -> Result<(), Foo> { 
-
-       
-    let mut atc = escrow::Foo::new();  
-
-
-
-    let mut _to_addr: [u8; 32] = Foo::address_to_bytes(sender.to_string());//[0; 32];
-
-    let __app_id : u64 = 161737986 ;
-    let pages: u32 = 0;
-    
-    godot_dbg!("retrieving suggested params");
-    let params = self.algod.suggested_transaction_params().await.unwrap();
-    //Txn Details As a Struct
-    let details = <bar::Foo as Trait>::Foo{ //OtherFoo::Foo { 
-            withdrw_amt : 0u32,//Foo::withdraw_amount(0u32),//BigUint::new(vec![0]),//BigUint { data: vec![0u64] },//BigUint = BigUint::new(vec![0]), 
-            withdrw_to_addr: _to_addr.clone(), 
-            arg1: Foo::withdraw_amount(0u32), 
-            arg2: Foo::address(_to_addr),
-            _app_id: __app_id.clone(), 
-            _escrow_address: Foo::app_address(&__app_id),//to_app_address(__app_id), 
-            atc: &atc };
-
-    //println!("{:?}", &details);
-    godot_dbg!(&details);
-            //Add method Call     
-    atc.add_method_call( &mut AddMethodCallParams {
-                    app_id: details._app_id,
-                    method: bar::Foo::withdraw(), //bar::Foo::withdraw() //for deposits //bar::Foo::deposit()
-                    method_args: vec![details.arg1, details.arg2],
-                    fee: escrow::Foo::fee(2500),
-                    sender: *sender,
-                    suggested_params: params,
-                    on_complete: NoOp,
-                    approval_program: None,
-                    clear_program: None,
-                    global_schema: None,
-                    local_schema: None,
-                    extra_pages: pages,
-                    note: Foo::note(0u32),//_note,
-                    lease: None,
-                    rekey_to: None,
-                    signer: Foo::basic_account(&mnemonic)
-            
-        }
-    ).unwrap();
-
-
-    atc.build_group().expect("Error");
-
-    atc.execute(&self.algod).await.expect("Error");
-    
-    let status_str : &mut AtomicTransactionComposerStatus = &mut atc.status();
-    godot_dbg!(status_str);
-
-    Ok(())
     }
 
     #[method]

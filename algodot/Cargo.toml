@@ -13,7 +13,7 @@ tokio = { version = "1.10", features = ["rt"] }
 gdnative = { version = "0.11", features = ["async"] }
 futures = "0.3"
 algonaut = { git = "https://github.com/manuelmauro/algonaut", rev = "75bce54" }
-num-bigint = {git = "https://github.com/rust-num/num-bigint", version = "0.4"}
+num-bigint = {git = "https://github.com/rust-num/num-bigint", version = "0.4.3"}
 algodot_macros = { path = "../macros" }
 algodot_core = { path = "../core" }
 algodot_abi = { path = "../abi" }
