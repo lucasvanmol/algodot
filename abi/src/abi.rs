@@ -10,12 +10,19 @@ pub mod abi_smartcontract {
 
     
     use algonaut::abi::abi_interactions::AbiMethod;
+    use gdnative::prelude::ToVariant as ToVariant;
+    use gdnative::core_types::Variant;
 
     pub struct Foo {
         pub name: String,
         pub description: String,
         pub type_: String, 
         pub parsed: Option<String>,
+    }
+
+    impl ToVariant for Foo {
+        fn to_variant(&self) -> Variant{todo!()}
+
     }
 
     impl MyTrait for Foo {
