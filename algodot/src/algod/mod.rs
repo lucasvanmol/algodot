@@ -27,7 +27,7 @@ use algonaut::atomic_transaction_composer::{AtomicTransactionComposerStatus,
 AddMethodCallParams //transaction_signer::TransactionSigner::BasicAccount, 
 };
 
-
+use algonaut::atomic_transaction_composer::AtomicTransactionComposer;
 //use algodot_core::Account;
 use algonaut::transaction::transaction::ApplicationCallOnComplete::NoOp;
 
@@ -104,6 +104,14 @@ impl Algodot {
             round += 1;
         }
     }
+    /* Executes Atomic Transactions for ARC 4 SmartContracts */
+    async fn execute(&self ,mut atc : AtomicTransactionComposer ) {
+        atc.execute(&self.algod).await.expect("Error");
+        let status_str : &mut AtomicTransactionComposerStatus = &mut atc.status();
+        godot_dbg!(status_str);
+        //Ok::<(), E>(());
+    }
+
 }
 
 #[methods]
@@ -382,12 +390,12 @@ impl Algodot {
     atc.build_group().expect("Error");
 
     //async ex{
-    //    atc.execute(&self.algod).await.expect("Error");
+    //atc.execute(&self.algod).await.expect("Error");
     //}
-
+    Algodot::execute(&self, atc);
     //atc.execute(&self.algod);
-    let status_str : &mut AtomicTransactionComposerStatus = &mut atc.status();
-    godot_dbg!(status_str);
+    //let status_str : &mut AtomicTransactionComposerStatus = &mut atc.status();
+    //godot_dbg!(status_str);
 
     Ok(())
     }
@@ -510,6 +518,4 @@ asyncmethods!(algod, node, this,
         }
     }
 
-    //fn execute(&algod) {atc.execute(&algod).await.expect("Error")
-    //}
 );
