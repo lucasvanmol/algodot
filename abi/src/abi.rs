@@ -8,7 +8,7 @@ pub mod abi_smartcontract {
     //use algonaut_abi::abi_interactions::AbiReturn;
     use algonaut::abi::abi_type::AbiType;
 
-
+    
     use algonaut::abi::abi_interactions::AbiMethod;
 
     pub struct Foo {
@@ -91,8 +91,6 @@ pub mod abi_smartcontract {
 
 //Custom Params Struct
 
-mod params {
-
 
 //use rmp_serde::from_slice;
 pub mod ATC {
@@ -151,31 +149,61 @@ pub mod ATC {
 
 
 pub mod params {
+
+    /* 
+        Temporary Fix for Params Error Between algodot_core and algonaut suggested 
+        transaction parameters
+    
+    */
+
     use algonaut::core::SuggestedTransactionParams;
-    //use std::collections::HashMap;
-    //use crate::params::from_slice;
     use algonaut::model::algod::v2::TransactionParams;
     use algonaut::core::MicroAlgos;
     use algonaut::core::Round;
-    //use algonaut_crypto::HashDigest;
-    //use crate::params::SuggestedTransactionParams;
+    use algonaut::crypto::HashDigest;
 
     pub struct MySuggestedTransactionParams(SuggestedTransactionParams);
 
-        
-        trait ToVariant {
-            type Foo;
-            type Params;
-            type Parsed;
-            type Payment;
-            type MyTrait;
+    struct Foo {
+        genesis_id: String,
+        genesis_hash: [u8; 32],
+        consensus_version: String,
+        fee_per_byte: MicroAlgos,
+        min_fee: MicroAlgos,
+        first_valid: Round,
+        last_valid: Round,
+    }
+
+    
+
+    pub trait Into {
+   
             
 
             fn _app_id(&self, x: u64) -> u64;
-            fn default() -> Option<String>{ None }
+            fn default(&self) -> Option<String> where Self: Sized{ None }
             //fn parsed() -> Option<AbiType>;
 
             //fn suggested_tx_params(&self) -> OtherSuggestedTransactionParams { }
+
+
+            //returnss a algonaut::algonaut_core::SuggestedTransactionParams
+            /*
+
+            DOCS: https://docs.rs/algonaut_core/0.4.2/algonaut_core/struct.SuggestedTransactionParams.html
+            
+            */
+            fn get_params(&self) -> algonaut::core::SuggestedTransactionParams { SuggestedTransactionParams{
+                
+                genesis_id : "dfdfg".to_string(),
+                genesis_hash : algonaut::crypto::HashDigest([0u8; 32]),
+                consensus_version : "sdgsgs".to_string(),
+                fee_per_byte : MicroAlgos(0),
+                min_fee : MicroAlgos(0),
+                first_valid : Round(0u64),
+                last_valid : Round(0u64),
+
+             }}
 
             fn to_variant(&self, params : SuggestedTransactionParams) -> TransactionParams { 
                 let dict =  algonaut::model::algod::v2::TransactionParams{
@@ -188,12 +216,13 @@ pub mod params {
                 };
 
                 dict
-            }
-
         }
 
+    
     }
+
 }
+
 
 
 //

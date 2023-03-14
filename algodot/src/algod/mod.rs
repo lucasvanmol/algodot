@@ -1,5 +1,6 @@
 use algodot_abi::abi_smartcontract::*;
 use algodot_abi::escrow::Foo as escrowFoo;
+//use algodot_abi::atc_params::Into as atc_params;
 //use algodot_abi::abi_smartcontract::Foo;
 //use algodot_abi::escrow::Foo;
 use algodot_abi::abi_smartcontract::Foo as abiFoo;
@@ -18,6 +19,7 @@ use algonaut::transaction::{Pay, TransactionType, TxnBuilder, builder::CallAppli
 use gdnative::api::Engine;
 use gdnative::prelude::*;
 use gdnative::tasks::{Async, AsyncMethod, Spawner};
+
 use std::rc::Rc;
 
 
@@ -311,7 +313,7 @@ impl Algodot {
     }
 
 
-    #[methods]
+    #[method]
     #[allow(clippy::too_many_arguments)]
     fn construct_atc(
         /* Atomic Transaction Composer*/
@@ -338,8 +340,10 @@ impl Algodot {
     
     godot_dbg!("retrieving suggested params");
     //let params = self.algod.suggested_transaction_params().await.unwrap();
-    //let params = self.algod.suggested_transaction_params().await.unwrap();
-
+    
+    //async get_params {
+    //    let params = self.algod.suggested_transaction_params().await.unwrap();
+    // }
     //Txn Details As a Struct
     let details = escrowFoo{ //OtherFoo::Foo { 
             withdrw_amt : 0u32,//Foo::withdraw_amount(0u32),//BigUint::new(vec![0]),//BigUint { data: vec![0u64] },//BigUint = BigUint::new(vec![0]), 
@@ -359,7 +363,7 @@ impl Algodot {
                     method_args: vec![details.arg1, details.arg2],
                     fee: escrowFoo::fee(2500),
                     sender: *sender,
-                    suggested_params: params,
+                    suggested_params: params.into(),//atc_params::get_params(&self).into(),//params.unwrap(),//suggested_transaction_params(),
                     on_complete: NoOp,
                     approval_program: None,
                     clear_program: None,
@@ -377,11 +381,13 @@ impl Algodot {
 
     atc.build_group().expect("Error");
 
-    //atc.execute(&self.algod).await.expect("Error");
-    
+    //async ex{
+    //    atc.execute(&self.algod).await.expect("Error");
+    //}
+
     //atc.execute(&self.algod);
-    //let status_str : &mut AtomicTransactionComposerStatus = &mut atc.status();
-    //godot_dbg!(status_str);
+    let status_str : &mut AtomicTransactionComposerStatus = &mut atc.status();
+    godot_dbg!(status_str);
 
     Ok(())
     }
@@ -421,6 +427,8 @@ impl Algodot {
         godot_unwrap!(result).map(|_| txns)
     }
 }
+
+/*ASync Methods*/
 
 asyncmethods!(algod, node, this,
     fn health(_ctx, _args) {

@@ -137,6 +137,25 @@ impl FromVariant for MySuggestedTransactionParams {
     }
 }
 
+impl From<MySuggestedTransactionParams> for algonaut::core::SuggestedTransactionParams{
+    //fn from(_: MySuggestedTransactionParams) -> algonaut::core::SuggestedTransactionParams { todo!() }
+
+ fn from(_: MySuggestedTransactionParams) -> algonaut::core::SuggestedTransactionParams { SuggestedTransactionParams{
+                
+                genesis_id : "dfdfg".to_string(),
+                genesis_hash : algonaut::crypto::HashDigest([0u8; 32]),
+                consensus_version : "sdgsgs".to_string(),
+                fee_per_byte : MicroAlgos(0),
+                min_fee : MicroAlgos(0),
+                first_valid : Round(0u64),
+                last_valid : Round(0u64),
+
+             }}
+
+}
+
+
+
 #[derive(Deref, DerefMut, From, Into)]
 pub struct MyTransaction(pub Transaction);
 
