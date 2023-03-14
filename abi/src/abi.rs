@@ -96,10 +96,7 @@ pub mod abi_smartcontract {
     }
 }
 
-//Custom Params Struct
 
-
-//use rmp_serde::from_slice;
 pub mod ATC {
     /*
     Atomic Transaction Composer Required Traits
@@ -189,12 +186,7 @@ pub mod params {
 
             fn _app_id(&self, x: u64) -> u64;
             fn default(&self) -> Option<String> where Self: Sized{ None }
-            //fn parsed() -> Option<AbiType>;
-
-            //fn suggested_tx_params(&self) -> OtherSuggestedTransactionParams { }
-
-
-            //returnss a algonaut::algonaut_core::SuggestedTransactionParams
+   
             /*
 
             DOCS: https://docs.rs/algonaut_core/0.4.2/algonaut_core/struct.SuggestedTransactionParams.html
@@ -243,15 +235,14 @@ pub mod escrow {
 
     use algonaut::{
         atomic_transaction_composer::{
-            transaction_signer::TransactionSigner, AbiArgValue, //AbiMethodReturnValue,
-            AtomicTransactionComposer, //AbiReturnDecodeError, AddMethodCallParams, 
-            TransactionWithSigner, //AtomicTransactionComposerStatus, 
+            transaction_signer::TransactionSigner, AbiArgValue,
+            AtomicTransactionComposer, 
+            TransactionWithSigner,
         },
         error::ServiceError,
     };
     use algonaut::abi::{
-        abi_interactions::{AbiMethod}, //AbiArgType,AbiReturn,, ReferenceArgType,, AbiReturnType  
-        //abi_type::{AbiType, AbiValue as OtherAbiValue},
+        abi_interactions::{AbiMethod},  
     };
     use algonaut::core::{to_app_address, Address as OtherAddress, MicroAlgos, CompiledTeal, SuggestedTransactionParams};
     
@@ -268,8 +259,6 @@ pub mod escrow {
   
     use std::convert::TryInto;
    
-    //use crate::params::params::MySuggestedTransactionParams;
-    
     use algonaut::atomic_transaction_composer::transaction_signer::TransactionSigner::BasicAccount;
     
     #[derive(Debug)]
@@ -291,8 +280,6 @@ pub mod escrow {
         type Payment;
 
         fn _app_id(&self, x: u64) -> u64;
-        //fn default() -> Option<String>{ None }
-        //fn suggested_tx_params(&self) -> OtherSuggestedTransactionParams { OtherSuggestedTransactionParams::default() }
         fn arg1(withdrw_amt: u64) -> AbiArgValue{AbiArgValue::AbiValue( Int(withdrw_amt.into()))}
         fn arg2(withdrw_amt: u64) -> AbiArgValue{AbiArgValue::AbiValue( Int(withdrw_amt.into()))}
     }
@@ -308,7 +295,6 @@ pub mod escrow {
     impl Foo <'_> {
         // Adding method to create application call
         fn get_call(&self) -> Result<ApplicationCallOnComplete, ServiceError> {
-            //let func_args = vec![self.arg1.clone(), self.arg2.clone()];
             
             todo!()
             
@@ -317,7 +303,6 @@ pub mod escrow {
         // Adding method to create pay transaction
         fn get_payment(&self) -> Result<Payment, ServiceError> {
             todo!()
-           // tx
         }
 
         fn arg1(&self)-> AbiArgValue{ 
