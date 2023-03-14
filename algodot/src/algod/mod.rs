@@ -318,7 +318,7 @@ impl Algodot {
     fn construct_atc(
         /* Atomic Transaction Composer*/
         &self,
-        _base: &Node,
+        #[base] _base: &Node,
         params: SuggestedTransactionParams,
         sender: Address,
         mnemonic : String,
