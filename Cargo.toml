@@ -1,6 +1,5 @@
 [workspace]
+members = ["algodot","macros"]
 
-members = [
-    "algodot",
-    "macros"
-]
+
+
