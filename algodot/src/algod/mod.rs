@@ -1,17 +1,35 @@
+use algodot_abi::abi_smartcontract::*;
+use algodot_abi::escrow::Foo as escrowFoo;
+//use algodot_abi::atc_params::Into as atc_params;
+//use algodot_abi::abi_smartcontract::Foo;
+//use algodot_abi::escrow::Foo;
+use algodot_abi::abi_smartcontract::Foo as abiFoo;
+
+//use algodot_abi::*;
 use algodot_core::*;
 use algodot_macros::*;
 use algonaut::algod::v2::Algod;
 use algonaut::core::{MicroAlgos, Round};
 use algonaut::model::algod::v2::{PendingTransaction, TransactionResponse};
 use algonaut::transaction::transaction::{
-    AssetAcceptTransaction, AssetConfigurationTransaction, AssetParams, AssetTransferTransaction,
+    AssetAcceptTransaction,    AssetConfigurationTransaction, AssetParams, AssetTransferTransaction,
 };
 use algonaut::transaction::tx_group::TxGroup;
-use algonaut::transaction::{builder::CallApplication, Pay, TransactionType, TxnBuilder};
+use algonaut::transaction::{Pay, TransactionType, TxnBuilder, builder::CallApplication, };
 use gdnative::api::Engine;
 use gdnative::prelude::*;
 use gdnative::tasks::{Async, AsyncMethod, Spawner};
+
 use std::rc::Rc;
+
+use algonaut::atomic_transaction_composer::{AtomicTransactionComposerStatus, 
+AddMethodCallParams //transaction_signer::TransactionSigner::BasicAccount, 
+};
+
+
+use algonaut::atomic_transaction_composer::AtomicTransactionComposer;
+//use algodot_core::Account;
+use algonaut::transaction::transaction::ApplicationCallOnComplete::NoOp;
 
 #[derive(NativeClass)]
 #[inherit(Node)]
@@ -40,7 +58,7 @@ impl Algodot {
             // leave these default values here for now
             algod: Rc::new(
                 Algod::new(
-                    "http://localhost:4001",
+                   "http://localhost:4001",
                     "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                 )
                 .unwrap(),
@@ -86,6 +104,15 @@ impl Algodot {
             round += 1;
         }
     }
+    /* Executes Atomic Transactions for ARC 4 SmartContracts 
+    
+    async fn execute(&self ,mut atc : AtomicTransactionComposer ) {
+        atc.execute(&self.algod).await.expect("Error");
+        //godot_print!("{}", stringify!(&mut atc.status()));
+        godot_dbg!("Building Atomic Tranaction");
+    }
+    */
+
 }
 
 #[methods]
@@ -269,6 +296,7 @@ impl Algodot {
         .into()
     }
 
+    
     #[method]
     #[allow(clippy::too_many_arguments)]
     fn construct_app_call(
@@ -277,18 +305,106 @@ impl Algodot {
         params: SuggestedTransactionParams,
         sender: Address,
         app_id: u64,
-        #[opt] app_arguments: Option<String>,
-    ) -> Transaction {
+        #[opt] app_arguments: Option<String>, 
+        
+   
+    ) -> Transaction { 
+
         TxnBuilder::with(
             &params,
             CallApplication::new(*sender, app_id)
-                .app_arguments(vec![app_arguments.expect("REASON").into_bytes()])
+                .app_arguments( vec![app_arguments.expect("REASON").into_bytes()])
                 .build(),
-        )
-        .build()
-        .unwrap()
-        .into()
+            )
+            .build()
+            .unwrap()
+            .into()
     }
+
+
+    #[method]
+    #[allow(clippy::too_many_arguments)]
+    fn construct_atc(
+        /* Atomic Transaction Composer*/
+        &self,
+        #[base] _base: &Node,
+        params: SuggestedTransactionParams,
+        sender: Address,
+        mnemonic : String,
+        app_id: u64,
+        app_arguments: Option<String>, 
+        
+   
+    ) -> Result<(), Foo> { 
+
+       
+    let mut atc = escrowFoo::new();  
+
+
+
+    let mut _to_addr: [u8; 32] = escrowFoo::address_to_bytes(sender.to_string());//[0; 32];
+
+    let __app_id : u64 = 161737986 ;
+    let pages: u32 = 0;
+    
+    godot_dbg!("retrieving suggested params");
+    //let params = self.algod.suggested_transaction_params().await.unwrap();
+    
+    //async get_params {
+    //    let params = self.algod.suggested_transaction_params().await.unwrap();
+    // }
+    //Txn Details As a Struct
+    let details = escrowFoo{ //OtherFoo::Foo { 
+            withdrw_amt : 0u32,//Foo::withdraw_amount(0u32),//BigUint::new(vec![0]),//BigUint { data: vec![0u64] },//BigUint = BigUint::new(vec![0]), 
+            withdrw_to_addr: _to_addr.clone(), 
+            arg1: escrowFoo::withdraw_amount(0u32), 
+            arg2: escrowFoo::address(_to_addr),
+            _app_id: __app_id.clone(), 
+            _escrow_address: escrowFoo::app_address(&__app_id),//to_app_address(__app_id), 
+            atc: &atc };
+
+    //println!("{:?}", &details);
+    godot_dbg!(&details);
+            //Add method Call     
+    atc.add_method_call( &mut AddMethodCallParams {
+                    app_id: details._app_id,
+                    method: abiFoo::withdraw(), //bar::Foo::withdraw() //for deposits //bar::Foo::deposit()
+                    method_args: vec![details.arg1, details.arg2],
+                    fee: escrowFoo::fee(2500),
+                    sender: *sender,
+                    suggested_params: params.into(),//atc_params::get_params(&self).into(),//params.unwrap(),//suggested_transaction_params(),
+                    on_complete: NoOp,
+                    approval_program: None,
+                    clear_program: None,
+                    global_schema: None,
+                    local_schema: None,
+                    extra_pages: pages,
+                    note: escrowFoo::note(0u32),//_note,
+                    lease: None,
+                    rekey_to: None,
+                    signer: escrowFoo::basic_account(&mnemonic)
+            
+        }
+    ).unwrap();
+
+
+    atc.build_group().expect("Error");
+
+    let fut = async {
+        atc.execute(&self.algod).await.expect("Error");
+    };
+    //futures::executor::block_on(fut);
+   
+    //Self::execute(&self, atc);
+    
+    //};//atc.execute(&self.algod);
+    //let status_str : &mut AtomicTransactionComposerStatus = &mut atc.status();
+    godot_dbg!("{}",stringify!(fut));
+
+    Ok(())
+    }
+
+
 
     #[method]
     fn construct_asset_opt_in(
@@ -307,7 +423,7 @@ impl Algodot {
         )
         .build()
         .unwrap()
-        .into()
+        .into() //uses Core Traits
     }
 
     #[method]
@@ -323,6 +439,8 @@ impl Algodot {
         godot_unwrap!(result).map(|_| txns)
     }
 }
+
+/*ASync Methods*/
 
 asyncmethods!(algod, node, this,
     fn health(_ctx, _args) {
@@ -342,7 +460,15 @@ asyncmethods!(algod, node, this,
             godot_unwrap!(params).to_variant()
         }
     }
-
+    /*
+    fn execute (_ctx, _args){
+        /*
+        async move {
+            atc.execute(algod);//.await.expect("Error");
+        }; */
+        //todo!()
+    }
+    */
     fn status(_ctx, _args) {
         async move {
             let status = algod.status().await;
@@ -403,4 +529,5 @@ asyncmethods!(algod, node, this,
             godot_unwrap!(compiled).map(|c| (c.hash().0.to_vec().to_variant(), c.bytes_to_sign().to_variant())).to_variant()
         }
     }
+
 );
