@@ -140,14 +140,14 @@ impl FromVariant for MySuggestedTransactionParams {
 impl From<MySuggestedTransactionParams> for algonaut::core::SuggestedTransactionParams{
     //fn from(_: MySuggestedTransactionParams) -> algonaut::core::SuggestedTransactionParams { todo!() }
 
- fn from(_: MySuggestedTransactionParams) -> algonaut::core::SuggestedTransactionParams { SuggestedTransactionParams{
+ fn from(n: MySuggestedTransactionParams) -> algonaut::core::SuggestedTransactionParams { SuggestedTransactionParams{
                 
-                genesis_id : "dfdfg".to_string(),
-                genesis_hash : algonaut::crypto::HashDigest([0u8; 32]),
-                consensus_version : "sdgsgs".to_string(),
-                fee_per_byte : MicroAlgos(0),
-                min_fee : MicroAlgos(0),
-                first_valid : Round(0u64),
+                genesis_id : n.genesis_id.clone(),//"dfdfg".to_string(),
+                genesis_hash : n.genesis_hash.clone(),//algonaut::crypto::HashDigest([0u8; 32]),
+                consensus_version : n.consensus_version.clone(),//"sdgsgs".to_string(),
+                fee_per_byte : n.fee_per_byte.clone(),//MicroAlgos(0),
+                min_fee : n.min_fee.clone(),//MicroAlgos(0),
+                first_valid : n.first_valid.clone(),//Round(0u64),
                 last_valid : Round(0u64),
 
              }}

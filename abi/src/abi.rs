@@ -56,19 +56,7 @@ pub mod abi_smartcontract {
     impl Foo {
         //Doc : https://developer.algorand.org/docs/get-details/transactions/signatures/#single-signatures
         //      https://developer.algorand.org/docs/get-details/dapps/smart-contracts/ABI/?from_query=Method%20Signature#reference-types
-        // Boilerplate
-        //pub fn new() -> AbiMethod {
-        //    let method_sig : String = "withdraw(uint64,account)void".to_string();
-            //let method_sig : String = "add(uint64,uint64)uint128".to_string();
 
-            
-        //    println!("{}",&method_sig);
-
-        //    AbiMethod::from_signature(&method_sig)
-        //    .expect("Error")
-            
-        //}
-        
         pub fn withdraw() -> AbiMethod {
             let method_sig : String = "withdraw(uint64,account)void".to_string();
             //let method_sig : String = "add(uint64,uint64)uint128".to_string();
@@ -165,6 +153,7 @@ pub mod params {
     use algonaut::core::MicroAlgos;
     use algonaut::core::Round;
     use algonaut::crypto::HashDigest;
+    //use algodot_core::SuggestedTransactionParams;
 
     pub struct MySuggestedTransactionParams(SuggestedTransactionParams);
 
@@ -192,17 +181,7 @@ pub mod params {
             DOCS: https://docs.rs/algonaut_core/0.4.2/algonaut_core/struct.SuggestedTransactionParams.html
             
             */
-            fn get_params(&self) -> algonaut::core::SuggestedTransactionParams { SuggestedTransactionParams{
-                
-                genesis_id : "dfdfg".to_string(),
-                genesis_hash : algonaut::crypto::HashDigest([0u8; 32]),
-                consensus_version : "sdgsgs".to_string(),
-                fee_per_byte : MicroAlgos(0),
-                min_fee : MicroAlgos(0),
-                first_valid : Round(0u64),
-                last_valid : Round(0u64),
-
-             }}
+        
 
             fn to_variant(&self, params : SuggestedTransactionParams) -> TransactionParams { 
                 let dict =  algonaut::model::algod::v2::TransactionParams{
