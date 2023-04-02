@@ -148,7 +148,7 @@ impl From<MySuggestedTransactionParams> for algonaut::core::SuggestedTransaction
                 fee_per_byte : n.fee_per_byte.clone(),//MicroAlgos(0),
                 min_fee : n.min_fee.clone(),//MicroAlgos(0),
                 first_valid : n.first_valid.clone(),//Round(0u64),
-                last_valid : Round(0u64),
+                last_valid : n.last_valid.clone(),//Round(0u64),
 
              }}
 
