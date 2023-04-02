@@ -1,11 +1,6 @@
 use algodot_abi::abi_smartcontract::*;
 use algodot_abi::escrow::Foo as escrowFoo;
-//use algodot_abi::atc_params::Into as atc_params;
-//use algodot_abi::abi_smartcontract::Foo;
-//use algodot_abi::escrow::Foo;
 use algodot_abi::abi_smartcontract::Foo as abiFoo;
-
-//use algodot_abi::*;
 use algodot_core::*;
 use algodot_macros::*;
 use algonaut::algod::v2::Algod;
@@ -109,7 +104,7 @@ impl Algodot {
         }
     }
     //Executes Atomic Transactions for ARC 4 SmartContracts 
-    
+    /*
     async fn execute(algod: Rc<Algod>, mut atc: AtomicTransactionComposer) -> ExecuteResult { 
         
         let t :ExecuteResult = atc.execute(&algod).await.expect("Error");
@@ -118,7 +113,7 @@ impl Algodot {
         t
 
     }
-    
+    */    
 
 }
 
@@ -408,10 +403,16 @@ impl Algodot {
 
     atc.build_group().expect("Error");
     
-    let _ = Self::execute(self.algod.clone(),atc);
+    //godot_dbg!("{}", &atc);
+    //Self::execute(self.algod.clone(),atc);
     
-    godot_dbg!("Async Method Run--->");
+    //godot_dbg!("Async Method Run--->");
+    let _ = async {
+        atc.execute(&self.algod.clone()).await.expect("Error");
+        godot_dbg!("{}",atc)
+    };
 
+    
     Ok(())
 
     }
