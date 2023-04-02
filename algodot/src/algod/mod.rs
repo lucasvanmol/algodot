@@ -25,11 +25,14 @@ use std::rc::Rc;
 use algonaut::atomic_transaction_composer::{AtomicTransactionComposerStatus, 
 AddMethodCallParams //transaction_signer::TransactionSigner::BasicAccount, 
 };
-
+use algonaut::atomic_transaction_composer::ExecuteResult;
 
 use algonaut::atomic_transaction_composer::AtomicTransactionComposer;
 //use algodot_core::Account;
 use algonaut::transaction::transaction::ApplicationCallOnComplete::NoOp;
+
+use std::ops::Deref;
+
 
 #[derive(NativeClass)]
 #[inherit(Node)]
@@ -46,6 +49,7 @@ pub struct Algodot {
 
     algod: Rc<Algod>,
 }
+
 
 impl Algodot {
     fn new(_base: &Node) -> Self {
@@ -104,16 +108,32 @@ impl Algodot {
             round += 1;
         }
     }
-    /* Executes Atomic Transactions for ARC 4 SmartContracts 
+    //Executes Atomic Transactions for ARC 4 SmartContracts 
     
-    async fn execute(&self ,mut atc : AtomicTransactionComposer ) {
-        atc.execute(&self.algod).await.expect("Error");
-        //godot_print!("{}", stringify!(&mut atc.status()));
-        godot_dbg!("Building Atomic Tranaction");
+    async fn execute(algod: Rc<Algod>, mut atc: AtomicTransactionComposer) -> ExecuteResult { 
+        
+        let t :ExecuteResult = atc.execute(&algod).await.expect("Error");
+        
+        godot_dbg!("Executing Atomic Tranaction {}", &t);
+        t
+
     }
-    */
+    
 
 }
+
+
+impl Clone for Algodot {
+    fn clone(&self) -> Self {
+        Self {
+            url: self.url.clone(),
+            token: self.token.clone(),
+            headers: self.headers.clone(),
+            algod: Rc::clone(&self.algod),
+        }
+    }
+}
+
 
 #[methods]
 impl Algodot {
@@ -388,12 +408,8 @@ impl Algodot {
 
     atc.build_group().expect("Error");
 
-    godot_dbg!("{}", &atc);
-    
-    let t = async {
-        atc.execute(&self.algod).await.expect("Error")       
-    };
-        
+    Self::execute(self.algod.clone(),atc);
+
     godot_dbg!("Async Method Run--->");
 
     Ok(())
