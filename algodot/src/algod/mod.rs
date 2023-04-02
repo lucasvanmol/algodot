@@ -31,7 +31,7 @@ use algonaut::atomic_transaction_composer::AtomicTransactionComposer;
 //use algodot_core::Account;
 use algonaut::transaction::transaction::ApplicationCallOnComplete::NoOp;
 
-use std::ops::Deref;
+//use std::ops::Deref;
 
 
 #[derive(NativeClass)]
@@ -407,9 +407,9 @@ impl Algodot {
 
 
     atc.build_group().expect("Error");
-
-    Self::execute(self.algod.clone(),atc);
-
+    
+    let _ = Self::execute(self.algod.clone(),atc);
+    
     godot_dbg!("Async Method Run--->");
 
     Ok(())
