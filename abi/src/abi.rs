@@ -152,7 +152,7 @@ pub mod params {
     use algonaut::model::algod::v2::TransactionParams;
     use algonaut::core::MicroAlgos;
     use algonaut::core::Round;
-    use algonaut::crypto::HashDigest;
+    //use algonaut::crypto::HashDigest;
     //use algodot_core::SuggestedTransactionParams;
 
     pub struct MySuggestedTransactionParams(SuggestedTransactionParams);
