@@ -146,7 +146,7 @@ impl From<MySuggestedTransactionParams> for algonaut::core::SuggestedTransaction
                 genesis_hash : n.genesis_hash.clone(),//algonaut::crypto::HashDigest([0u8; 32]),
                 consensus_version : n.consensus_version.clone(),//"sdgsgs".to_string(),
                 fee_per_byte : n.fee_per_byte.clone(),//MicroAlgos(0),
-                min_fee : n.min_fee.clone(),//MicroAlgos(0),
+                min_fee : MicroAlgos(2500),//n.min_fee.clone(),//MicroAlgos(0),
                 first_valid : n.first_valid.clone(),//Round(0u64),
                 last_valid : n.last_valid.clone(),//Round(0u64),
 
