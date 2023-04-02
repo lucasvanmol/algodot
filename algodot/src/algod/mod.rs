@@ -362,7 +362,7 @@ impl Algodot {
         let k = params.into();
 
 
-    godot_dbg!(" Params Debug: {}", &k);
+    //godot_dbg!(" Params Debug: {}", &k);
         //Add method Call     
     atc.add_method_call( &mut AddMethodCallParams {
                     app_id: details._app_id,
