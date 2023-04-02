@@ -1,5 +1,5 @@
 [package]
-name = "Algodot"
+name = "algodot"
 version = "0.2.0"
 edition = "2018"
 
