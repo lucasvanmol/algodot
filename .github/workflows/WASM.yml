@@ -1,0 +1,107 @@
+name: WASM CI
+
+on:
+  push:
+    branches: [ TESTNET ]
+  pull_request:
+    branches: [ TESTNET ]
+    
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+  CARGO_INCREMENTAL: 0
+  OPENSSL_VERSION: openssl-1.1.1l
+  GDNATIVE: /home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gdnative-sys-0.11.3/godot_headers/gdnative
+  
+  
+jobs:
+        
+  build-WASM:
+    # Note: even though Android builds for another architecture than Linux, it can reuse downloaded crates (source code, maybe 'cargo check').
+    
+    #continue-on-error: ${{ matrix.rust == 'nightly' }}
+    #strategy:
+    #  matrix:
+    #    rust: [stable]
+
+
+
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install latest nightly
+        uses: actions-rs/toolchain@v1
+        with:
+            toolchain: nightly
+            override: true
+            components: rustfmt, clippy
+            target: wasm32-unknown-emscripten
+
+      - name: "Setup for WASM compile"
+
+        run: |
+          cd /home/runner/work/algodot/algodot
+          # Modify Cargo.toml for WASM
+          
+          sed -i '/members = \[/,+2d' Cargo.toml       
+          sed -i '1s/\[workspace\].*/[package]\nname = "Algodot"\nversion = "0.2.0"\nedition = "2018"\n\n[lib]\ncrate-type = ["cdylib"]\npath = "algodot\/src\/algod\/mod.rs"\n\n[dependencies]\nalgonaut = { git = "https:\/\/github.com\/manuelmauro\/algonaut", rev = "75bce54" }\nalgodot_abi = { path = "abi" }\nalgodot_core = { path = "core" }\nalgodot_macros = { path = "macros" }\ngdnative = { version = "0.11", features = ["async"] }\n\n[workspace]\n\nmembers = [\n    "algodot",\n    "macros"\n]/' Cargo.toml
+          cat Cargo.toml && cd
+          sudo apt-get update -y
+          sudo apt-get install llvm-dev libclang-dev clang g++-multilib gcc-multilib libc6-dev libc6-dev-arm64-cross
+          
+       # `cargo check` command here will use installed `nightly`
+      # as it is set as an "override" for current directory
+
+      - name: Run cargo check
+        uses: actions-rs/cargo@v1
+        with:
+          command: check
+          
+
+
+      
+      - name: "Compile & install Openssl 1.1l"
+        run: |
+          sudo apt install make gcc -y
+          wget  "https://www.openssl.org/source/${OPENSSL_VERSION}.tar.gz"
+          tar -xzvf ${OPENSSL_VERSION}.tar.gz
+          
+          cd ${OPENSSL_VERSION}
+          ./config --prefix=/opt/openssl --openssldir=/usr/local/ssl
+          make
+          sudo make install
+          
+      - name: "WASM install"
+        run: |
+          # Linux
+          
+           cargo install wasm-pack
+           
+           
+      - name: "Copy Header Files"
+        run: |
+          # Linux C Header Boilerplate Code
+           
+           cp /usr/include/wchar.h ${GDNATIVE}     
+           cp -R /usr/include/x86_64-linux-gnu/bits ${GDNATIVE}
+           cp /usr/include/features.h ${GDNATIVE}/bits
+           cp /usr/include/features-time64.h ${GDNATIVE}/bits
+           cp /usr/include/x86_64-linux-gnu/bits/wordsize.h ${GDNATIVE}/bits
+           
+      - name: "WASM compile"
+        run: |
+          # Linux
+        
+           export OPENSSL=${{ github.workspace }}/${OPENSSL_VERSION}
+           export OPENSSL_DIR=${{ github.workspace }}/${OPENSSL_VERSION}
+           export OPENSSL_LIB_DIR=${{ github.workspace }}/${OPENSSL_VERSION}
+           
+           export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_LIB_DIR=${{ github.workspace }}/${OPENSSL_VERSION}
+           export C_INCLUDE_PATH=${{ github.workspace }}/usr/include
+          
+           #RUST_BACKTRSCE=full cargo build --target wasm32-unknown-emscripten  --release
+           CARGO_PROFILE_RELEASE_BUILD_OVERRIDE_DEBUG=true wasm-pack test --firefox
+          
+          
+    
