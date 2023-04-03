@@ -11,7 +11,7 @@ env:
   RUST_BACKTRACE: 1
   CARGO_INCREMENTAL: 0
   OPENSSL_VERSION : openssl-1.1.1l
-  NDK_VERSION: 24.0.8215888
+
   
 jobs:       
   build-android-arm:
