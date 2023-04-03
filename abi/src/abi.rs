@@ -333,14 +333,12 @@ pub mod escrow {
                 Constructs a Payment Transaction to an Address
             */
 
-            let _t = TxnBuilder::with(
+            TxnBuilder::with(
                 &_params,
                 Pay::new(acct1.address(), to_address, MicroAlgos(123_456)).build(),
             )
             .build()
-            .unwrap();
-
-            _t
+            .unwrap()
         }
 
         pub fn app_address(app_id: &u64) -> Address {

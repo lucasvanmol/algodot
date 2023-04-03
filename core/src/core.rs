@@ -141,12 +141,12 @@ impl From<MySuggestedTransactionParams> for algonaut::core::SuggestedTransaction
     fn from(n: MySuggestedTransactionParams) -> algonaut::core::SuggestedTransactionParams {
         SuggestedTransactionParams {
             genesis_id: n.genesis_id.clone(),
-            genesis_hash: n.genesis_hash.clone(),
+            genesis_hash: n.genesis_hash,
             consensus_version: n.consensus_version.clone(),
-            fee_per_byte: n.fee_per_byte.clone(),
+            fee_per_byte: n.fee_per_byte,
             min_fee: MicroAlgos(2500),
-            first_valid: n.first_valid.clone(),
-            last_valid: n.last_valid.clone(),
+            first_valid: n.first_valid,
+            last_valid: n.last_valid,
         }
     }
 }
