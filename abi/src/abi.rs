@@ -491,20 +491,8 @@ pub mod escrow {
         ) -> Result<Foo<'_>, ServiceError> {todo!()}
         
     
-    /* Executes the Atomic Transaction Compoer in Async*/
+     /* Executes the Atomic Transaction Compoer in Async*/
 
-    pub async fn Execute(_algod : &Algod, mut atc : AtomicTransactionComposer) -> Result<ExecuteResult, ServiceError>{
-            let t : ExecuteResult= atc.execute(_algod).await.expect("Error").into();  
-            
-            /* Output Execute Result to Command Line*/
-          
-            //implement to variant trait for dictionary
-          
-            //dict.insert("method_results", t.method_results); implement to variant trait for dictionary
-            println!("{}", &t.to_variant());
-
-             Ok(t)
-        }
 
         /* Implement To and From Variable with Dictionary Types*/
     

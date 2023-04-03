@@ -1,4 +1,4 @@
-use algodot_abi::abi_smartcontract::*;
+//use algodot_abi::abi_smartcontract::*;
 use algodot_abi::escrow::Foo as escrowFoo;
 use algodot_abi::abi_smartcontract::Foo as abiFoo;
 use algodot_core::*;
@@ -22,12 +22,12 @@ AddMethodCallParams //transaction_signer::TransactionSigner::BasicAccount,
 };
 use algonaut::atomic_transaction_composer::ExecuteResult;
 
-use algonaut::atomic_transaction_composer::AtomicTransactionComposer;
+//use algonaut::atomic_transaction_composer::AtomicTransactionComposer;
 //use algodot_core::Account;
 use algonaut::transaction::transaction::ApplicationCallOnComplete::NoOp;
 //use algonaut::error::ServiceError;
 //use std::ops::Deref;
-use gdnative::tasks::Context;
+//use gdnative::tasks::Context;
 
 #[derive(NativeClass, Clone)]
 #[inherit(Node)]
@@ -40,7 +40,7 @@ pub struct Algodot {
     token: String,
 
     #[property(set = "Self::set_headers")]
-    headers: StringArray,
+    headers: PoolArray<GodotString>,
 
     algod: Rc<Algod>,
 }
@@ -51,7 +51,7 @@ impl Algodot {
         Algodot {
             url: String::new(),
             token: String::new(),
-            headers: StringArray::new(),
+            headers: PoolArray::<GodotString>::new(),
 
             // algod will be initialised on _enter_tree()
             // leave these default values here for now
@@ -163,7 +163,7 @@ impl Algodot {
     }
 
     #[method]
-    fn set_headers(&mut self, #[base] _base: TRef<Node>, headers: StringArray) {
+    fn set_headers(&mut self, #[base] _base: TRef<Node>, headers: PoolArray<GodotString>) {
         self.headers = headers;
         self.update_algod();
     }
@@ -290,7 +290,7 @@ impl Algodot {
         default_frozen: bool,
         total: u64,
         unit_name: String,
-        #[opt] meta_data_hash: Option<ByteArray>,
+        #[opt] meta_data_hash: Option<PoolArray<u8>>,
         #[opt] url: Option<String>,
         #[opt] clawback: Option<Address>,
         #[opt] freeze: Option<Address>,
@@ -379,7 +379,7 @@ impl Algodot {
 
     let mut _to_addr: [u8; 32] = escrowFoo::address_to_bytes(sender.to_string());//[0; 32];
 
-    let __app_id : u64 = 161737986 ;
+    //let __app_id : u64 = 161737986 ;
     let pages: u32 = 0;
     
   
@@ -389,8 +389,8 @@ impl Algodot {
             withdrw_to_addr: _to_addr.clone(), 
             arg1: escrowFoo::withdraw_amount(0u32), 
             arg2: escrowFoo::address(_to_addr),
-            _app_id: __app_id.clone(), 
-            _escrow_address: escrowFoo::app_address(&__app_id), 
+            _app_id: app_id.clone(),//__app_id.clone(), 
+            _escrow_address: escrowFoo::app_address(&app_id), 
             atc: &atc 
         };
 
@@ -423,11 +423,6 @@ impl Algodot {
 
     atc.build_group().expect("Error");
    
-    godot_dbg!("{}", &atc);
-
-    //let t = &self.algod.clone();
-    //escrowFoo::Execute(&self.algod.clone(),atc); //works
-     
     //Testnet
     // Should ideally get initialization code from Algodot Type but 
     //That would require editting the init variables to global variables with lifetimes
@@ -443,7 +438,7 @@ impl Algodot {
                     headers,
                 ).unwrap();
     
-    atc.execute(&po).await.expect("Error");
+    let result : ExecuteResult = atc.execute(&po).await.expect("Error");
         // Returns an ExecuteResu;t
         // Use a rust Enum for better programmability 
     //escrowFoo::Execute(t,atc).await.unwrap().tx_ids.to_variant();
@@ -461,6 +456,9 @@ impl Algodot {
     // Rewrite this method as async
     // figure out async macro in core.rs
     let dict = Dictionary::new();
+    dict.insert("confirmed round", result.confirmed_round);
+    dict.insert("tx_ids", result.tx_ids);
+    //dict.insert("status ", atc.status());
     dict.into()
 
     }
