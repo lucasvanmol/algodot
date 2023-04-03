@@ -203,14 +203,14 @@ pub mod params {
 
 
 
-//
+
 pub mod escrow {
 
     use algonaut::algod::v2::Algod;
     use algonaut::abi::abi_type::AbiValue::Int;
     use algonaut::core::Address;
     
-    use num_bigint::BigUint;
+    //use num_bigint::BigUint;
 
     use algonaut::{
         atomic_transaction_composer::{
@@ -239,8 +239,19 @@ pub mod escrow {
     use std::convert::TryInto;
    
     use algonaut::atomic_transaction_composer::transaction_signer::TransactionSigner::BasicAccount;
-    
-    #[derive(Debug)]
+    use algonaut::atomic_transaction_composer::ExecuteResult;
+    use algonaut::atomic_transaction_composer::AbiMethodResult;
+    use gdnative::core_types::Dictionary;
+
+    //use gdnative::core_types::ToVariant;
+    //use gdnative::core_types::FromVariant;
+    use gdnative::core_types::Variant;
+    use gdnative::prelude::OwnedToVariant;
+
+
+
+    #[derive(Debug, Clone)]
+    //#[derive(Debug)]
     //lifetime Parameter
     pub struct Foo <'a> {
         pub withdrw_amt: u32,
@@ -252,24 +263,64 @@ pub mod escrow {
         pub atc: &'a AtomicTransactionComposer,
     }
 
+    pub struct MyExecuteResult {
+         pub confirmed_round: Option<u64>,
+         pub tx_ids: Vec<String>,
+         pub method_results: Vec<AbiMethodResult>,
+    }
+
     trait MyTrait {
         type Foo <'a>;
         type Params;
         type Parsed;
         type Payment;
 
+        type ServiceError;
+
         fn _app_id(&self, x: u64) -> u64;
         fn arg1(withdrw_amt: u64) -> AbiArgValue{AbiArgValue::AbiValue( Int(withdrw_amt.into()))}
         fn arg2(withdrw_amt: u64) -> AbiArgValue{AbiArgValue::AbiValue( Int(withdrw_amt.into()))}
     }
+
+    pub trait ToVariant{
+        fn to_variant(&self) -> Variant;
+    }
+
+    /* Trait Implementations*/
 
     impl MyTrait for Foo <'_>{
         type Foo <'a> = Foo<'a>;
         type Parsed = Option<String>;
         type Payment = Option<Payment>;
         type Params = Option<OtherSuggestedTransactionParams>;
+
+        type ServiceError = Option<ServiceError>;
         fn _app_id(&self, x: u64) -> u64 { x }
     }
+
+    impl ToVariant for ExecuteResult{
+
+        //type ServiceError;
+        
+        fn to_variant(&self) -> Variant{
+            /*
+            ExecuteResult{
+                confirmed_round: None, //Some(x.confirmed_round),
+                tx_ids: x.tx_ids,
+                method_results: x.method_results,
+            }
+
+            */
+
+            let dict = Dictionary::new();
+            dict.insert("confirmed_round", Some(self.confirmed_round));
+            dict.insert("tx_ids", self.tx_ids.clone());
+            //dict.insert("method_results", self.method_results);
+            dict.owned_to_variant()
+        }
+    }
+
+    /* Smart Contract Arc 4 Implementation*/
 
     impl Foo <'_> {
         // Adding method to create application call
@@ -312,15 +363,7 @@ pub mod escrow {
             
 
         }
-        pub fn withdraw(_acct1: Account ){
-             /* 
-            Withdraw Method Parameters for Escrow SmartContract
-            
-                Docs: https://docs.rs/num-bigint/0.4.3/num_bigint/struct.BigUint.html
-                Does nothing
-            */
 
-        }
         
 
         //use algonaut_core::Address;
@@ -355,8 +398,6 @@ pub mod escrow {
             Does
             */
 
-            //Params
-            //
             //App ID
             let _app_id = 161737986;
 
@@ -402,9 +443,7 @@ pub mod escrow {
         Constructs a 32 Bit Byte Slice froma Given Address String
         */   
             let mut _to_addr: [u8; 32] = [0; 32];
-            //_to_addr.copy_from_slice(&acct1.address().to_string().as_bytes()[..32]);
             _to_addr.copy_from_slice(&addr.as_bytes()[..32]);
-
             _to_addr
             
         }
@@ -431,13 +470,12 @@ pub mod escrow {
         
         */
         
-        //&AtomicTransactionComposer
+        
         &self,
-        //#[base] _base: &Node,
         _app_id: u64,
         _method: AbiMethod,
         _method_args: Vec<AbiArgValue>,
-        _fee: TxnFee,//Fixed(MicroAlgos(2500u64)), //make customizable
+        _fee: TxnFee, //make customizable
         _sender: Address,
         _on_complete: ApplicationCallOnComplete,
         _clear_program: Option<CompiledTeal>,
@@ -450,13 +488,32 @@ pub mod escrow {
         _signer: TransactionSigner,
     
     
-    ) -> Result<Foo<'_>, ServiceError> {
-            todo!()
-            
-        }
+        ) -> Result<Foo<'_>, ServiceError> {todo!()}
         
+    
+    /* Executes the Atomic Transaction Compoer in Async*/
 
+    pub async fn Execute(_algod : &Algod, mut atc : AtomicTransactionComposer) -> Result<ExecuteResult, ServiceError>{
+            let t : ExecuteResult= atc.execute(_algod).await.expect("Error").into();  
+            
+            /* Output Execute Result to Command Line*/
+          
+            //implement to variant trait for dictionary
+          
+            //dict.insert("method_results", t.method_results); implement to variant trait for dictionary
+            println!("{}", &t.to_variant());
+
+             Ok(t)
+        }
+
+        /* Implement To and From Variable with Dictionary Types*/
+    
+    
+    
     } 
+
+
+
 
 }
     
