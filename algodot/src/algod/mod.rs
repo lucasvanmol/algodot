@@ -8,6 +8,7 @@ use algonaut::core::{MicroAlgos, Round};
 use algonaut::model::algod::v2::{PendingTransaction, TransactionResponse};
 use algonaut::transaction::transaction::{
     AssetAcceptTransaction,    AssetConfigurationTransaction, AssetParams, AssetTransferTransaction,
+    ApplicationCallOnComplete::NoOp;
 };
 use algonaut::transaction::tx_group::TxGroup;
 use algonaut::transaction::{Pay, TransactionType, TxnBuilder, builder::CallApplication, };
@@ -17,17 +18,10 @@ use gdnative::tasks::{Async, AsyncMethod, Spawner};
 
 use std::rc::Rc;
 
-use algonaut::atomic_transaction_composer::{ //AtomicTransactionComposerStatus, 
-AddMethodCallParams //transaction_signer::TransactionSigner::BasicAccount, 
-};
-use algonaut::atomic_transaction_composer::ExecuteResult;
+use algonaut::atomic_transaction_composer::{ AddMethodCallParams, ExecuteResult};
 
-//use algonaut::atomic_transaction_composer::AtomicTransactionComposer;
-//use algodot_core::Account;
-use algonaut::transaction::transaction::ApplicationCallOnComplete::NoOp;
-//use algonaut::error::ServiceError;
-//use std::ops::Deref;
-//use gdnative::tasks::Context;
+
+use algonaut::transaction::transaction::
 
 #[derive(NativeClass, Clone)]
 #[inherit(Node)]
@@ -102,45 +96,11 @@ impl Algodot {
             }
             round += 1;
         }
-    }
-    //Executes Atomic Transactions for ARC 4 SmartContracts 
-    /*
-    async fn execute(algod: Rc<Algod>, mut atc: AtomicTransactionComposer) -> ExecuteResult { 
-        
-        let t :ExecuteResult = atc.execute(&algod).await.expect("Error");
-        
-        godot_dbg!("Executing Atomic Tranaction {}", &t);
-        t
-
-    }
-    */    
+    }  
 
 
 }
 
-/*
-impl Clone for Algodot {
-    fn clone(&self) -> Self {
-        Self {
-            url: self.url.clone(),
-            token: self.token.clone(),
-            headers: self.headers.clone(),
-            algod: Rc::clone(&self.algod),
-        }
-    }
-}
-
-
-impl FromVariant for Algodot{
-    fn from_variant(variant: &Variant) -> Variant {
-        let t =Variant::new("sdsdg");
-        t
-    }
-
-  
-}
-
-*/
 
 
 #[methods]
@@ -423,7 +383,7 @@ impl Algodot {
    
     //Testnet
     // Should ideally get initialization code from Algodot Type but 
-    //That would require editting the init variables to global variables with lifetimes
+    // That would require editting the init variables to global variables with lifetimes
 
     let url = String::from("https://node.testnet.algoexplorerapi.io");
  

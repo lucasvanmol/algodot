@@ -246,9 +246,10 @@ impl ToVariant for MyTransaction {
                 //defaults to a noOp on transaction complete
                 //should be further customized to include ClearState,CloseOut,DeleteApplication
                 TransactionType::ApplicationCallTransaction(appl) => {
-                    //Creates a Txn Dictionary for Signing the App Call Txn
+                    /*
+                    Creates a Txn Dictionary for Signing all App Call Txn
 
-                    //creates a Byte Array from app_arg
+                    */
                     let q: PoolArray<u8> = get_byte_array(appl.app_arguments.as_ref().unwrap().clone())
                         .unwrap_or_default();
                     dict.insert("app_id", appl.app_id);

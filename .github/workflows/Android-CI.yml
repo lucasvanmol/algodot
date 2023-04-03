@@ -10,7 +10,7 @@ env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
   CARGO_INCREMENTAL: 0
-  
+  OPENSSL_VERSION : openssl-1.1.1l
   
 jobs:       
   build-android-arm:
@@ -52,7 +52,7 @@ jobs:
           -execdir sh -c 'echo "INPUT(-lunwind)" > libgcc.a' \;
       
       
-      - name: "Build OpenSSL for arm"
+      - name: "Build OpenSSL for arm with Bash"
         run: |
         
           if [[ -z "${ANDROID_NDK_HOME}" ]]; then
@@ -63,8 +63,8 @@ jobs:
           fi
           sleep 3
           # need change
-          export OPENSSL_VERSION="openssl-1.1.1l"
-          curl -O "https://www.openssl.org/source/${OPENSSL_VERSION}.tar.gz"
+          
+          curl -O "https://www.openssl.org/source/${{env.OPENSSL_VERSION}}.tar.gz"
 
 
           PROJECT_HOME=`pwd`
@@ -152,7 +152,7 @@ jobs:
           name: "Openssl dependencies arm-v7a"
           path: openssl_android
       
-      - name: "Build Rust for targets: armv7-linux-androideabi" # aarch64-linux-android
+      - name: "Build Rust for targets with Bash: armv7-linux-androideabi" # aarch64-linux-android
         run: |
           
         
@@ -196,7 +196,7 @@ jobs:
           name: "android armabi-v7a"
           path: target/armv7-linux-androideabi/release/libalgodot.so
         
-      - name: "Build OpenSSL for arm64"
+      - name: "Build OpenSSL for arm64 with Bash"
         run: |
         
           if [[ -z "${ANDROID_NDK_HOME}" ]]; then
@@ -291,7 +291,7 @@ jobs:
       
       
       
-      - name: "Build Rust for targets: armv8-linux-androideabi" # aarch64-linux-android
+      - name: "Build Rust for targets with Bash: armv8-linux-androideabi" # aarch64-linux-android
         run: |
           
         
