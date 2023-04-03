@@ -1,11 +1,9 @@
 //code reference: https://github.com/manuelmauro/algonaut/blob/main/tests/step_defs/integration/abi.rs
 
 pub mod abi_smartcontract {
-    //use algonaut_abi::abi_interactions::AbiMethodArg;
-    //use algonaut_abi::abi_interactions::AbiReturn;
-    use algonaut::abi::abi_type::AbiType;
 
     use algonaut::abi::abi_interactions::AbiMethod;
+    use algonaut::abi::abi_type::AbiType;
     use gdnative::core_types::Variant;
     use gdnative::prelude::ToVariant;
 
