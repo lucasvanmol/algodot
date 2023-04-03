@@ -174,28 +174,18 @@ pub mod params {
 
 pub mod escrow {
 
-    use algonaut::abi::abi_interactions::AbiMethod;
     use algonaut::abi::abi_type::AbiValue::Int;
     use algonaut::core::Address;
-    use algonaut::core::{to_app_address, Address as OtherAddress, CompiledTeal, MicroAlgos};
+    use algonaut::core::{to_app_address, Address as OtherAddress, MicroAlgos};
     use algonaut::{
-        atomic_transaction_composer::{
-            transaction_signer::TransactionSigner, AbiArgValue, AtomicTransactionComposer,
-        },
+        atomic_transaction_composer::{AbiArgValue, AtomicTransactionComposer},
         error::ServiceError,
     };
 
-    use algonaut::transaction::{
-        builder::TxnFee,
-        builder::TxnFee::Fixed,
-        transaction::{ApplicationCallOnComplete, StateSchema},
-        Pay, TxnBuilder,
-    };
+    use algonaut::transaction::{builder::TxnFee, builder::TxnFee::Fixed, Pay, TxnBuilder};
 
     use algonaut::core::SuggestedTransactionParams as OtherSuggestedTransactionParams;
     use algonaut::transaction::{account::Account, transaction::Payment};
-
-    use algonaut::crypto::HashDigest;
 
     use std::convert::TryInto;
 
@@ -206,7 +196,6 @@ pub mod escrow {
     use gdnative::core_types::Variant;
     use gdnative::prelude::OwnedToVariant;
 
-    #[allow(clippy::too_many_arguments)]
     #[derive(Debug, Clone)]
     pub struct Foo<'a> {
         pub withdrw_amt: u32,
@@ -423,7 +412,7 @@ pub mod escrow {
         pub fn fee(amount: u64) -> TxnFee {
             Fixed(MicroAlgos(amount))
         }
-
+        /*
         pub fn construct_app_call_method(
             /*
             Constructs an App Call Method as a Rust Module
@@ -446,10 +435,10 @@ pub mod escrow {
             _signer: TransactionSigner,
         ) -> Result<Foo<'_>, ServiceError> {
             todo!()
-        }
-
-        /* Executes the Atomic Transaction Compoer in Async*/
-
-        /* Implement To and From Variable with Dictionary Types*/
+             */
     }
+
+    /* Executes the Atomic Transaction Compoer in Async*/
+
+    /* Implement To and From Variable with Dictionary Types*/
 }
