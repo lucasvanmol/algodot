@@ -20,9 +20,6 @@ use serde::Serialize;
 use std::str::FromStr;
 use thiserror::Error;
 
-
-
-
 /// This file contains implementations of ToVariant and FromVariant for algonaut types.
 ///
 /// It might be worth looking into forking algonaut instead, allowing the use of `#[derive]` directly.
@@ -97,7 +94,7 @@ impl MyAccount {
     }
 }
 
-#[derive(Deref, DerefMut, From)]
+#[derive(Deref, DerefMut, From, Clone)]
 pub struct MySuggestedTransactionParams(SuggestedTransactionParams);
 
 //used when constructing To a variant
@@ -110,7 +107,10 @@ impl ToVariant for MySuggestedTransactionParams {
         dict.insert("consensus_version", &self.consensus_version);
         dict.insert("min_fee", self.min_fee.0);
         dict.insert("fee_per_byte", self.fee_per_byte.0);
-        dict.insert("genesis_hash", PoolArray::<u8>::from_slice(&self.genesis_hash.0));
+        dict.insert(
+            "genesis_hash",
+            PoolArray::<u8>::from_slice(&self.genesis_hash.0),
+        );
         dict.owned_to_variant()
     }
 }
@@ -137,32 +137,24 @@ impl FromVariant for MySuggestedTransactionParams {
     }
 }
 
-impl From<MySuggestedTransactionParams> for algonaut::core::SuggestedTransactionParams{
-    //fn from(_: MySuggestedTransactionParams) -> algonaut::core::SuggestedTransactionParams { todo!() }
-
- fn from(n: MySuggestedTransactionParams) -> algonaut::core::SuggestedTransactionParams { SuggestedTransactionParams{
-                
-                genesis_id : n.genesis_id.clone(),//"dfdfg".to_string(),
-                genesis_hash : n.genesis_hash.clone(),//algonaut::crypto::HashDigest([0u8; 32]),
-                consensus_version : n.consensus_version.clone(),//"sdgsgs".to_string(),
-                fee_per_byte : n.fee_per_byte.clone(),//MicroAlgos(0),
-                min_fee : MicroAlgos(2500),//n.min_fee.clone(),//MicroAlgos(0),
-                first_valid : n.first_valid.clone(),//Round(0u64),
-                last_valid : n.last_valid.clone(),//Round(0u64),
-
-             }}
-
+impl From<MySuggestedTransactionParams> for algonaut::core::SuggestedTransactionParams {
+    fn from(n: MySuggestedTransactionParams) -> algonaut::core::SuggestedTransactionParams {
+        SuggestedTransactionParams {
+            genesis_id: n.genesis_id.clone(),
+            genesis_hash: n.genesis_hash,
+            consensus_version: n.consensus_version.clone(),
+            fee_per_byte: n.fee_per_byte,
+            min_fee: MicroAlgos(2500),
+            first_valid: n.first_valid,
+            last_valid: n.last_valid,
+        }
+    }
 }
-
-
 
 #[derive(Deref, DerefMut, From, Into)]
 pub struct MyTransaction(pub Transaction);
 
 impl ToVariant for MyTransaction {
-
-
-
     fn to_variant(&self) -> Variant {
         let dict = Dictionary::new();
         dict.insert("fee", self.fee.0);
@@ -250,8 +242,9 @@ impl ToVariant for MyTransaction {
                     Creates a Txn Dictionary for Signing all App Call Txn
 
                     */
-                    let q: PoolArray<u8> = get_byte_array(appl.app_arguments.as_ref().unwrap().clone())
-                        .unwrap_or_default();
+                    let q: PoolArray<u8> =
+                        get_byte_array(appl.app_arguments.as_ref().unwrap().clone())
+                            .unwrap_or_default();
                     dict.insert("app_id", appl.app_id);
                     dict.insert("app_arg", q);
                     dict.insert("txn", Dictionary::new());
@@ -324,7 +317,9 @@ impl ToVariant for MySignedTransaction {
         let dict = Dictionary::new();
         dict.insert("txn", MyTransaction::from(self.transaction.clone()));
         match self.sig {
-            TransactionSignature::Single(sig) => dict.insert("sig", PoolArray::<u8>::from_slice(&sig.0)),
+            TransactionSignature::Single(sig) => {
+                dict.insert("sig", PoolArray::<u8>::from_slice(&sig.0))
+            }
             TransactionSignature::Multi(_) => todo!(),
             TransactionSignature::Logic(_) => todo!(),
         }
