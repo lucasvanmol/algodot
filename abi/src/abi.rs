@@ -378,7 +378,7 @@ pub mod escrow {
         }
 
         */
-        pub fn new() -> AtomicTransactionComposer {
+        pub fn new_atc() -> AtomicTransactionComposer {
             /*
             Constructs a Default Atomic Transation Composer
             */

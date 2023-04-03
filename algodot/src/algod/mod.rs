@@ -331,7 +331,7 @@ impl Algodot {
     ) -> Dictionary { //Returns Opaque Type //Result<ExecuteResult, ServiceError> //Result<(), Foo>
 
        
-    let mut atc = escrowFoo::new();  
+    let mut atc = escrowFoo::new_atc();  
 
 
 
