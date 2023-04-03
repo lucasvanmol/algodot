@@ -162,16 +162,14 @@ pub mod params {
         */
 
         fn to_variant(&self, params: SuggestedTransactionParams) -> TransactionParams {
-            let dict = algonaut::model::algod::v2::TransactionParams {
+            algonaut::model::algod::v2::TransactionParams {
                 consensus_version: params.consensus_version,
                 fee_per_byte: MicroAlgos(0u64),
-                genesis_hash: params.genesis_hash, //HashDigest([u8; 32]),
+                genesis_hash: params.genesis_hash,
                 genesis_id: params.genesis_id,
                 last_round: Round(0u64),
                 min_fee: MicroAlgos(0u64),
-            };
-
-            dict
+            }
         }
     }
 }
@@ -344,7 +342,7 @@ pub mod escrow {
             .build()
             .unwrap();
 
-            return _t;
+            _t
         }
 
         pub fn app_address(app_id: &u64) -> Address {
@@ -422,7 +420,7 @@ pub mod escrow {
         pub fn basic_account(
             mnemonic: &str,
         ) -> algonaut::atomic_transaction_composer::transaction_signer::TransactionSigner {
-            BasicAccount(algonaut::transaction::account::Account::from_mnemonic(&mnemonic).unwrap())
+            BasicAccount(algonaut::transaction::account::Account::from_mnemonic(mnemonic).unwrap())
         }
 
         pub fn fee(amount: u64) -> TxnFee {
