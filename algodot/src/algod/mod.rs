@@ -1,4 +1,3 @@
-//use algodot_abi::abi_smartcontract::*;
 use algodot_abi::escrow::Foo as escrowFoo;
 use algodot_abi::abi_smartcontract::Foo as abiFoo;
 use algodot_core::*;
@@ -8,7 +7,7 @@ use algonaut::core::{MicroAlgos, Round};
 use algonaut::model::algod::v2::{PendingTransaction, TransactionResponse};
 use algonaut::transaction::transaction::{
     AssetAcceptTransaction,    AssetConfigurationTransaction, AssetParams, AssetTransferTransaction,
-    ApplicationCallOnComplete::NoOp;
+    ApplicationCallOnComplete::NoOp,
 };
 use algonaut::transaction::tx_group::TxGroup;
 use algonaut::transaction::{Pay, TransactionType, TxnBuilder, builder::CallApplication, };
