@@ -1,3 +1,4 @@
+//use algodot_abi::abi_smartcontract::*;
 use algodot_abi::escrow::Foo as escrowFoo;
 use algodot_abi::abi_smartcontract::Foo as abiFoo;
 use algodot_core::*;
@@ -19,8 +20,6 @@ use std::rc::Rc;
 
 use algonaut::atomic_transaction_composer::{ AddMethodCallParams, ExecuteResult};
 
-
-use algonaut::transaction::transaction::
 
 #[derive(NativeClass, Clone)]
 #[inherit(Node)]
@@ -58,6 +57,7 @@ impl Algodot {
         }
     }
 
+    /* */
     fn register(builder: &ClassBuilder<Algodot>) {
         Self::register_signals(builder);
 
@@ -330,7 +330,7 @@ impl Algodot {
     ) -> Dictionary { //Returns Opaque Type //Result<ExecuteResult, ServiceError> //Result<(), Foo>
 
        
-    let mut atc = escrowFoo::new();  
+    let mut atc = escrowFoo::new_atc();  
 
 
 
