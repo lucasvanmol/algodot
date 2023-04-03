@@ -21,8 +21,6 @@ use std::rc::Rc;
 use algonaut::atomic_transaction_composer::{ AddMethodCallParams, ExecuteResult};
 
 
-use algonaut::transaction::transaction::
-
 #[derive(NativeClass, Clone)]
 #[inherit(Node)]
 #[register_with(Self::register)]
@@ -59,6 +57,7 @@ impl Algodot {
         }
     }
 
+    /* */
     fn register(builder: &ClassBuilder<Algodot>) {
         Self::register_signals(builder);
 

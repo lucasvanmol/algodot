@@ -4,6 +4,7 @@ use tokio::{
     task::LocalSet,
 };
 
+mod algod;
 // https://godot-rust.github.io/book/recipes/async-tokio.html
 
 thread_local! {
@@ -65,7 +66,7 @@ impl AsyncExecutorDriver {
 fn init(handle: InitHandle) {
     gdnative::tasks::register_runtime(&handle);
     gdnative::tasks::set_executor(EXECUTOR.with(|e| *e));
-
+    handle.add_class::<algod::Algodot>();
     handle.add_class::<AsyncExecutorDriver>();
 }
 
