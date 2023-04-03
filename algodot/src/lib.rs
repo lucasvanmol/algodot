@@ -67,7 +67,7 @@ fn init(handle: InitHandle) {
     gdnative::tasks::register_runtime(&handle);
     gdnative::tasks::set_executor(EXECUTOR.with(|e| *e));
 
-    handle.add_class::<algod::Algodot>();
+    handle.add_class::<Algodot>();
     handle.add_class::<AsyncExecutorDriver>();
 }
 
