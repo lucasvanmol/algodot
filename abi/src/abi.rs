@@ -85,7 +85,7 @@ pub mod abi_smartcontract {
 }
 
 
-pub mod ATC {
+pub mod atc {
     /*
     Atomic Transaction Composer Required Traits
     */
@@ -157,6 +157,7 @@ pub mod params {
 
     pub struct MySuggestedTransactionParams(SuggestedTransactionParams);
 
+    /*
     struct Foo {
         genesis_id: String,
         genesis_hash: [u8; 32],
@@ -167,7 +168,7 @@ pub mod params {
         last_valid: Round,
     }
 
-    
+    */
 
     pub trait Into {
    
@@ -206,7 +207,7 @@ pub mod params {
 
 pub mod escrow {
 
-    use algonaut::algod::v2::Algod;
+    //use algonaut::algod::v2::Algod;
     use algonaut::abi::abi_type::AbiValue::Int;
     use algonaut::core::Address;
     
@@ -216,14 +217,14 @@ pub mod escrow {
         atomic_transaction_composer::{
             transaction_signer::TransactionSigner, AbiArgValue,
             AtomicTransactionComposer, 
-            TransactionWithSigner,
+            //TransactionWithSigner,
         },
         error::ServiceError,
     };
     use algonaut::abi::{
         abi_interactions::{AbiMethod},  
     };
-    use algonaut::core::{to_app_address, Address as OtherAddress, MicroAlgos, CompiledTeal, SuggestedTransactionParams};
+    use algonaut::core::{to_app_address, Address as OtherAddress, MicroAlgos, CompiledTeal };
     
     use algonaut::transaction::{
         builder::TxnFee, builder::TxnFee::Fixed,
@@ -323,12 +324,18 @@ pub mod escrow {
     /* Smart Contract Arc 4 Implementation*/
 
     impl Foo <'_> {
+
+        /*
         // Adding method to create application call
         fn get_call(&self) -> Result<ApplicationCallOnComplete, ServiceError> {
             
             todo!()
             
         }
+
+        */
+
+        /*
 
         // Adding method to create pay transaction
         fn get_payment(&self) -> Result<Payment, ServiceError> {
@@ -339,6 +346,8 @@ pub mod escrow {
             todo!()
             
         }
+
+        */
         
         pub fn note(size : u32) -> Option <Vec<u8>>{
             Some(vec![size.try_into().unwrap()])
@@ -389,6 +398,8 @@ pub mod escrow {
         pub fn app_address (app_id : &u64) -> Address{
             to_app_address(*app_id)
         }
+
+        /*
         
         pub fn deposit(_algod : Algod , acct1_3 : Account ,  params : algonaut::core::SuggestedTransactionParams) -> algonaut::core::SuggestedTransactionParams {
             /*
@@ -430,6 +441,7 @@ pub mod escrow {
  
         }
 
+        */
         pub fn new() -> AtomicTransactionComposer{
         /*
         Constructs a Default Atomic Transation Composer
