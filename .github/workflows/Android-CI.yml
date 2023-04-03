@@ -11,6 +11,7 @@ env:
   RUST_BACKTRACE: 1
   CARGO_INCREMENTAL: 0
   OPENSSL_VERSION : openssl-1.1.1l
+  NDK_VERSION: 24.0.8215888
   
 jobs:       
   build-android-arm:
@@ -57,7 +58,7 @@ jobs:
         
           if [[ -z "${ANDROID_NDK_HOME}" ]]; then
             # need change
-            export ANDROID_NDK_HOME=~/Android/Sdk/ndk/25.1.8937393
+            export ANDROID_NDK_HOME=~/Android/Sdk/ndk/${{ env.ANDROID_NDK_VERSION }}
           else
             echo "Use environment variable ANDROID_NDK_HOME is: $ANDROID_NDK_HOME"
           fi
@@ -174,7 +175,7 @@ jobs:
           PKG_CONFIG_ALLOW_CROSS_armv7_linux_androideabi=1
           
          
-          export ANDROID_NDK_VERSION=25.1.8937393
+          export ANDROID_NDK_VERSION=${{ env.ANDROID_NDK_VERSION }}
 
           export OPENSSL_DIR=${{ github.workspace }}
           export TOOLCHAIN=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64
@@ -201,7 +202,7 @@ jobs:
         
           if [[ -z "${ANDROID_NDK_HOME}" ]]; then
             # need change
-            export ANDROID_NDK_HOME=~/Android/Sdk/ndk/25.1.8937393
+            export ANDROID_NDK_HOME=~/Android/Sdk/ndk/${{ env.ANDROID_NDK_VERSION }}
           else
             echo "Use environment variable ANDROID_NDK_HOME is: $ANDROID_NDK_HOME"
           fi
@@ -309,7 +310,7 @@ jobs:
           export AARCH64_LINUX_ANDROID_OPENSSL_LIB_DIR=${{ github.workspace }}/openssl_android
             
          
-          export ANDROID_NDK_VERSION=25.1.8937393
+          export ANDROID_NDK_VERSION=${{ env.ANDROID_NDK_VERSION }}
 
           export OPENSSL_DIR=${{ github.workspace }}/openssl_android
           export TOOLCHAIN=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64
