@@ -2,9 +2,9 @@ name: Android CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ TESTNET ]
   pull_request:
-    branches: [ master ]
+    branches: [ TESTNET ]
     
 env:
   CARGO_TERM_COLOR: always

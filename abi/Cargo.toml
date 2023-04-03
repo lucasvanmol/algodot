@@ -1,5 +1,5 @@
 [package]
-name = "algodot_core"
+name = "algodot_abi"
 version = "0.2.1"
 edition = "2021"
 
@@ -13,3 +13,4 @@ derive_more = "0.99.16"
 serde = "1.0"
 serde_json = "1.0"
 thiserror = "1.0.30"
+

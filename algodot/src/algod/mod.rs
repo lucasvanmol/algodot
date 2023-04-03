@@ -1,11 +1,6 @@
-use algodot_abi::abi_smartcontract::*;
+//use algodot_abi::abi_smartcontract::*;
 use algodot_abi::escrow::Foo as escrowFoo;
-//use algodot_abi::atc_params::Into as atc_params;
-//use algodot_abi::abi_smartcontract::Foo;
-//use algodot_abi::escrow::Foo;
 use algodot_abi::abi_smartcontract::Foo as abiFoo;
-
-//use algodot_abi::*;
 use algodot_core::*;
 use algodot_macros::*;
 use algonaut::algod::v2::Algod;
@@ -13,6 +8,7 @@ use algonaut::core::{MicroAlgos, Round};
 use algonaut::model::algod::v2::{PendingTransaction, TransactionResponse};
 use algonaut::transaction::transaction::{
     AssetAcceptTransaction,    AssetConfigurationTransaction, AssetParams, AssetTransferTransaction,
+    ApplicationCallOnComplete::NoOp;
 };
 use algonaut::transaction::tx_group::TxGroup;
 use algonaut::transaction::{Pay, TransactionType, TxnBuilder, builder::CallApplication, };
@@ -22,16 +18,12 @@ use gdnative::tasks::{Async, AsyncMethod, Spawner};
 
 use std::rc::Rc;
 
-use algonaut::atomic_transaction_composer::{AtomicTransactionComposerStatus, 
-AddMethodCallParams //transaction_signer::TransactionSigner::BasicAccount, 
-};
+use algonaut::atomic_transaction_composer::{ AddMethodCallParams, ExecuteResult};
 
 
-use algonaut::atomic_transaction_composer::AtomicTransactionComposer;
-//use algodot_core::Account;
-use algonaut::transaction::transaction::ApplicationCallOnComplete::NoOp;
+use algonaut::transaction::transaction::
 
-#[derive(NativeClass)]
+#[derive(NativeClass, Clone)]
 #[inherit(Node)]
 #[register_with(Self::register)]
 pub struct Algodot {
@@ -42,17 +34,18 @@ pub struct Algodot {
     token: String,
 
     #[property(set = "Self::set_headers")]
-    headers: StringArray,
+    headers: PoolArray<GodotString>,
 
     algod: Rc<Algod>,
 }
+
 
 impl Algodot {
     fn new(_base: &Node) -> Self {
         Algodot {
             url: String::new(),
             token: String::new(),
-            headers: StringArray::new(),
+            headers: PoolArray::<GodotString>::new(),
 
             // algod will be initialised on _enter_tree()
             // leave these default values here for now
@@ -103,17 +96,12 @@ impl Algodot {
             }
             round += 1;
         }
-    }
-    /* Executes Atomic Transactions for ARC 4 SmartContracts 
-    
-    async fn execute(&self ,mut atc : AtomicTransactionComposer ) {
-        atc.execute(&self.algod).await.expect("Error");
-        //godot_print!("{}", stringify!(&mut atc.status()));
-        godot_dbg!("Building Atomic Tranaction");
-    }
-    */
+    }  
+
 
 }
+
+
 
 #[methods]
 impl Algodot {
@@ -135,7 +123,7 @@ impl Algodot {
     }
 
     #[method]
-    fn set_headers(&mut self, #[base] _base: TRef<Node>, headers: StringArray) {
+    fn set_headers(&mut self, #[base] _base: TRef<Node>, headers: PoolArray<GodotString>) {
         self.headers = headers;
         self.update_algod();
     }
@@ -262,7 +250,7 @@ impl Algodot {
         default_frozen: bool,
         total: u64,
         unit_name: String,
-        #[opt] meta_data_hash: Option<ByteArray>,
+        #[opt] meta_data_hash: Option<PoolArray<u8>>,
         #[opt] url: Option<String>,
         #[opt] clawback: Option<Address>,
         #[opt] freeze: Option<Address>,
@@ -322,20 +310,25 @@ impl Algodot {
     }
 
 
-    #[method]
+    #[method(async)]
     #[allow(clippy::too_many_arguments)]
-    fn construct_atc(
-        /* Atomic Transaction Composer*/
-        &self,
-        #[base] _base: &Node,
+    async fn construct_atc(
+        /* 
+        Atomic Transaction Composer
+        
+        An exported async method that returns a dictionary of the tx id or error code
+        */
+        //#[async_ctx]    
+        //#[opt] &self,
+
         params: SuggestedTransactionParams,
         sender: Address,
         mnemonic : String,
         app_id: u64,
-        app_arguments: Option<String>, 
+        #[opt] _app_arguments: Option<String>, 
         
    
-    ) -> Result<(), Foo> { 
+    ) -> Dictionary { //Returns Opaque Type //Result<ExecuteResult, ServiceError> //Result<(), Foo>
 
        
     let mut atc = escrowFoo::new();  
@@ -344,35 +337,33 @@ impl Algodot {
 
     let mut _to_addr: [u8; 32] = escrowFoo::address_to_bytes(sender.to_string());//[0; 32];
 
-    let __app_id : u64 = 161737986 ;
+    //let __app_id : u64 = 161737986 ;
     let pages: u32 = 0;
     
-    godot_dbg!("retrieving suggested params");
-    //let params = self.algod.suggested_transaction_params().await.unwrap();
-    
-    //async get_params {
-    //    let params = self.algod.suggested_transaction_params().await.unwrap();
-    // }
+  
     //Txn Details As a Struct
-    let details = escrowFoo{ //OtherFoo::Foo { 
-            withdrw_amt : 0u32,//Foo::withdraw_amount(0u32),//BigUint::new(vec![0]),//BigUint { data: vec![0u64] },//BigUint = BigUint::new(vec![0]), 
+    let details = escrowFoo{  
+            withdrw_amt : 0u32,
             withdrw_to_addr: _to_addr.clone(), 
             arg1: escrowFoo::withdraw_amount(0u32), 
             arg2: escrowFoo::address(_to_addr),
-            _app_id: __app_id.clone(), 
-            _escrow_address: escrowFoo::app_address(&__app_id),//to_app_address(__app_id), 
-            atc: &atc };
+            _app_id: app_id.clone(),//__app_id.clone(), 
+            _escrow_address: escrowFoo::app_address(&app_id), 
+            atc: &atc 
+        };
 
-    //println!("{:?}", &details);
-    godot_dbg!(&details);
-            //Add method Call     
+    let k = params.into();
+
+
+    //godot_dbg!(" Params Debug: {}", &k);
+    
     atc.add_method_call( &mut AddMethodCallParams {
                     app_id: details._app_id,
                     method: abiFoo::withdraw(), //bar::Foo::withdraw() //for deposits //bar::Foo::deposit()
                     method_args: vec![details.arg1, details.arg2],
                     fee: escrowFoo::fee(2500),
                     sender: *sender,
-                    suggested_params: params.into(),//atc_params::get_params(&self).into(),//params.unwrap(),//suggested_transaction_params(),
+                    suggested_params: k,//params.into(),
                     on_complete: NoOp,
                     approval_program: None,
                     clear_program: None,
@@ -389,19 +380,45 @@ impl Algodot {
 
 
     atc.build_group().expect("Error");
-
-    let fut = async {
-        atc.execute(&self.algod).await.expect("Error");
-    };
-    //futures::executor::block_on(fut);
    
-    //Self::execute(&self, atc);
-    
-    //};//atc.execute(&self.algod);
-    //let status_str : &mut AtomicTransactionComposerStatus = &mut atc.status();
-    godot_dbg!("{}",stringify!(fut));
+    //Testnet
+    // Should ideally get initialization code from Algodot Type but 
+    // That would require editting the init variables to global variables with lifetimes
 
-    Ok(())
+    let url = String::from("https://node.testnet.algoexplorerapi.io");
+ 
+    let user = String::from("User-Agent");
+    let pass = String::from("DoYouLoveMe?");
+    let headers :  Vec<(&str, &str)> = vec![(&user, &pass)];
+    
+    let po =  Algod::with_headers(
+                   &url,
+                    headers,
+                ).unwrap();
+    
+    let result : ExecuteResult = atc.execute(&po).await.expect("Error");
+        // Returns an ExecuteResu;t
+        // Use a rust Enum for better programmability 
+    //escrowFoo::Execute(t,atc).await.unwrap().tx_ids.to_variant();
+
+        //atc
+    //};
+    //.await.expect("Error");
+
+    godot_dbg!(atc.status());
+
+    //Ok(())
+    // implement To and From Variant traits in ATC for Easy executing and Parsing
+    // implement traits for ExecuteResult and Service Error
+    // Parse ATC.build group() to .json
+    // Rewrite this method as async
+    // figure out async macro in core.rs
+    let dict = Dictionary::new();
+    dict.insert("confirmed round", result.confirmed_round);
+    dict.insert("tx_ids", result.tx_ids);
+    //dict.insert("status ", atc.status());
+    dict.into()
+
     }
 
 
