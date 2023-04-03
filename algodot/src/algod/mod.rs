@@ -17,7 +17,7 @@ use gdnative::tasks::{Async, AsyncMethod, Spawner};
 
 use std::rc::Rc;
 
-use algonaut::atomic_transaction_composer::{AtomicTransactionComposerStatus, 
+use algonaut::atomic_transaction_composer::{ //AtomicTransactionComposerStatus, 
 AddMethodCallParams //transaction_signer::TransactionSigner::BasicAccount, 
 };
 use algonaut::atomic_transaction_composer::ExecuteResult;
@@ -360,14 +360,12 @@ impl Algodot {
         */
         //#[async_ctx]    
         //#[opt] &self,
-        //&self, 
-        //#[base] _owner: &Node,
-        //algod : Algodot,
+
         params: SuggestedTransactionParams,
         sender: Address,
         mnemonic : String,
         app_id: u64,
-        app_arguments: Option<String>, 
+        #[opt] _app_arguments: Option<String>, 
         
    
     ) -> Dictionary { //Returns Opaque Type //Result<ExecuteResult, ServiceError> //Result<(), Foo>
@@ -398,7 +396,7 @@ impl Algodot {
 
 
     //godot_dbg!(" Params Debug: {}", &k);
-        //Add method Call     
+    
     atc.add_method_call( &mut AddMethodCallParams {
                     app_id: details._app_id,
                     method: abiFoo::withdraw(), //bar::Foo::withdraw() //for deposits //bar::Foo::deposit()

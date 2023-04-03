@@ -110,7 +110,7 @@ impl ToVariant for MySuggestedTransactionParams {
         dict.insert("consensus_version", &self.consensus_version);
         dict.insert("min_fee", self.min_fee.0);
         dict.insert("fee_per_byte", self.fee_per_byte.0);
-        dict.insert("genesis_hash", ByteArray::from_slice(&self.genesis_hash.0));
+        dict.insert("genesis_hash", PoolArray::<u8>::from_slice(&self.genesis_hash.0));
         dict.owned_to_variant()
     }
 }
@@ -161,14 +161,13 @@ pub struct MyTransaction(pub Transaction);
 
 impl ToVariant for MyTransaction {
 
-    //Implements into() method for algodot::core mod rs.
-    //bugs out on gdnative 11
+
 
     fn to_variant(&self) -> Variant {
         let dict = Dictionary::new();
         dict.insert("fee", self.fee.0);
         dict.insert("fv", self.first_valid.0);
-        dict.insert("gh", ByteArray::from_slice(&self.genesis_hash.0));
+        dict.insert("gh", PoolArray::<u8>::from_slice(&self.genesis_hash.0));
         dict.insert("lv", self.last_valid.0);
         dict.insert(
             "type",
@@ -250,7 +249,7 @@ impl ToVariant for MyTransaction {
                     //Creates a Txn Dictionary for Signing the App Call Txn
 
                     //creates a Byte Array from app_arg
-                    let q: ByteArray = get_byte_array(appl.app_arguments.as_ref().unwrap().clone())
+                    let q: PoolArray<u8> = get_byte_array(appl.app_arguments.as_ref().unwrap().clone())
                         .unwrap_or_default();
                     dict.insert("app_id", appl.app_id);
                     dict.insert("app_arg", q);
@@ -267,13 +266,13 @@ impl ToVariant for MyTransaction {
             dict.insert("gen", gen);
         }
         if let Some(grp) = &self.group {
-            dict.insert("grp", ByteArray::from_slice(&grp.0));
+            dict.insert("grp", PoolArray::<u8>::from_slice(&grp.0));
         }
         if let Some(lx) = &self.lease {
-            dict.insert("lx", ByteArray::from_slice(&lx.0));
+            dict.insert("lx", PoolArray::<u8>::from_slice(&lx.0));
         }
         if let Some(note) = &self.note {
-            dict.insert("note", ByteArray::from_slice(note.as_slice()));
+            dict.insert("note", PoolArray::<u8>::from_slice(note.as_slice()));
         }
         if let Some(rekey) = self.rekey_to {
             dict.insert("rekey", MyAddress::from(rekey));
@@ -324,7 +323,7 @@ impl ToVariant for MySignedTransaction {
         let dict = Dictionary::new();
         dict.insert("txn", MyTransaction::from(self.transaction.clone()));
         match self.sig {
-            TransactionSignature::Single(sig) => dict.insert("sig", ByteArray::from_slice(&sig.0)),
+            TransactionSignature::Single(sig) => dict.insert("sig", PoolArray::<u8>::from_slice(&sig.0)),
             TransactionSignature::Multi(_) => todo!(),
             TransactionSignature::Logic(_) => todo!(),
         }
@@ -414,7 +413,7 @@ fn get_hash_digest(
     let byte_array = get_field(dict, field_name)?;
 
     let byte_array = byte_array
-        .to::<ByteArray>()
+        .to::<PoolArray<u8>>()
         .ok_or(FromVariantError::InvalidField {
             field_name,
             error: Box::new(FromVariantError::Custom("must be byte array".to_string())),
@@ -523,7 +522,7 @@ fn get_dict(dict: &Dictionary, field_name: &'static str) -> Result<Dictionary, F
 fn get_vec_u8(dict: &Dictionary, field_name: &'static str) -> Result<Vec<u8>, FromVariantError> {
     let var = get_field(dict, field_name)?;
     let byte_array = var
-        .to::<ByteArray>()
+        .to::<PoolArray<u8>>()
         .ok_or(FromVariantError::InvalidField {
             field_name,
             error: Box::new(FromVariantError::InvalidVariantType {
@@ -537,8 +536,8 @@ fn get_vec_u8(dict: &Dictionary, field_name: &'static str) -> Result<Vec<u8>, Fr
 
 //converts a <Vec<Vec<u8>>> to u8
 #[allow(dead_code)]
-fn get_byte_array(vector: Vec<Vec<u8>>) -> Result<ByteArray, FromVariantError> {
-    let byte_array = ByteArray::from_vec(vector.into_iter().next().unwrap_or_default());
+fn get_byte_array(vector: Vec<Vec<u8>>) -> Result<PoolArray<u8>, FromVariantError> {
+    let byte_array = PoolArray::<u8>::from_vec(vector.into_iter().next().unwrap_or_default());
     Ok(byte_array)
 }
 
