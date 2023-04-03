@@ -344,7 +344,7 @@ impl Algodot {
     let details = escrowFoo{  
             withdrw_amt : 0u32,
             withdrw_to_addr: _to_addr.clone(), 
-            arg1: escrowFoo::withdraw_amount(0u32), 
+            arg1: escrowFoo::withdraw_amount(5000u32), 
             arg2: escrowFoo::address(_to_addr),
             _app_id: app_id.clone(),//__app_id.clone(), 
             _escrow_address: escrowFoo::app_address(&app_id), 
