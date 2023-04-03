@@ -94,7 +94,7 @@ impl MyAccount {
     }
 }
 
-#[derive(Deref, DerefMut, From)]
+#[derive(Deref, DerefMut, From, Clone)]
 pub struct MySuggestedTransactionParams(SuggestedTransactionParams);
 
 //used when constructing To a variant
