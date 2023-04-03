@@ -5,7 +5,6 @@ use tokio::{
 };
 
 // https://godot-rust.github.io/book/recipes/async-tokio.html
-mod algod;
 
 thread_local! {
     static EXECUTOR: &'static SharedLocalPool = {
@@ -67,7 +66,6 @@ fn init(handle: InitHandle) {
     gdnative::tasks::register_runtime(&handle);
     gdnative::tasks::set_executor(EXECUTOR.with(|e| *e));
 
-    handle.add_class::<algod::Algodot>();
     handle.add_class::<AsyncExecutorDriver>();
 }
 
