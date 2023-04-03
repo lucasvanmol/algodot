@@ -25,11 +25,11 @@ use algonaut::atomic_transaction_composer::ExecuteResult;
 use algonaut::atomic_transaction_composer::AtomicTransactionComposer;
 //use algodot_core::Account;
 use algonaut::transaction::transaction::ApplicationCallOnComplete::NoOp;
-
+//use algonaut::error::ServiceError;
 //use std::ops::Deref;
+use gdnative::tasks::Context;
 
-
-#[derive(NativeClass)]
+#[derive(NativeClass, Clone)]
 #[inherit(Node)]
 #[register_with(Self::register)]
 pub struct Algodot {
@@ -115,9 +115,10 @@ impl Algodot {
     }
     */    
 
+
 }
 
-
+/*
 impl Clone for Algodot {
     fn clone(&self) -> Self {
         Self {
@@ -128,6 +129,18 @@ impl Clone for Algodot {
         }
     }
 }
+
+
+impl FromVariant for Algodot{
+    fn from_variant(variant: &Variant) -> Variant {
+        let t =Variant::new("sdsdg");
+        t
+    }
+
+  
+}
+
+*/
 
 
 #[methods]
@@ -337,12 +350,19 @@ impl Algodot {
     }
 
 
-    #[method]
+    #[method(async)]
     #[allow(clippy::too_many_arguments)]
-    fn construct_atc(
-        /* Atomic Transaction Composer*/
-        &self,
-        #[base] _base: &Node,
+    async fn construct_atc(
+        /* 
+        Atomic Transaction Composer
+        
+        An exported async method that returns a dictionary of the tx id or error code
+        */
+        //#[async_ctx]    
+        //#[opt] &self,
+        //&self, 
+        //#[base] _owner: &Node,
+        //algod : Algodot,
         params: SuggestedTransactionParams,
         sender: Address,
         mnemonic : String,
@@ -350,7 +370,7 @@ impl Algodot {
         app_arguments: Option<String>, 
         
    
-    ) -> Result<(), Foo> { 
+    ) -> Dictionary { //Returns Opaque Type //Result<ExecuteResult, ServiceError> //Result<(), Foo>
 
        
     let mut atc = escrowFoo::new();  
@@ -374,7 +394,7 @@ impl Algodot {
             atc: &atc 
         };
 
-        let k = params.into();
+    let k = params.into();
 
 
     //godot_dbg!(" Params Debug: {}", &k);
@@ -402,18 +422,46 @@ impl Algodot {
 
 
     atc.build_group().expect("Error");
-    
-    //godot_dbg!("{}", &atc);
-    //Self::execute(self.algod.clone(),atc);
-    
-    //godot_dbg!("Async Method Run--->");
-    let _ = async {
-        atc.execute(&self.algod.clone()).await.expect("Error");
-        godot_dbg!("{}",atc)
-    };
+   
+    godot_dbg!("{}", &atc);
 
+    //let t = &self.algod.clone();
+    //escrowFoo::Execute(&self.algod.clone(),atc); //works
+     
+    //Testnet
+    // Should ideally get initialization code from Algodot Type but 
+    //That would require editting the init variables to global variables with lifetimes
+
+    let url = String::from("https://node.testnet.algoexplorerapi.io");
+ 
+    let user = String::from("User-Agent");
+    let pass = String::from("DoYouLoveMe?");
+    let headers :  Vec<(&str, &str)> = vec![(&user, &pass)];
     
-    Ok(())
+    let po =  Algod::with_headers(
+                   &url,
+                    headers,
+                ).unwrap();
+    
+    atc.execute(&po).await.expect("Error");
+        // Returns an ExecuteResu;t
+        // Use a rust Enum for better programmability 
+    //escrowFoo::Execute(t,atc).await.unwrap().tx_ids.to_variant();
+
+        //atc
+    //};
+    //.await.expect("Error");
+
+    godot_dbg!(atc.status());
+
+    //Ok(())
+    // implement To and From Variant traits in ATC for Easy executing and Parsing
+    // implement traits for ExecuteResult and Service Error
+    // Parse ATC.build group() to .json
+    // Rewrite this method as async
+    // figure out async macro in core.rs
+    let dict = Dictionary::new();
+    dict.into()
 
     }
 
