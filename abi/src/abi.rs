@@ -206,6 +206,7 @@ pub mod escrow {
     use gdnative::core_types::Variant;
     use gdnative::prelude::OwnedToVariant;
 
+    #[allow(clippy::too_many_arguments)]
     #[derive(Debug, Clone)]
     pub struct Foo<'a> {
         pub withdrw_amt: u32,
