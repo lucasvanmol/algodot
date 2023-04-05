@@ -188,6 +188,7 @@ pub mod escrow {
     use algonaut::transaction::{account::Account, transaction::Payment};
 
     use std::convert::TryInto;
+    use std::str::FromStr;
 
     use algonaut::atomic_transaction_composer::transaction_signer::TransactionSigner::BasicAccount;
     use algonaut::atomic_transaction_composer::AbiMethodResult;
@@ -385,10 +386,22 @@ pub mod escrow {
             AtomicTransactionComposer::default()
         }
 
+        pub fn address_to_address(s: &str) -> OtherAddress {
+            /*
+            Constructs a 32 Bit Byte Slice froma Given Address String
+            */
+            let mut _to_addr = OtherAddress::from_str(s).unwrap();
+
+            //let mut _to_addr: [u8; 32] = [0; 32];
+            //_to_addr.copy_from_slice(&addr.as_bytes()[..32]);
+            _to_addr
+        }
+
         pub fn address_to_bytes(addr: String) -> [u8; 32] {
             /*
             Constructs a 32 Bit Byte Slice froma Given Address String
             */
+
             let mut _to_addr: [u8; 32] = [0; 32];
             _to_addr.copy_from_slice(&addr.as_bytes()[..32]);
             _to_addr

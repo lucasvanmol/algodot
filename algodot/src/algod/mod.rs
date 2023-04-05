@@ -4,7 +4,7 @@ use algodot_abi::escrow::Foo as escrowFoo;
 use algodot_core::*;
 use algodot_macros::*;
 use algonaut::algod::v2::Algod;
-use algonaut::core::{MicroAlgos, Round};
+use algonaut::core::{Address as OtherAddress, MicroAlgos, Round};
 use algonaut::model::algod::v2::{PendingTransaction, TransactionResponse};
 use algonaut::transaction::transaction::{
     ApplicationCallOnComplete::NoOp, AssetAcceptTransaction, AssetConfigurationTransaction,
@@ -318,9 +318,10 @@ impl Algodot {
 
         let mut atc = escrowFoo::new_atc();
 
-        let mut _to_addr: [u8; 32] = Address.to_bytes(); //escrowFoo::address_to_bytes(sender.to_string()); //[0; 32];
+        //let mut _to_addr: [u8; 32] = escrowFoo::address_to_bytes(sender.to_string()); //[0; 32];
 
-        //let __app_id : u64 = 161737986 ;
+        let mut _to_addr: Address = Account::from_mnemonic(&mnemonic).address(); //escrowFoo::address_to_address(&receiver);
+                                                                                 //let __app_id : u64 = 161737986 ;
         let pages: u32 = 0;
 
         //Txn Details As a Struct
@@ -328,7 +329,7 @@ impl Algodot {
             withdrw_amt: 0u32,
             withdrw_to_addr: _to_addr.clone(),
             arg1: escrowFoo::withdraw_amount(5000u32),
-            arg2: escrowFoo::address(_to_addr),
+            arg2: _to_addr,          //escrowFoo::address(_to_addr),
             _app_id: app_id.clone(), //__app_id.clone(),
             _escrow_address: escrowFoo::app_address(&app_id),
             atc: &atc,
@@ -369,18 +370,8 @@ impl Algodot {
         let user = String::from("User-Agent");
         let pass = String::from("DoYouLoveMe?");
         let headers: Vec<(&str, &str)> = vec![(&user, &pass)];
-
         let po = Algod::with_headers(&url, headers).unwrap();
-
         let result: ExecuteResult = atc.execute(&po).await.expect("Error");
-        // Returns an ExecuteResu;t
-        // Use a rust Enum for better programmability
-        //escrowFoo::Execute(t,atc).await.unwrap().tx_ids.to_variant();
-
-        //atc
-        //};
-        //.await.expect("Error");
-
         godot_dbg!(atc.status());
 
         //Ok(())
