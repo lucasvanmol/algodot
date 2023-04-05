@@ -75,6 +75,10 @@ impl ToVariant for MyAddress {
     fn to_variant(&self) -> Variant {
         (*self).to_string().to_variant()
     }
+
+    fn to_bytes(&self) -> PoolArray<[u8; 32]> {
+        PoolArray::<u8>::from(&self)
+    }
 }
 
 #[derive(Deref, DerefMut, From)]

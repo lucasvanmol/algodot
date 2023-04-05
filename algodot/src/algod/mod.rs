@@ -1,25 +1,24 @@
 //use algodot_abi::abi_smartcontract::*;
-use algodot_abi::escrow::Foo as escrowFoo;
 use algodot_abi::abi_smartcontract::Foo as abiFoo;
+use algodot_abi::escrow::Foo as escrowFoo;
 use algodot_core::*;
 use algodot_macros::*;
 use algonaut::algod::v2::Algod;
 use algonaut::core::{MicroAlgos, Round};
 use algonaut::model::algod::v2::{PendingTransaction, TransactionResponse};
 use algonaut::transaction::transaction::{
-    AssetAcceptTransaction,    AssetConfigurationTransaction, AssetParams, AssetTransferTransaction,
-    ApplicationCallOnComplete::NoOp,
+    ApplicationCallOnComplete::NoOp, AssetAcceptTransaction, AssetConfigurationTransaction,
+    AssetParams, AssetTransferTransaction,
 };
 use algonaut::transaction::tx_group::TxGroup;
-use algonaut::transaction::{Pay, TransactionType, TxnBuilder, builder::CallApplication, };
+use algonaut::transaction::{builder::CallApplication, Pay, TransactionType, TxnBuilder};
 use gdnative::api::Engine;
 use gdnative::prelude::*;
 use gdnative::tasks::{Async, AsyncMethod, Spawner};
 
 use std::rc::Rc;
 
-use algonaut::atomic_transaction_composer::{ AddMethodCallParams, ExecuteResult};
-
+use algonaut::atomic_transaction_composer::{AddMethodCallParams, ExecuteResult};
 
 #[derive(NativeClass, Clone)]
 #[inherit(Node)]
@@ -37,7 +36,6 @@ pub struct Algodot {
     algod: Rc<Algod>,
 }
 
-
 impl Algodot {
     fn new(_base: &Node) -> Self {
         Algodot {
@@ -49,7 +47,7 @@ impl Algodot {
             // leave these default values here for now
             algod: Rc::new(
                 Algod::new(
-                   "http://localhost:4001",
+                    "http://localhost:4001",
                     "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                 )
                 .unwrap(),
@@ -95,12 +93,8 @@ impl Algodot {
             }
             round += 1;
         }
-    }  
-
-
+    }
 }
-
-
 
 #[methods]
 impl Algodot {
@@ -283,7 +277,6 @@ impl Algodot {
         .into()
     }
 
-    
     #[method]
     #[allow(clippy::too_many_arguments)]
     fn construct_app_call(
@@ -292,135 +285,116 @@ impl Algodot {
         params: SuggestedTransactionParams,
         sender: Address,
         app_id: u64,
-        #[opt] app_arguments: Option<String>, 
-        
-   
-    ) -> Transaction { 
-
+        #[opt] app_arguments: Option<String>,
+    ) -> Transaction {
         TxnBuilder::with(
             &params,
             CallApplication::new(*sender, app_id)
-                .app_arguments( vec![app_arguments.expect("REASON").into_bytes()])
+                .app_arguments(vec![app_arguments.expect("REASON").into_bytes()])
                 .build(),
-            )
-            .build()
-            .unwrap()
-            .into()
+        )
+        .build()
+        .unwrap()
+        .into()
     }
-
 
     #[method(async)]
     #[allow(clippy::too_many_arguments)]
     async fn construct_atc(
-        /* 
+        /*
         Atomic Transaction Composer
-        
+
         An exported async method that returns a dictionary of the tx id or error code
         */
-        //#[async_ctx]    
+        //#[async_ctx]
         //#[opt] &self,
-
         params: SuggestedTransactionParams,
         sender: Address,
-        mnemonic : String,
+        mnemonic: String,
         app_id: u64,
-        #[opt] _app_arguments: Option<String>, 
-        
-   
-    ) -> Dictionary { //Returns Opaque Type //Result<ExecuteResult, ServiceError> //Result<(), Foo>
+        #[opt] _app_arguments: Option<String>,
+    ) -> Dictionary {
+        //Returns Opaque Type //Result<ExecuteResult, ServiceError> //Result<(), Foo>
 
-       
-    let mut atc = escrowFoo::new_atc();  
+        let mut atc = escrowFoo::new_atc();
 
+        let mut _to_addr: [u8; 32] = Address.to_bytes();//escrowFoo::address_to_bytes(sender.to_string()); //[0; 32];
 
+        //let __app_id : u64 = 161737986 ;
+        let pages: u32 = 0;
 
-    let mut _to_addr: [u8; 32] = escrowFoo::address_to_bytes(sender.to_string());//[0; 32];
-
-    //let __app_id : u64 = 161737986 ;
-    let pages: u32 = 0;
-    
-  
-    //Txn Details As a Struct
-    let details = escrowFoo{  
-            withdrw_amt : 0u32,
-            withdrw_to_addr: _to_addr.clone(), 
-            arg1: escrowFoo::withdraw_amount(5000u32), 
+        //Txn Details As a Struct
+        let details = escrowFoo {
+            withdrw_amt: 0u32,
+            withdrw_to_addr: _to_addr.clone(),
+            arg1: escrowFoo::withdraw_amount(5000u32),
             arg2: escrowFoo::address(_to_addr),
-            _app_id: app_id.clone(),//__app_id.clone(), 
-            _escrow_address: escrowFoo::app_address(&app_id), 
-            atc: &atc 
+            _app_id: app_id.clone(), //__app_id.clone(),
+            _escrow_address: escrowFoo::app_address(&app_id),
+            atc: &atc,
         };
 
-    let k = params.into();
+        let k = params.into();
 
+        //godot_dbg!(" Params Debug: {}", &k);
 
-    //godot_dbg!(" Params Debug: {}", &k);
-    
-    atc.add_method_call( &mut AddMethodCallParams {
-                    app_id: details._app_id,
-                    method: abiFoo::withdraw(), //bar::Foo::withdraw() //for deposits //bar::Foo::deposit()
-                    method_args: vec![details.arg1, details.arg2],
-                    fee: escrowFoo::fee(2500),
-                    sender: *sender,
-                    suggested_params: k,//params.into(),
-                    on_complete: NoOp,
-                    approval_program: None,
-                    clear_program: None,
-                    global_schema: None,
-                    local_schema: None,
-                    extra_pages: pages,
-                    note: escrowFoo::note(0u32),//_note,
-                    lease: None,
-                    rekey_to: None,
-                    signer: escrowFoo::basic_account(&mnemonic)
-            
-        }
-    ).unwrap();
+        atc.add_method_call(&mut AddMethodCallParams {
+            app_id: details._app_id,
+            method: abiFoo::withdraw(), //bar::Foo::withdraw() //for deposits //bar::Foo::deposit()
+            method_args: vec![details.arg1, details.arg2],
+            fee: escrowFoo::fee(2500),
+            sender: *sender,
+            suggested_params: k, //params.into(),
+            on_complete: NoOp,
+            approval_program: None,
+            clear_program: None,
+            global_schema: None,
+            local_schema: None,
+            extra_pages: pages,
+            note: escrowFoo::note(0u32), //_note,
+            lease: None,
+            rekey_to: None,
+            signer: escrowFoo::basic_account(&mnemonic),
+        })
+        .unwrap();
 
+        atc.build_group().expect("Error");
 
-    atc.build_group().expect("Error");
-   
-    //Testnet
-    // Should ideally get initialization code from Algodot Type but 
-    // That would require editting the init variables to global variables with lifetimes
+        //Testnet
+        // Should ideally get initialization code from Algodot Type but
+        // That would require editting the init variables to global variables with lifetimes
 
-    let url = String::from("https://node.testnet.algoexplorerapi.io");
- 
-    let user = String::from("User-Agent");
-    let pass = String::from("DoYouLoveMe?");
-    let headers :  Vec<(&str, &str)> = vec![(&user, &pass)];
-    
-    let po =  Algod::with_headers(
-                   &url,
-                    headers,
-                ).unwrap();
-    
-    let result : ExecuteResult = atc.execute(&po).await.expect("Error");
+        let url = String::from("https://node.testnet.algoexplorerapi.io");
+
+        let user = String::from("User-Agent");
+        let pass = String::from("DoYouLoveMe?");
+        let headers: Vec<(&str, &str)> = vec![(&user, &pass)];
+
+        let po = Algod::with_headers(&url, headers).unwrap();
+
+        let result: ExecuteResult = atc.execute(&po).await.expect("Error");
         // Returns an ExecuteResu;t
-        // Use a rust Enum for better programmability 
-    //escrowFoo::Execute(t,atc).await.unwrap().tx_ids.to_variant();
+        // Use a rust Enum for better programmability
+        //escrowFoo::Execute(t,atc).await.unwrap().tx_ids.to_variant();
 
         //atc
-    //};
-    //.await.expect("Error");
+        //};
+        //.await.expect("Error");
 
-    godot_dbg!(atc.status());
+        godot_dbg!(atc.status());
 
-    //Ok(())
-    // implement To and From Variant traits in ATC for Easy executing and Parsing
-    // implement traits for ExecuteResult and Service Error
-    // Parse ATC.build group() to .json
-    // Rewrite this method as async
-    // figure out async macro in core.rs
-    let dict = Dictionary::new();
-    dict.insert("confirmed round", result.confirmed_round);
-    dict.insert("tx_ids", result.tx_ids);
-    //dict.insert("status ", atc.status());
-    dict.into()
-
+        //Ok(())
+        // implement To and From Variant traits in ATC for Easy executing and Parsing
+        // implement traits for ExecuteResult and Service Error
+        // Parse ATC.build group() to .json
+        // Rewrite this method as async
+        // figure out async macro in core.rs
+        let dict = Dictionary::new();
+        dict.insert("confirmed round", result.confirmed_round);
+        dict.insert("tx_ids", result.tx_ids);
+        //dict.insert("status ", atc.status());
+        dict.into()
     }
-
-
 
     #[method]
     fn construct_asset_opt_in(
