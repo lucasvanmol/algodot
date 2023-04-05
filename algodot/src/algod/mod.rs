@@ -318,7 +318,7 @@ impl Algodot {
 
         let mut atc = escrowFoo::new_atc();
 
-        let mut _to_addr: [u8; 32] = Address.to_bytes();//escrowFoo::address_to_bytes(sender.to_string()); //[0; 32];
+        let mut _to_addr: [u8; 32] = Address.to_bytes(); //escrowFoo::address_to_bytes(sender.to_string()); //[0; 32];
 
         //let __app_id : u64 = 161737986 ;
         let pages: u32 = 0;
