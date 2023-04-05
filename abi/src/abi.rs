@@ -390,11 +390,10 @@ pub mod escrow {
             /*
             Constructs a 32 Bit Byte Slice froma Given Address String
             */
-            let mut _to_addr = OtherAddress::from_str(s).unwrap();
+            OtherAddress::from_str(s).unwrap()
 
             //let mut _to_addr: [u8; 32] = [0; 32];
             //_to_addr.copy_from_slice(&addr.as_bytes()[..32]);
-            _to_addr
         }
 
         pub fn address_to_bytes(addr: String) -> [u8; 32] {
