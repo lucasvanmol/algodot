@@ -408,11 +408,9 @@ pub mod escrow {
 
         //let arg2: AbiArgValue = AbiArgValue::AbiValue(algonaut_abi::abi_type::AbiValue::Address(OtherAddress::new(withdrw_to_addr)));
 
-        pub fn address(addr: [u8; 32]) -> AbiArgValue {
+        pub fn address(addr: OtherAddress) -> AbiArgValue {
             /* Returns an Address abi value from an Address as [u8,32]*/
-            AbiArgValue::AbiValue(algonaut::abi::abi_type::AbiValue::Address(
-                OtherAddress::new(addr),
-            ))
+            AbiArgValue::AbiValue(algonaut::abi::abi_type::AbiValue::Address(addr))
         }
 
         pub fn basic_account(
