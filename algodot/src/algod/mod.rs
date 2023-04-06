@@ -367,7 +367,7 @@ impl Algodot {
 
         atc.build_group().expect("Error");
 
-        godot_dbg!(" ATC Debug: {}", &atc);
+        //godot_dbg!(" ATC Debug: {}", &atc);
 
         //Testnet
         // Should ideally get initialization code from Algodot Type but
@@ -392,7 +392,7 @@ impl Algodot {
         dict.insert("confirmed round", result.confirmed_round);
         dict.insert("tx_ids", result.tx_ids);
         //dict.insert("status ", atc.status());
-        dict.into()
+        dict
     }
 
     #[method]
