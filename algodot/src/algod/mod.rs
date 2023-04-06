@@ -333,10 +333,10 @@ impl Algodot {
         //Txn Details As a Struct
         let details = escrowFoo {
             withdrw_amt: 0u32,
-            withdrw_to_addr: _to_addr.clone(),
+            withdrw_to_addr: _to_addr,
             arg1: escrowFoo::withdraw_amount(5000u32),
             arg2: escrowFoo::address(_to_addr),
-            _app_id: app_id.clone(), //__app_id.clone(),
+            _app_id: app_id, //__app_id.clone(),
             _escrow_address: escrowFoo::app_address(&app_id),
             atc: &atc,
         };
