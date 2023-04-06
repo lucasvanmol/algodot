@@ -392,7 +392,7 @@ impl Algodot {
         dict.insert("confirmed round", result.confirmed_round);
         dict.insert("tx_ids", result.tx_ids);
         //dict.insert("status ", atc.status());
-        dict
+        dict.into()
     }
 
     #[method]
