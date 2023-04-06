@@ -4,14 +4,16 @@ use algodot_abi::escrow::Foo as escrowFoo;
 use algodot_core::*;
 use algodot_macros::*;
 use algonaut::algod::v2::Algod;
-use algonaut::core::{Address as OtherAddress, MicroAlgos, Round};
+use algonaut::core::{MicroAlgos, Round}; //Address as OtherAddress,
 use algonaut::model::algod::v2::{PendingTransaction, TransactionResponse};
 use algonaut::transaction::transaction::{
     ApplicationCallOnComplete::NoOp, AssetAcceptTransaction, AssetConfigurationTransaction,
     AssetParams, AssetTransferTransaction,
 };
 use algonaut::transaction::tx_group::TxGroup;
-use algonaut::transaction::{builder::CallApplication, Pay, TransactionType, TxnBuilder};
+use algonaut::transaction::{
+    account::Account as OtherAccount, builder::CallApplication, Pay, TransactionType, TxnBuilder,
+};
 use gdnative::api::Engine;
 use gdnative::prelude::*;
 use gdnative::tasks::{Async, AsyncMethod, Spawner};
@@ -320,8 +322,12 @@ impl Algodot {
 
         //let mut _to_addr: [u8; 32] = escrowFoo::address_to_bytes(sender.to_string()); //[0; 32];
 
-        let mut _to_addr: Address = Account::from_mnemonic(&mnemonic).address(); //escrowFoo::address_to_address(&receiver);
-                                                                                 //let __app_id : u64 = 161737986 ;
+        let _acct: OtherAccount = OtherAccount::from_mnemonic(&mnemonic).unwrap();
+        let _addr_as_string: String = _acct.address().to_string();
+
+        let mut _to_addr: [u8; 32] = escrowFoo::address_to_bytes(_addr_as_string);
+        //escrowFoo::address_to_address(&receiver);
+        //let __app_id : u64 = 161737986 ;
         let pages: u32 = 0;
 
         //Txn Details As a Struct
@@ -329,7 +335,7 @@ impl Algodot {
             withdrw_amt: 0u32,
             withdrw_to_addr: _to_addr.clone(),
             arg1: escrowFoo::withdraw_amount(5000u32),
-            arg2: _to_addr,          //escrowFoo::address(_to_addr),
+            arg2: escrowFoo::address(_to_addr),
             _app_id: app_id.clone(), //__app_id.clone(),
             _escrow_address: escrowFoo::app_address(&app_id),
             atc: &atc,
@@ -360,6 +366,8 @@ impl Algodot {
         .unwrap();
 
         atc.build_group().expect("Error");
+
+        godot_dbg!(" ATC Debug: {}", &atc);
 
         //Testnet
         // Should ideally get initialization code from Algodot Type but
