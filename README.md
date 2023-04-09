@@ -1,5 +1,5 @@
 # Algodot
-Algorand integration in Godot.
+Algorand integration in Godot 3.5* GDnative.
 
 
 ## Download the addon
